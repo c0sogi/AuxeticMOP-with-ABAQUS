@@ -1,7 +1,7 @@
 # AuxeticMOP
 This code is currently in development!
 I am using Abaqus CAE software to research the optimal properties of an Auxetic cell.
-These codes are used to generate data about n*n*n cell topology to be input into Abaqus, and to derive results by running it with Abaqus.
+These codes are used to generate data about 3D cell topology to be input into Abaqus, and to derive results by running it with Abaqus.
 
 Firstly, In main.py, main process makes a gui_process, parent_conn, child_conn by calling class App from GraphicUserInterface.py.
 The class App is what we are going to put parameters into main process & abaqus, and retreive plotting data from results(pareto front of fitness values, hypervolume).
