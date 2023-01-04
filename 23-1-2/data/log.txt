@@ -1,0 +1,22 @@
+[2022/12/31 20:48:35][Gen1 offspring1] Complete
+[2022/12/31 20:48:59][Gen1 offspring2] Complete
+[2022/12/31 20:49:20][Gen1 offspring3] Complete
+[2022/12/31 20:49:46][Gen1 offspring4] Complete
+[2022/12/31 20:50:12][Gen1 offspring5] Complete
+[2022/12/31 20:50:34][Gen1 offspring6] Complete
+[2022/12/31 20:50:56][Gen1 offspring7] Complete
+[2022/12/31 20:51:18][Gen1 offspring8] Complete
+[2022/12/31 20:51:41][Gen1 offspring9] Complete
+[2022/12/31 20:52:01][Gen1 offspring10] Complete
+[2023/01/01 20:33:19][Gen1 offspring1/10] Complete
+[2023/01/01 20:52:53][Gen1: 1 / 10 (0.00%)] Complete
+[2023/01/01 20:53:07][Gen1: 2 / 10 (0.00%)] Complete
+[2023/01/01 20:53:19][Gen1: 3 / 10 (0.00%)] Complete
+[2023/01/01 20:53:33][Gen1: 4 / 10 (0.00%)] Complete
+[2023/01/01 20:53:47][Gen1: 5 / 10 (0.00%)] Complete
+[2023/01/01 20:54:02][Gen1: 6 / 10 (0.00%)] Complete
+[2023/01/01 20:54:17][Gen1: 7 / 10 (0.00%)] Complete
+[2023/01/01 20:54:30][Gen1: 8 / 10 (0.00%)] Complete
+[2023/01/01 20:54:45][Gen1: 9 / 10 (0.00%)] Complete
+[2023/01/01 20:55:00][Gen1: 10 / 10 (100.00%)] Complete
+[2023/01/01 20:55:00][Gen1] All current generation work done!

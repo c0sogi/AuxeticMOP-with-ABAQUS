@@ -1,0 +1,43 @@
+<Description>
+   ABAQUS/ABQcaeK rank 0 received the INTERRUPT signal
+
+</Description>
+
+<Context>
+   CAE
+</Context>
+
+<Callstack>
+  1)  ABQSMABasShared.dll         ExceptCallback1                         
+  2)  ucrtbase.dll                perror                                  
+  3)  KERNELBASE.dll              CtrlRoutine                             
+  4)  KERNEL32.DLL                BaseThreadInitThunk                     
+  5)  ntdll.dll                   RtlUserThreadStart                      
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Available>          4 GB </Available>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          24 GB </Size>
+       <Used>          19 GB </Used>
+       <Free>           5 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\dcas\PythonCodes\Coop\pythoncode\23-1-2\data </current> <free>    202 GB </free>   <used>    727 GB </used> 
+     <temp> C:\Users\dcas\AppData\Local\Temp </temp>    <free>    202 GB </free>
+</Directories>
+
+<Installation>
+     <Version> Learning Edition 2022 2022 HF2 </Version>
+       <Build> 2022_03_21-21.37.34 176360 </Build>
+</Installation>
+

@@ -1,0 +1,90 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(0.0, 0.0), 
+    point2=(3.0, 3.0))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Part-1', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Part-1'].BaseSolidExtrude(depth=3.0, sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-1', part=
+    mdb.models['Model-1'].parts['Part-1'])
+mdb.models['Model-1'].rootAssembly.LinearInstancePattern(direction1=(1.0, 0.0, 
+    0.0), direction2=(0.0, 1.0, 0.0), instanceList=('Part-1', ), number1=29, 
+    number2=1, spacing1=0.0, spacing2=0.0)
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1', ), vector=
+    (0.0, 0.0, 9.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-2-1', ), 
+    vector=(0.0, 0.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-3-1', ), 
+    vector=(0.0, 3.0, 9.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-4-1', ), 
+    vector=(0.0, 3.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-5-1', ), 
+    vector=(0.0, 6.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-6-1', ), 
+    vector=(0.0, 9.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-7-1', ), 
+    vector=(0.0, 12.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-8-1', ), 
+    vector=(3.0, 0.0, 9.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-9-1', ), 
+    vector=(3.0, 0.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-10-1', )
+    , vector=(3.0, 3.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-11-1', )
+    , vector=(3.0, 9.0, 9.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-12-1', )
+    , vector=(3.0, 9.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-13-1', )
+    , vector=(3.0, 12.0, 0.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-14-1', )
+    , vector=(3.0, 12.0, 3.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-15-1', )
+    , vector=(3.0, 12.0, 6.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-16-1', )
+    , vector=(3.0, 12.0, 9.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-17-1', )
+    , vector=(3.0, 12.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-18-1', )
+    , vector=(6.0, 12.0, 0.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-19-1', )
+    , vector=(6.0, 12.0, 3.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-20-1', )
+    , vector=(6.0, 12.0, 6.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-21-1', )
+    , vector=(6.0, 12.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-22-1', )
+    , vector=(9.0, 12.0, 0.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-23-1', )
+    , vector=(9.0, 12.0, 3.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-24-1', )
+    , vector=(9.0, 12.0, 6.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-25-1', )
+    , vector=(9.0, 12.0, 12.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-26-1', )
+    , vector=(12.0, 12.0, 3.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-27-1', )
+    , vector=(12.0, 12.0, 6.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-28-1', )
+    , vector=(12.0, 12.0, 9.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-lin-29-1', )
+    , vector=(12.0, 12.0, 12.0))
+mdb.models['Model-1'].rootAssembly.InstanceFromBooleanMerge(domain=GEOMETRY, 
+    instances=[mdb.models['Model-1'].rootAssembly.instances['Part-1']], 
+    keepIntersections=ON, name='Merge-2', originalInstances=SUPPRESS)
+#* At least two instances must be selected for merging geometry.

@@ -1,0 +1,473 @@
+Begin Testing...
+
+
+<<<<<<<<<< Offspring 1 >>>>>>>>>>
+[Warning] Timeout due to too much long validation time.
+> Total random voxel additions:  0
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 2 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  0
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 3 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much long validation time.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  0
+> Timeout count:  4
+
+<<<<<<<<<< Offspring 4 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  25
+> Timeout count:  2
+
+<<<<<<<<<< Offspring 5 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  23
+> Timeout count:  12
+
+<<<<<<<<<< Offspring 6 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  20
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 7 >>>>>>>>>>
+> Total random voxel additions:  14
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 8 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 9 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 10 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  37
+> Timeout count:  2
+
+<<<<<<<<<< Offspring 11 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  43
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 12 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  15
+> Timeout count:  2
+
+<<<<<<<<<< Offspring 13 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  24
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 14 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  46
+> Timeout count:  5
+
+<<<<<<<<<< Offspring 15 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  6
+> Timeout count:  2
+
+<<<<<<<<<< Offspring 16 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much long validation time.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  48
+> Timeout count:  4
+
+<<<<<<<<<< Offspring 17 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  43
+> Timeout count:  9
+
+<<<<<<<<<< Offspring 18 >>>>>>>>>>
+> Total random voxel additions:  13
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 19 >>>>>>>>>>
+> Total random voxel additions:  38
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 20 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  50
+> Timeout count:  3
+
+<<<<<<<<<< Offspring 21 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  44
+> Timeout count:  7
+
+<<<<<<<<<< Offspring 22 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 23 >>>>>>>>>>
+> Total random voxel additions:  36
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 24 >>>>>>>>>>
+> Total random voxel additions:  39
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 25 >>>>>>>>>>
+> Total random voxel additions:  18
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 26 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 27 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 28 >>>>>>>>>>
+> Total random voxel additions:  34
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 29 >>>>>>>>>>
+> Total random voxel additions:  27
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 30 >>>>>>>>>>
+> Total random voxel additions:  14
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 31 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 32 >>>>>>>>>>
+> Total random voxel additions:  41
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 33 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 34 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  40
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 35 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  16
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 36 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  0
+> Timeout count:  3
+
+<<<<<<<<<< Offspring 37 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 38 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 39 >>>>>>>>>>
+> Total random voxel additions:  14
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 40 >>>>>>>>>>
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+[Warning] Timeout due to too much random voxel additions.
+> Total random voxel additions:  33
+> Timeout count:  4
+
+<<<<<<<<<< Offspring 41 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 42 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 43 >>>>>>>>>>
+> Total random voxel additions:  9
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 44 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 45 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 46 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 47 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 48 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 49 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 50 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 51 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 52 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 53 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 54 >>>>>>>>>>
+> Total random voxel additions:  2
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 55 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 56 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 57 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 58 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 59 >>>>>>>>>>
+[Warning] Timeout due to too much long validation time.
+> Total random voxel additions:  0
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 60 >>>>>>>>>>
+> Total random voxel additions:  40
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 61 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 62 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 63 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 64 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 65 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 66 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 67 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 68 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 69 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 70 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 71 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 72 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 73 >>>>>>>>>>
+[Warning] Timeout due to too much long validation time.
+[Warning] Timeout due to too much long validation time.
+> Total random voxel additions:  0
+> Timeout count:  2
+
+<<<<<<<<<< Offspring 74 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 75 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 76 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 77 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 78 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 79 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 80 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 81 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 82 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 83 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 84 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 85 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 86 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 87 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 88 >>>>>>>>>>
+[Warning] Timeout due to too much long validation time.
+> Total random voxel additions:  0
+> Timeout count:  1
+
+<<<<<<<<<< Offspring 89 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 90 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 91 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 92 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 93 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 94 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 95 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 96 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 97 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 98 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 99 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+
+<<<<<<<<<< Offspring 100 >>>>>>>>>>
+> Total random voxel additions:  0
+> Timeout count:  0
+Total runtime of 1 generations: 10.2668123000185s

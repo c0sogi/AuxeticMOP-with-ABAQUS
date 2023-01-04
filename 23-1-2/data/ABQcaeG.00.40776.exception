@@ -1,0 +1,77 @@
+<Description>
+   ABAQUS/ABQcaeG rank 0 received the INTERRUPT signal
+
+</Description>
+
+<Context>
+   ABQcaeG
+</Context>
+
+<Callstack>
+  1)  ABQSMABasShared.dll         ExceptCallback1                         
+  2)  ucrtbase.dll                perror                                  
+  3)  KERNELBASE.dll              CtrlRoutine                             
+  4)  KERNEL32.DLL                BaseThreadInitThunk                     
+  5)  ntdll.dll                   RtlUserThreadStart                      
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Available>          4 GB </Available>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          24 GB </Size>
+       <Used>          19 GB </Used>
+       <Free>           5 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\dcas\PythonCodes\Coop\pythoncode\23-1-2\data </current> <free>    203 GB </free>   <used>    727 GB </used> 
+     <temp> C:\Users\dcas\AppData\Local\Temp </temp>    <free>    203 GB </free>
+</Directories>
+
+<Installation>
+</Installation>
+
+<Description>
+   ABQcaeG.exe / rank 0 / thread 0  encountered a system exception 0xC0000005 (EXCEPTION_ACCESS_VIOLATION)
+</Description>
+
+<Context>
+   ABQcaeG
+</Context>
+
+<Callstack>
+  1)  ABQcaeG.exe               unknown                                 
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Available>          4 GB </Available>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          24 GB </Size>
+       <Used>          18 GB </Used>
+       <Free>           6 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\dcas\PythonCodes\Coop\pythoncode\23-1-2\data </current> <free>    203 GB </free>   <used>    727 GB </used> 
+     <temp> C:\Users\dcas\AppData\Local\Temp </temp>    <free>    203 GB </free>
+</Directories>
+
+<Installation>
+</Installation>
+

@@ -1,0 +1,437 @@
+1
+
+   Abaqus Learning Edition 2022                                  Date 01-1-2023   Time 20:53:39
+   
+
+
+
+     PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   *******************************************************
+
+
+     END PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   ***********************************************************
+
+
+
+
+     OPTIONS BEING PROCESSED
+   ***************************
+
+
+  *Heading
+  *Node
+  *Element, type=C3D8R
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET11
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET13
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET15
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET17
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET19
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET21
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET23
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET25
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET27
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET29
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET3
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET31
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET33
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET35
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET37
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET39
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET41
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET43
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET45
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET47
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET49
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET5
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET51
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET53
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET55
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET57
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET59
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET61
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET63
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET65
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET67
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET69
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET7
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET71
+  *Nset, nset=ASSEMBLY_MERGE-1-1__PICKEDSET9
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET11
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET13
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET15
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET17
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET19
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET21
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET23
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET25
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET27
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET29
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET3
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET31
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET33
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET35
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET37
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET39
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET41
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET43
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET45
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET47
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET49
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET5
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET51
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET53
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET55
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET57
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET59
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET61
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET63
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET65
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET67
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET69
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET7
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET71
+  *Elset, elset=ASSEMBLY_MERGE-1-1__PICKEDSET9
+  *Node
+  *Nset, nset=ASSEMBLY_FX
+  *Nset, nset=ASSEMBLY_FX0
+  *Nset, nset=ASSEMBLY_FY
+  *Nset, nset=ASSEMBLY_FY0
+  *Nset, nset=ASSEMBLY_FZ
+  *Nset, nset=ASSEMBLY_FZ0
+  *Nset, nset=ASSEMBLY_RP1
+  *Nset, nset=ASSEMBLY_RP2
+  *Nset, nset=ASSEMBLY_RP3
+  *Elset, elset=ASSEMBLY_FX
+  *Elset, elset=ASSEMBLY_FX0
+  *Elset, elset=ASSEMBLY_FY
+  *Elset, elset=ASSEMBLY_FY0
+  *Elset, elset=ASSEMBLY_FZ
+  *Elset, elset=ASSEMBLY_FZ0
+  *Elset, elset=ASSEMBLY__FX_S1
+  *Elset, elset=ASSEMBLY__FX_S2
+  *Elset, elset=ASSEMBLY__FY_S4
+  *Elset, elset=ASSEMBLY__FZ_S3
+  *Elset, elset=ASSEMBLY__SURF-1_S1
+  *Elset, elset=ASSEMBLY__SURF-1_S2
+  *Elset, elset=ASSEMBLY__SURF-1_S3
+  *Elset, elset=ASSEMBLY__SURF-1_S4
+  *Elset, elset=ASSEMBLY__SURF-1_S5
+  *Elset, elset=ASSEMBLY__SURF-1_S6
+  *material, name=MATERIAL-1
+  *elastic, type=ENGINEERINGCONSTANTS
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-29
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-30
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-31
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-32
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-33
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-34
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-35
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-22
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-23
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-24
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-25
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-26
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-27
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-28
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-15
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-16
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-17
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-18
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-19
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-20
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-21
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-9
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-8
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-10
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-11
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-12
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-13
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-14
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-2
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-3
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-4
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-5
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-6
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-7
+  *orientation, name=ASSEMBLY_MERGE-1-1_ORI-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET59, orientation=ASSEMBLY_MERGE-1-1_ORI-29, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET61, orientation=ASSEMBLY_MERGE-1-1_ORI-30, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET63, orientation=ASSEMBLY_MERGE-1-1_ORI-31, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET65, orientation=ASSEMBLY_MERGE-1-1_ORI-32, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET67, orientation=ASSEMBLY_MERGE-1-1_ORI-33, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET69, orientation=ASSEMBLY_MERGE-1-1_ORI-34, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET71, orientation=ASSEMBLY_MERGE-1-1_ORI-35, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET45, orientation=ASSEMBLY_MERGE-1-1_ORI-22, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET47, orientation=ASSEMBLY_MERGE-1-1_ORI-23, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET49, orientation=ASSEMBLY_MERGE-1-1_ORI-24, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET51, orientation=ASSEMBLY_MERGE-1-1_ORI-25, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET53, orientation=ASSEMBLY_MERGE-1-1_ORI-26, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET55, orientation=ASSEMBLY_MERGE-1-1_ORI-27, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET57, orientation=ASSEMBLY_MERGE-1-1_ORI-28, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET31, orientation=ASSEMBLY_MERGE-1-1_ORI-15, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET33, orientation=ASSEMBLY_MERGE-1-1_ORI-16, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET35, orientation=ASSEMBLY_MERGE-1-1_ORI-17, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET37, orientation=ASSEMBLY_MERGE-1-1_ORI-18, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET39, orientation=ASSEMBLY_MERGE-1-1_ORI-19, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET41, orientation=ASSEMBLY_MERGE-1-1_ORI-20, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET43, orientation=ASSEMBLY_MERGE-1-1_ORI-21, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET19, orientation=ASSEMBLY_MERGE-1-1_ORI-9, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET17, orientation=ASSEMBLY_MERGE-1-1_ORI-8, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET21, orientation=ASSEMBLY_MERGE-1-1_ORI-10, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET23, orientation=ASSEMBLY_MERGE-1-1_ORI-11, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET25, orientation=ASSEMBLY_MERGE-1-1_ORI-12, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET27, orientation=ASSEMBLY_MERGE-1-1_ORI-13, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET29, orientation=ASSEMBLY_MERGE-1-1_ORI-14, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET5, orientation=ASSEMBLY_MERGE-1-1_ORI-2, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET7, orientation=ASSEMBLY_MERGE-1-1_ORI-3, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET9, orientation=ASSEMBLY_MERGE-1-1_ORI-4, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET11, orientation=ASSEMBLY_MERGE-1-1_ORI-5, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET13, orientation=ASSEMBLY_MERGE-1-1_ORI-6, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET15, orientation=ASSEMBLY_MERGE-1-1_ORI-7, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET3, orientation=ASSEMBLY_MERGE-1-1_ORI-1, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET59, orientation=ASSEMBLY_MERGE-1-1_ORI-29, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET61, orientation=ASSEMBLY_MERGE-1-1_ORI-30, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET63, orientation=ASSEMBLY_MERGE-1-1_ORI-31, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET65, orientation=ASSEMBLY_MERGE-1-1_ORI-32, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET67, orientation=ASSEMBLY_MERGE-1-1_ORI-33, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET69, orientation=ASSEMBLY_MERGE-1-1_ORI-34, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET71, orientation=ASSEMBLY_MERGE-1-1_ORI-35, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET45, orientation=ASSEMBLY_MERGE-1-1_ORI-22, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET47, orientation=ASSEMBLY_MERGE-1-1_ORI-23, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET49, orientation=ASSEMBLY_MERGE-1-1_ORI-24, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET51, orientation=ASSEMBLY_MERGE-1-1_ORI-25, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET53, orientation=ASSEMBLY_MERGE-1-1_ORI-26, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET55, orientation=ASSEMBLY_MERGE-1-1_ORI-27, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET57, orientation=ASSEMBLY_MERGE-1-1_ORI-28, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET31, orientation=ASSEMBLY_MERGE-1-1_ORI-15, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET33, orientation=ASSEMBLY_MERGE-1-1_ORI-16, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET35, orientation=ASSEMBLY_MERGE-1-1_ORI-17, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET37, orientation=ASSEMBLY_MERGE-1-1_ORI-18, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET39, orientation=ASSEMBLY_MERGE-1-1_ORI-19, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET41, orientation=ASSEMBLY_MERGE-1-1_ORI-20, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET43, orientation=ASSEMBLY_MERGE-1-1_ORI-21, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET19, orientation=ASSEMBLY_MERGE-1-1_ORI-9, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET17, orientation=ASSEMBLY_MERGE-1-1_ORI-8, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET21, orientation=ASSEMBLY_MERGE-1-1_ORI-10, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET23, orientation=ASSEMBLY_MERGE-1-1_ORI-11, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET25, orientation=ASSEMBLY_MERGE-1-1_ORI-12, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET27, orientation=ASSEMBLY_MERGE-1-1_ORI-13, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET29, orientation=ASSEMBLY_MERGE-1-1_ORI-14, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET5, orientation=ASSEMBLY_MERGE-1-1_ORI-2, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET7, orientation=ASSEMBLY_MERGE-1-1_ORI-3, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET9, orientation=ASSEMBLY_MERGE-1-1_ORI-4, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET11, orientation=ASSEMBLY_MERGE-1-1_ORI-5, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET13, orientation=ASSEMBLY_MERGE-1-1_ORI-6, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET15, orientation=ASSEMBLY_MERGE-1-1_ORI-7, material=MATERIAL-1
+  *solidsection, elset=ASSEMBLY_MERGE-1-1__PICKEDSET3, orientation=ASSEMBLY_MERGE-1-1_ORI-1, material=MATERIAL-1
+  *contactpair, interaction=INTPROP-1, type=SURFACETOSURFACE, tracking=STATE
+  *surface, type=ELEMENT, name=ASSEMBLY_FX
+  *surface, type=ELEMENT, name=ASSEMBLY_FY
+  *surface, type=ELEMENT, name=ASSEMBLY_FZ
+  *surface, type=ELEMENT, name=ASSEMBLY_SURF-1
+  *contactpair, interaction=INTPROP-1, type=SURFACETOSURFACE, tracking=STATE
+  *surface, type=ELEMENT, name=ASSEMBLY_FX
+  *surface, type=ELEMENT, name=ASSEMBLY_FY
+  *surface, type=ELEMENT, name=ASSEMBLY_FZ
+  *surface, type=ELEMENT, name=ASSEMBLY_SURF-1
+  *surface, type=ELEMENT, name=ASSEMBLY_FX
+  *surface, type=ELEMENT, name=ASSEMBLY_FY
+  *surface, type=ELEMENT, name=ASSEMBLY_FZ
+  *surface, type=ELEMENT, name=ASSEMBLY_SURF-1
+  *contactpair, interaction=INTPROP-1, type=SURFACETOSURFACE, tracking=STATE
+  *surfaceinteraction, name=INTPROP-1
+  *surfacebehavior, pressure-overclosure=HARD
+  *contactpair, interaction=INTPROP-1, type=SURFACETOSURFACE, tracking=STATE
+  *contactpair, interaction=INTPROP-1, type=SURFACETOSURFACE, tracking=STATE
+  *coupling, constraintname=ASSEMBLY_CONSTRAINT-1, refnode=ASSEMBLY_RP2, surface=ASSEMBLY_FY
+  *coupling, constraintname=ASSEMBLY_CONSTRAINT-1, refnode=ASSEMBLY_RP2, surface=ASSEMBLY_FY
+  *coupling, constraintname=ASSEMBLY_CONSTRAINT-1, refnode=ASSEMBLY_RP2, surface=ASSEMBLY_FY
+  *kinematic
+
+ ***NOTE: WHENEVER A TRANSLATION (ROTATION) DOF AT A NODE IS CONSTRAINED BY A 
+          KINEMATIC COUPLING DEFINITION THE TRANSLATION (ROTATION) DOFS FOR 
+          THAT NODE CANNOT BE INCLUDED IN ANY OTHER CONSTRAINT INCLUDING MPCS, 
+          RIGID BODIES, ETC.
+  *coupling, constraintname=ASSEMBLY_CONSTRAINT-1, refnode=ASSEMBLY_RP2, surface=ASSEMBLY_FY
+  *surfaceinteraction, name=INTPROP-1
+  *surfacebehavior, pressure-overclosure=HARD
+  *surfaceinteraction, name=INTPROP-1
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *contactpair, interaction=INTPROP-1, type=SURFACETOSURFACE, tracking=STATE
+  *surfaceinteraction, name=INTPROP-1
+  *contactpair, interaction=INTPROP-1, type=SURFACETOSURFACE, tracking=STATE
+  *surface, type=ELEMENT, name=ASSEMBLY_FX
+  *surface, type=ELEMENT, name=ASSEMBLY_FY
+  *surface, type=ELEMENT, name=ASSEMBLY_FZ
+  *surface, type=ELEMENT, name=ASSEMBLY_SURF-1
+  *output, field
+  *output, history
+  *output, history, variable=PRESELECT
+  *elementoutput, directions=YES
+  *output, field
+  *output, history
+  *output, history, variable=PRESELECT
+  *elementoutput, directions=YES
+  *output, field
+  *output, history
+  *output, history, variable=PRESELECT
+  *elementoutput, directions=YES
+
+ ***NOTE: MPCS (EXTERNAL or INTERNAL, including those generated from rigid body 
+          definitions), KINEMATIC COUPLINGS, AND/OR EQUATIONS WILL ACTIVATE 
+          ADDITIONAL DEGREES OF FREEDOM
+  *Step, name=Step-1, nlgeom=NO, inc=10000
+  *output, field
+  *output, history
+  *output, history, variable=PRESELECT
+  *Step, name=Step-1, nlgeom=NO, inc=10000
+
+ ***WARNING: NODE SET ASSEMBLY_RP1 HAS NO MEMBERS AND WILL BE IGNORED.  NODES 
+             DEFINED IN THIS SET MAY HAVE BEEN DELETED BECAUSE THEY WERE NOT 
+             CONNECTED TO ANY ELEMENTS.
+
+ ***WARNING: NODE SET ASSEMBLY_RP3 HAS NO MEMBERS AND WILL BE IGNORED.  NODES 
+             DEFINED IN THIS SET MAY HAVE BEEN DELETED BECAUSE THEY WERE NOT 
+             CONNECTED TO ANY ELEMENTS.
+  *Step, name=Step-1, nlgeom=NO, inc=10000
+  *static
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *output, field
+  *nodeoutput
+  *elementoutput, directions=YES
+  *output, history
+  *nodeoutput, nset=ASSEMBLY_RP2
+  *output, history, variable=PRESELECT
+  *endstep
+  *Step, name=Step-1, nlgeom=NO, inc=10000
+  *static
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *endstep
+
+ ***WARNING: DEGREE OF FREEDOM 3 HAS BEEN ELIMINATED AT NODE 65 INSTANCE 
+             MERGE-1-1 BOUNDARY CONDITION TYPE ZSYMM MAY NOT BE APPLIED AT THIS 
+             NODE
+
+ ***WARNING: DEGREE OF FREEDOM 3 HAS BEEN ELIMINATED AT NODE 68 INSTANCE 
+             MERGE-1-1 BOUNDARY CONDITION TYPE ZSYMM MAY NOT BE APPLIED AT THIS 
+             NODE
+
+ ***WARNING: 2 nodes have dof on which incorrect boundary conditions may have 
+             been specified. The nodes have been identified in node set 
+             WarnNodeBCIncorrectDof.
+
+
+
+                            P R O B L E M   S I Z E
+
+
+          NUMBER OF ELEMENTS IS                                   667
+          NUMBER OF ELEMENTS DEFINED BY THE USER AND *TIE          35
+          NUMBER OF INTERNAL ELEMENTS GENERATED FOR CONTACT       632
+          NUMBER OF NODES IS                                     1373
+          NUMBER OF NODES DEFINED BY THE USER                     109
+          NUMBER OF INTERNAL NODES GENERATED BY THE PROGRAM      1264
+          TOTAL NUMBER OF VARIABLES IN THE MODEL                 2268
+          (DEGREES OF FREEDOM PLUS MAX NO. OF ANY LAGRANGE MULTIPLIER
+           VARIABLES. INCLUDE *PRINT,SOLVE=YES TO GET THE ACTUAL NUMBER.)
+
+
+
+                              END OF USER INPUT PROCESSING
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =     0.20    
+       SYSTEM TIME (SEC)    =      0.0    
+       TOTAL CPU TIME (SEC) =     0.20    
+       WALLCLOCK TIME (SEC) =            0
+1
+
+   Abaqus Learning Edition 2022                                  Date 01-1-2023   Time 20:53:40
+   
+
+                                                                                               STEP    1  INCREMENT    1
+                                                                                          TIME COMPLETED IN THIS STEP   0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                1.000E-04
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-12
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                0.100    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+  
+                   M E M O R Y   E S T I M A T E
+  
+ PROCESS      FLOATING PT       MINIMUM MEMORY        MEMORY TO
+              OPERATIONS           REQUIRED          MINIMIZE I/O
+             PER ITERATION           (MB)               (MB)
+  
+     1          4.47E+05               18                 25
+  
+ NOTE:
+      (1) SINCE ABAQUS DOES NOT PRE-ALLOCATE MEMORY AND ONLY ALLOCATES MEMORY AS NEEDED DURING THE ANALYSIS,
+          THE MEMORY REQUIREMENT PRINTED HERE CAN ONLY BE VIEWED AS A GENERAL GUIDELINE BASED ON THE BEST
+          KNOWLEDGE AVAILABLE AT THE BEGINNING OF A STEP BEFORE THE SOLUTION PROCESS HAS BEGUN.
+      (2) THE ESTIMATE IS NORMALLY UPDATED AT THE BEGINNING OF EVERY STEP. IT IS THE MAXIMUM VALUE OF THE
+          ESTIMATE FROM THE CURRENT STEP TO THE LAST STEP OF THE ANALYSIS, WITH UNSYMMETRIC SOLUTION TAKEN
+          INTO ACCOUNT IF APPLICABLE. 
+      (3) SINCE THE ESTIMATE IS BASED ON THE ACTIVE DEGREES OF FREEDOM IN THE FIRST ITERATION OF THE 
+          CURRENT STEP, THE MEMORY ESTIMATE MIGHT BE SIGNIFICANTLY DIFFERENT THAN ACTUAL USAGE FOR 
+          PROBLEMS WITH SUBSTANTIAL CHANGES IN ACTIVE DEGREES OF FREEDOM BETWEEN STEPS (OR EVEN WITHIN
+          THE SAME STEP). EXAMPLES ARE: PROBLEMS WITH SIGNIFICANT CONTACT CHANGES, PROBLEMS WITH MODEL
+          CHANGE, PROBLEMS WITH BOTH STATIC STEP AND STEADY STATE DYNAMIC PROCEDURES WHERE ACOUSTIC 
+          ELEMENTS WILL ONLY BE ACTIVATED IN THE STEADY STATE DYNAMIC STEPS.
+      (4) FOR MULTI-PROCESS EXECUTION, THE ESTIMATED VALUE OF FLOATING POINT OPERATIONS FOR EACH PROCESS
+          IS BASED ON AN INITIAL SCHEDULING OF OPERATIONS AND MIGHT NOT REFLECT THE ACTUAL FLOATING 
+          POINT OPERATIONS COMPLETED ON EACH PROCESS. OPERATIONS ARE DYNAMICALLY BALANCED DURING EXECUTION, 
+          SO THE ACTUAL BALANCE OF OPERATIONS BETWEEN PROCESSES IS EXPECTED TO BE BETTER THAN THE ESTIMATE
+          PRINTED HERE.
+      (5) THE UPPER LIMIT OF MEMORY THAT CAN BE ALLOCATED BY ABAQUS WILL IN GENERAL DEPEND ON THE VALUE OF
+          THE "MEMORY" PARAMETER AND THE AMOUNT OF PHYSICAL MEMORY AVAILABLE ON THE MACHINE. PLEASE SEE
+          THE "ABAQUS ANALYSIS USER'S MANUAL" FOR MORE DETAILS. THE ACTUAL USAGE OF MEMORY AND OF DISK
+          SPACE FOR SCRATCH DATA WILL DEPEND ON THIS UPPER LIMIT AS WELL AS THE MEMORY REQUIRED TO MINIMIZE
+          I/O. IF THE MEMORY UPPER LIMIT IS GREATER THAN THE MEMORY REQUIRED TO MINIMIZE I/O, THEN THE ACTUAL
+          MEMORY USAGE WILL BE CLOSE TO THE ESTIMATED "MEMORY TO MINIMIZE I/O" VALUE, AND THE SCRATCH DISK
+          USAGE WILL BE CLOSE-TO-ZERO; OTHERWISE, THE ACTUAL MEMORY USED WILL BE CLOSE TO THE PREVIOUSLY
+          MENTIONED MEMORY LIMIT, AND THE SCRATCH DISK USAGE WILL BE ROUGHLY PROPORTIONAL TO THE DIFFERENCE
+          BETWEEN THE ESTIMATED "MEMORY TO MINIMIZE I/O" AND THE MEMORY UPPER LIMIT. HOWEVER ACCURATE
+          ESTIMATE OF THE SCRATCH DISK SPACE IS NOT POSSIBLE.
+      (6) USING "*RESTART, WRITE" CAN GENERATE A LARGE AMOUNT OF DATA WRITTEN IN THE WORK DIRECTORY.
+
+
+          THE ANALYSIS HAS BEEN COMPLETED
+
+
+
+                              ANALYSIS COMPLETE
+                              WITH      5 WARNING MESSAGES ON THE DAT FILE
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =      3.0    
+       SYSTEM TIME (SEC)    =     0.20    
+       TOTAL CPU TIME (SEC) =      3.2    
+       WALLCLOCK TIME (SEC) =            4

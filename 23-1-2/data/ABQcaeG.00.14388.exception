@@ -1,0 +1,97 @@
+<Description>
+   ABAQUS/ABQcaeG rank 0 received the INTERRUPT signal
+
+</Description>
+
+<Context>
+   ABQcaeG
+</Context>
+
+<Callstack>
+  1)  ABQSMABasShared.dll         ExceptCallback1                         
+  2)  ucrtbase.dll                perror                                  
+  3)  KERNELBASE.dll              CtrlRoutine                             
+  4)  KERNEL32.DLL                BaseThreadInitThunk                     
+  5)  ntdll.dll                   RtlUserThreadStart                      
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Available>          4 GB </Available>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          24 GB </Size>
+       <Used>          19 GB </Used>
+       <Free>           5 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\dcas\PythonCodes\Coop\pythoncode\23-1-2\data </current> <free>    203 GB </free>   <used>    727 GB </used> 
+     <temp> C:\Users\dcas\AppData\Local\Temp </temp>    <free>    203 GB </free>
+</Directories>
+
+<Installation>
+</Installation>
+
+<Description>
+   ABAQUS/ABQcaeG rank 0 received the ABORT signal
+
+</Description>
+
+<Context>
+   ABQcaeG
+</Context>
+
+<Callstack>
+  1)  ABQSMABasShared.dll         ExceptCallback1                         
+  2)  ucrtbase.dll                abort                                   
+  3)  ucrtbase.dll                terminate                               
+  4)  VCRUNTIME140_1.dll          _NLG_Return2                            
+  5)  VCRUNTIME140_1.dll          _NLG_Return2                            
+  6)  VCRUNTIME140_1.dll          _CxxFrameHandler4                       
+  7)  ntdll.dll                   RtlRestoreContext                       
+  8)  ntdll.dll                   RtlRaiseException                       
+  9)  KERNELBASE.dll              RaiseException                          
+ 10)  VCRUNTIME140.dll            CxxThrowException                       
+ 11)  ABQSMAInbVwrIPC.dll         ipc_Socket::Send                        
+ 12)  ABQSMAInbVwrIPC.dll         ipc_OsokStreamDevice::flush             
+ 13)  ABQSMAInbVwrIPC.dll         ipc_Que::RemoteSend                     
+ 14)  ABQSMAInbVwrIPC.dll         ipc_Client::SendDirective               
+ 15)  ABQSMAIngVwrSesGui.dll      qryG_KerClntBase::QryUnRegisterPath     
+ 16)  ABQSMAIngVwrSesGui.dll      qryG_QueryRegistrarRole::UnRegister     
+ 17)  ABQSMAIngVwrSesGui.dll      qryG_Proxy::~qryG_Proxy                 
+ 18)  ABQSMAIngVwrSesGui.dll      operator+                               
+ 19)  ABQSMAIngVwrGui.dll         ubi_FileToolsetGui::~ubi_FileToolsetGui 
+ 20)  ABQSMAIngVwrGui.dll         ubi_MdbConfirmationPriv::~ubi_MdbConfirmationPriv
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Available>          4 GB </Available>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          24 GB </Size>
+       <Used>          19 GB </Used>
+       <Free>           5 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\dcas\PythonCodes\Coop\pythoncode\23-1-2\data </current> <free>    203 GB </free>   <used>    727 GB </used> 
+     <temp> C:\Users\dcas\AppData\Local\Temp </temp>    <free>    203 GB </free>
+</Directories>
+
+<Installation>
+</Installation>
+

@@ -1,0 +1,1396 @@
+1
+
+   Abaqus Learning Edition 2022                                  Date 01-1-2023   Time 20:53:00
+   
+
+                                                                                 
+                                                                                 
+ STEP    1     INCREMENT     1     STEP TIME    0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                1.000E-04
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-12
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                0.100    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR FORCE    
+     CRITERION FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR DISP.    CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INITIAL VALUE OF TIME AVERAGE FORCE                               1.000E-02
+     AVERAGE FORCE     IS TIME AVERAGE FORCE    
+     ALTERNATE CRIT. FOR RESIDUAL FORCE     FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO FORCE     RELATIVE TO TIME AVRG. FORCE         1.000E-05
+     CRITERION FOR RESIDUAL FORCE     WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR DISP.    CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL FORCE     FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO FORCE     REL. TO TIME AVRG. MAX. FORCE        1.000E-05
+     CRITERION FOR ZERO DISP.    RELATIVE TO CHARACTERISTIC LENGTH     1.000E-08
+
+ CONVERGENCE TOLERANCE PARAMETERS FOR MOMENT   
+     CRITERION FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM          5.000E-03
+     CRITERION FOR ROTATION CORRECTION IN A NONLINEAR PROBLEM          1.000E-02
+     INITIAL VALUE OF TIME AVERAGE MOMENT                              1.000E-02
+     AVERAGE MOMENT    IS TIME AVERAGE MOMENT   
+     ALTERNATE CRIT. FOR RESIDUAL MOMENT    FOR A NONLINEAR PROBLEM    2.000E-02
+     CRITERION FOR ZERO MOMENT    RELATIVE TO TIME AVRG. MOMENT        1.000E-05
+     CRITERION FOR RESIDUAL MOMENT    WHEN THERE IS ZERO FLUX          1.000E-05
+     CRITERION FOR ROTATION CORRECTION WHEN THERE IS ZERO FLUX         1.000E-03
+     CRITERION FOR RESIDUAL MOMENT    FOR A LINEAR INCREMENT           1.000E-08
+     FIELD CONVERSION RATIO                                             1.00    
+     CRITERION FOR ZERO MOMENT    REL. TO TIME AVRG. MAX. MOMENT       1.000E-05
+
+     VOLUMETRIC STRAIN COMPATIBILITY TOLERANCE FOR HYBRID SOLIDS       1.000E-05
+     AXIAL STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS             1.000E-05
+     TRANS. SHEAR STRAIN COMPATIBILITY TOLERANCE FOR HYBRID BEAMS      1.000E-05
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P>P0          5.000E-03
+     SOFT CONTACT CONSTRAINT COMPATIBILITY TOLERANCE FOR P=0.0         0.100    
+     CONTACT FORCE ERROR TOLERANCE FOR CONVERT SDI=YES                 1.00    
+     DISPLACEMENT COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS           1.000E-05
+     ROTATION COMPATIBILITY TOLERANCE FOR DCOUP ELEMENTS               1.000E-05
+
+ EQUILIBRIUM WILL BE CHECKED FOR SEVERE DISCONTINUITY ITERATIONS
+
+ TIME INCREMENTATION CONTROL PARAMETERS:
+     FIRST EQUILIBRIUM ITERATION FOR CONSECUTIVE DIVERGENCE CHECK              4
+     EQUILIBRIUM ITERATION AT WHICH LOG. CONVERGENCE RATE CHECK BEGINS         8
+     EQUILIBRIUM ITERATION AFTER WHICH ALTERNATE RESIDUAL IS USED              9
+     MAXIMUM EQUILIBRIUM ITERATIONS ALLOWED                                   16
+     EQUILIBRIUM ITERATION COUNT FOR CUT-BACK IN NEXT INCREMENT               10
+     MAXIMUM EQUILIB. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      4
+     MAXIMUM ITERATIONS FOR SEVERE DISCONTINUITIES                            50
+     MAXIMUM ATTEMPTS ALLOWED IN AN INCREMENT                                  5
+     MAXIMUM DISCON. ITERS IN TWO INCREMENTS FOR TIME INCREMENT INCREASE      50
+     MAXIMUM CONTACT AUGMENTATIONS FOR *SURFACE BEHAVIOR,AUGMENTED LAGRANGE   50
+     CUT-BACK FACTOR AFTER DIVERGENCE                                 0.2500    
+     CUT-BACK FACTOR FOR TOO SLOW CONVERGENCE                         0.5000    
+     CUT-BACK FACTOR AFTER TOO MANY EQUILIBRIUM ITERATIONS            0.7500    
+     CUT-BACK FACTOR AFTER TOO MANY SEVERE DISCONTINUITY ITERATIONS   0.2500    
+     CUT-BACK FACTOR AFTER PROBLEMS IN ELEMENT ASSEMBLY               0.2500    
+     INCREASE FACTOR AFTER TWO INCREMENTS THAT CONVERGE QUICKLY        1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED                       1.500    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DYNAMICS)            1.250    
+     MAX. TIME INCREMENT INCREASE FACTOR ALLOWED (DIFFUSION)           2.000    
+     MINIMUM TIME INCREMENT RATIO FOR EXTRAPOLATION TO OCCUR          0.1000    
+     MAX. RATIO OF TIME INCREMENT TO STABILITY LIMIT                   1.000    
+     FRACTION OF STABILITY LIMIT FOR NEW TIME INCREMENT               0.9500    
+     TIME INCREMENT INCREASE FACTOR BEFORE A TIME POINT                1.000    
+
+ CONTACT CONTROLS APPLIED TO ALL CONTACT PAIRS:
+     GLOBAL STABILIZATION CONTROL IS NOT USED
+     RELATIVE PENETRATION TOLERANCE FOR AUGMENTED LAGRANGE CONTACT:
+          FINITE-SLIDING SURFACE-TO-SURFACE                            5.000E-02
+          OTHERWISE                                                    1.000E-03
+
+          PRINT OF INCREMENT NUMBER, TIME, ETC., EVERY    1  INCREMENTS
+
+     THE MAXIMUM NUMBER OF INCREMENTS IN THIS STEP IS                   10000
+
+     LINEAR EXTRAPOLATION WILL BE USED
+
+     CHARACTERISTIC ELEMENT LENGTH      3.00    
+
+     DETAILS REGARDING ACTUAL SOLUTION WAVEFRONT REQUESTED
+
+     DETAILED OUTPUT OF DIAGNOSTICS TO DATABASE REQUESTED
+
+     PRINT OF INCREMENT NUMBER, TIME, ETC., TO THE MESSAGE FILE EVERY     1  INCREMENTS
+
+     COLLECTING MODEL CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+
+     COLLECTING STEP CONSTRAINT INFORMATION FOR OVERCONSTRAINT CHECKS
+
+
+  INCREMENT     1 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  1.000E-04
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.214e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      9.550E-06   TIME AVG. FORCE       9.550E-06
+ LARGEST RESIDUAL FORCE            -1.371E-06   AT NODE         44   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -1.638E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          FORCE     EQUILIBRIUM NOT ACHIEVED WITHIN TOLERANCE.
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      3.000E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION      4.794E-39   AT NODE          1   DOF  4
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION     4.794E-39   AT NODE          1   DOF  4
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =  0.10000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     2
+
+
+ AVERAGE FORCE                      9.458E-06   TIME AVG. FORCE       9.458E-06
+ LARGEST RESIDUAL FORCE            -2.664E-11   AT NODE         44   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.640E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -1.685E-08   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      3.000E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -4.598E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.294E-39   AT NODE          1   DOF  4
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   2 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  2 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  1.000E-04,  FRACTION OF STEP COMPLETED  1.000E-04
+ STEP TIME COMPLETED       1.000E-04,  TOTAL TIME COMPLETED        1.000E-04
+
+
+  INCREMENT     2 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  1.000E-04
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      1.290E-04   TIME AVG. FORCE       6.922E-05
+ LARGEST RESIDUAL FORCE            -8.604E-12   AT NODE         44   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.637E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        3.030E-08   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM EQUATIONS HAVE CONVERGED
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -9.189E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.591E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    1.500E-04
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  1.000E-04,  FRACTION OF STEP COMPLETED  2.000E-04
+ STEP TIME COMPLETED       2.000E-04,  TOTAL TIME COMPLETED        2.000E-04
+
+
+  INCREMENT     3 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  1.500E-04
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      2.295E-04   TIME AVG. FORCE       1.227E-04
+ LARGEST RESIDUAL FORCE            -1.882E-13   AT NODE         44   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -2.457E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -1.735E-08   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -1.608E-38   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.293E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    2.250E-04
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  1.500E-04,  FRACTION OF STEP COMPLETED  3.500E-04
+ STEP TIME COMPLETED       3.500E-04,  TOTAL TIME COMPLETED        3.500E-04
+
+
+  INCREMENT     4 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  2.250E-04
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      3.825E-04   TIME AVG. FORCE       1.876E-04
+ LARGEST RESIDUAL FORCE             5.835E-16   AT NODE         49   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -3.686E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -3.725E-09   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -2.641E-38   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    3.375E-04
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  2.250E-04,  FRACTION OF STEP COMPLETED  5.750E-04
+ STEP TIME COMPLETED       5.750E-04,  TOTAL TIME COMPLETED        5.750E-04
+
+
+  INCREMENT     5 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  3.375E-04
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      6.070E-04   TIME AVG. FORCE       2.715E-04
+ LARGEST RESIDUAL FORCE            -1.552E-17   AT NODE         98   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -5.530E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -6.639E-10   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -4.192E-38   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    5.062E-04
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  3.375E-04,  FRACTION OF STEP COMPLETED  9.125E-04
+ STEP TIME COMPLETED       9.125E-04,  TOTAL TIME COMPLETED        9.125E-04
+
+
+  INCREMENT     6 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  5.062E-04
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      9.438E-04   TIME AVG. FORCE       3.836E-04
+ LARGEST RESIDUAL FORCE             3.545E-17   AT NODE          1   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -8.295E-05   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -1.102E-10   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -6.517E-38   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    7.594E-04
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  5.062E-04,  FRACTION OF STEP COMPLETED  1.419E-03
+ STEP TIME COMPLETED       1.419E-03,  TOTAL TIME COMPLETED        1.419E-03
+
+
+  INCREMENT     7 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  7.594E-04
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      1.449E-03   TIME AVG. FORCE       5.358E-04
+ LARGEST RESIDUAL FORCE             1.919E-17   AT NODE         95   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.244E-04   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -1.760E-11   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -1.001E-37   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    1.139E-03
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  7.594E-04,  FRACTION OF STEP COMPLETED  2.178E-03
+ STEP TIME COMPLETED       2.178E-03,  TOTAL TIME COMPLETED        2.178E-03
+
+
+  INCREMENT     8 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  1.139E-03
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      2.207E-03   TIME AVG. FORCE       7.446E-04
+ LARGEST RESIDUAL FORCE            -8.613E-17   AT NODE         74   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.866E-04   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -2.746E-12   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -1.524E-37   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    1.709E-03
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  1.139E-03,  FRACTION OF STEP COMPLETED  3.317E-03
+ STEP TIME COMPLETED       3.317E-03,  TOTAL TIME COMPLETED        3.317E-03
+
+
+  INCREMENT     9 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  1.709E-03
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      3.343E-03   TIME AVG. FORCE       1.033E-03
+ LARGEST RESIDUAL FORCE             7.083E-17   AT NODE          2   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -2.799E-04   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -4.223E-13   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -2.309E-37   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    2.563E-03
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  1.709E-03,  FRACTION OF STEP COMPLETED  5.026E-03
+ STEP TIME COMPLETED       5.026E-03,  TOTAL TIME COMPLETED        5.026E-03
+
+
+  INCREMENT    10 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  2.563E-03
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      5.048E-03   TIME AVG. FORCE       1.435E-03
+ LARGEST RESIDUAL FORCE             1.932E-16   AT NODE         61   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -4.199E-04   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -6.435E-14   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -3.486E-37   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    3.844E-03
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  2.563E-03,  FRACTION OF STEP COMPLETED  7.589E-03
+ STEP TIME COMPLETED       7.589E-03,  TOTAL TIME COMPLETED        7.589E-03
+
+
+  INCREMENT    11 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  3.844E-03
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      7.606E-03   TIME AVG. FORCE       1.996E-03
+ LARGEST RESIDUAL FORCE             1.701E-16   AT NODE         64   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -6.299E-04   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -9.745E-15   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -5.252E-37   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    5.767E-03
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  3.844E-03,  FRACTION OF STEP COMPLETED  1.143E-02
+ STEP TIME COMPLETED       1.143E-02,  TOTAL TIME COMPLETED        1.143E-02
+
+
+  INCREMENT    12 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  5.767E-03
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      1.144E-02   TIME AVG. FORCE       2.783E-03
+ LARGEST RESIDUAL FORCE             2.142E-16   AT NODE         47   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -9.448E-04   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -1.468E-15   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -7.901E-37   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    8.650E-03
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  5.767E-03,  FRACTION OF STEP COMPLETED  1.720E-02
+ STEP TIME COMPLETED       1.720E-02,  TOTAL TIME COMPLETED        1.720E-02
+
+
+  INCREMENT    13 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  8.650E-03
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      1.720E-02   TIME AVG. FORCE       3.892E-03
+ LARGEST RESIDUAL FORCE            -4.854E-16   AT NODE         74   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.417E-03   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -2.212E-16   AT NODE         46   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.000E-02
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -1.187E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    1.297E-02
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  8.650E-03,  FRACTION OF STEP COMPLETED  2.585E-02
+ STEP TIME COMPLETED       2.585E-02,  TOTAL TIME COMPLETED        2.585E-02
+
+
+  INCREMENT    14 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  1.297E-02
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      2.583E-02   TIME AVG. FORCE       5.459E-03
+ LARGEST RESIDUAL FORCE             9.217E-16   AT NODE         61   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -2.126E-03   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -3.530E-17   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.168E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -1.783E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    1.946E-02
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  1.297E-02,  FRACTION OF STEP COMPLETED  3.882E-02
+ STEP TIME COMPLETED       3.882E-02,  TOTAL TIME COMPLETED        3.882E-02
+
+
+  INCREMENT    15 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  1.946E-02
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      3.877E-02   TIME AVG. FORCE       7.680E-03
+ LARGEST RESIDUAL FORCE             8.856E-16   AT NODE         44   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -3.189E-03   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        5.629E-18   AT NODE         45   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      1.638E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -2.677E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    2.919E-02
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  1.946E-02,  FRACTION OF STEP COMPLETED  5.829E-02
+ STEP TIME COMPLETED       5.829E-02,  TOTAL TIME COMPLETED        5.829E-02
+
+
+  INCREMENT    16 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  2.919E-02
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      5.819E-02   TIME AVG. FORCE       1.084E-02
+ LARGEST RESIDUAL FORCE             1.069E-15   AT NODE         64   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -4.783E-03   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        3.457E-18   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      2.304E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -4.018E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    4.379E-02
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  2.919E-02,  FRACTION OF STEP COMPLETED  8.748E-02
+ STEP TIME COMPLETED       8.748E-02,  TOTAL TIME COMPLETED        8.748E-02
+
+
+  INCREMENT    17 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  4.379E-02
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      8.732E-02   TIME AVG. FORCE       1.534E-02
+ LARGEST RESIDUAL FORCE             1.697E-15   AT NODE         64   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -7.175E-03   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        3.657E-18   AT NODE         40   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      3.251E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -6.030E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    6.568E-02
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  4.379E-02,  FRACTION OF STEP COMPLETED  0.131    
+ STEP TIME COMPLETED       0.131    ,  TOTAL TIME COMPLETED        0.131    
+
+
+  INCREMENT    18 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  6.568E-02
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =  0.10000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =  0.10000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.131       TIME AVG. FORCE       2.176E-02
+ LARGEST RESIDUAL FORCE             2.720E-15   AT NODE          4   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.076E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -1.735E-17   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      4.601E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -9.047E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    9.853E-02
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  6.568E-02,  FRACTION OF STEP COMPLETED  0.197    
+ STEP TIME COMPLETED       0.197    ,  TOTAL TIME COMPLETED        0.197    
+
+
+  INCREMENT    19 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  9.853E-02
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.197       TIME AVG. FORCE       3.096E-02
+ LARGEST RESIDUAL FORCE            -2.776E-15   AT NODE         66   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.614E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -2.767E-17   AT NODE         48   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      6.529E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -1.357E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -2.297E-39   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+          TIME INCREMENT MAY NOW INCREASE TO    0.100    
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  9.853E-02,  FRACTION OF STEP COMPLETED  0.295    
+ STEP TIME COMPLETED       0.295    ,  TOTAL TIME COMPLETED        0.295    
+
+
+  INCREMENT    20 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.263       TIME AVG. FORCE       4.257E-02
+ LARGEST RESIDUAL FORCE            -6.328E-15   AT NODE         49   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        3.826E-17   AT NODE         40   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      9.289E-02
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -1.817E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.390E-36   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.395    
+ STEP TIME COMPLETED       0.395    ,  TOTAL TIME COMPLETED        0.395    
+
+
+  INCREMENT    21 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =  0.10000    
+       ELAPSED TOTAL CPU TIME (SEC) =  0.10000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.330       TIME AVG. FORCE       5.624E-02
+ LARGEST RESIDUAL FORCE            -3.331E-15   AT NODE         41   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -4.037E-17   AT NODE         40   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.128    
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -2.276E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.593E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.495    
+ STEP TIME COMPLETED       0.495    ,  TOTAL TIME COMPLETED        0.495    
+
+
+  INCREMENT    22 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.396       TIME AVG. FORCE       7.169E-02
+ LARGEST RESIDUAL FORCE             5.107E-15   AT NODE         49   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        3.130E-17   AT NODE         69   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.169    
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -2.735E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.593E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.595    
+ STEP TIME COMPLETED       0.595    ,  TOTAL TIME COMPLETED        0.595    
+
+
+  INCREMENT    23 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.463       TIME AVG. FORCE       8.869E-02
+ LARGEST RESIDUAL FORCE            -5.995E-15   AT NODE         49   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -2.119E-17   AT NODE         48   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.215    
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -3.195E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.593E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.695    
+ STEP TIME COMPLETED       0.695    ,  TOTAL TIME COMPLETED        0.695    
+
+
+  INCREMENT    24 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.529       TIME AVG. FORCE       0.107    
+ LARGEST RESIDUAL FORCE            -5.329E-15   AT NODE         44   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        3.917E-17   AT NODE         73   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.266    
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -3.654E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.593E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.795    
+ STEP TIME COMPLETED       0.795    ,  TOTAL TIME COMPLETED        0.795    
+
+
+  INCREMENT    25 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.596       TIME AVG. FORCE       0.127    
+ LARGEST RESIDUAL FORCE             5.329E-15   AT NODE         66   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.        7.762E-17   AT NODE         72   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.321    
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -4.113E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.593E-36   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.895    
+ STEP TIME COMPLETED       0.895    ,  TOTAL TIME COMPLETED        0.895    
+
+
+  INCREMENT    26 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  0.100    
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.662       TIME AVG. FORCE       0.147    
+ LARGEST RESIDUAL FORCE             6.439E-15   AT NODE         49   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -1.638E-02   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -9.087E-17   AT NODE         72   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.380    
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -4.573E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.593E-36   AT NODE         51   DOF  6
+   INSTANCE: MERGE-1-1                                                                       
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  0.100    ,  FRACTION OF STEP COMPLETED  0.995    
+ STEP TIME COMPLETED       0.995    ,  TOTAL TIME COMPLETED        0.995    
+
+
+  INCREMENT    27 STARTS. ATTEMPT NUMBER  1, TIME INCREMENT  4.522E-03
+ 
+	SYMMETRIC DIRECT SPARSE SOLVER RUNNING ON
+ 	1 HOST:        1 MPI RANK  x 1 THREAD
+ 	NUMBER OF EQUATIONS:     306
+ 	NUMBER OF RHS:           1
+ 	NUMBER OF FLOPS:         3.720e+05
+
+     CHECK POINT  START OF SOLVER     
+
+     CHECK POINT  END OF SOLVER       
+
+       ELAPSED USER TIME (SEC)      =   0.0000    
+       ELAPSED SYSTEM TIME (SEC)    =   0.0000    
+       ELAPSED TOTAL CPU TIME (SEC) =   0.0000    
+       ELAPSED WALLCLOCK TIME (SEC) =            0
+
+               CONVERGENCE CHECKS FOR EQUILIBRIUM ITERATION     1
+
+
+ AVERAGE FORCE                      0.665       TIME AVG. FORCE       0.166    
+ LARGEST RESIDUAL FORCE             1.776E-15   AT NODE         44   DOF  3
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST INCREMENT OF DISP.        -7.408E-04   AT NODE         45   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+ LARGEST CORRECTION TO DISP.       -2.719E-17   AT NODE         67   DOF  2
+   INSTANCE: MERGE-1-1                                                                       
+          THE FORCE     EQUILIBRIUM RESPONSE WAS LINEAR IN THIS INCREMENT
+
+ AVERAGE MOMENT                      0.00       TIME AVG. MOMENT      0.442    
+                                                (FROM FORCE     FIELD)
+ ALL MOMENT    RESIDUALS ARE ZERO
+ LARGEST INCREMENT OF ROTATION     -4.593E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+ LARGEST CORRECTION TO ROTATION    -4.387E-35   AT NODE          1   DOF  6
+   INSTANCE: {assembly node}                                                                 
+          THERE IS ZERO MOMENT    EVERYWHERE
+
+ ITERATION SUMMARY FOR THE INCREMENT:   1 TOTAL ITERATIONS, OF WHICH
+   0 ARE SEVERE DISCONTINUITY ITERATIONS AND  1 ARE EQUILIBRIUM ITERATIONS.
+
+ TIME INCREMENT COMPLETED  4.522E-03,  FRACTION OF STEP COMPLETED   1.00    
+ STEP TIME COMPLETED        1.00    ,  TOTAL TIME COMPLETED         1.00    
+
+
+          THE ANALYSIS HAS BEEN COMPLETED
+
+
+
+     ANALYSIS SUMMARY:
+     TOTAL OF         27  INCREMENTS
+                       0  CUTBACKS IN AUTOMATIC INCREMENTATION
+                      28  ITERATIONS INCLUDING CONTACT ITERATIONS IF PRESENT
+                      28  PASSES THROUGH THE EQUATION SOLVER OF WHICH 
+                      28  INVOLVE MATRIX DECOMPOSITION, INCLUDING
+                       0  DECOMPOSITION(S) OF THE MASS MATRIX
+                       1  REORDERING OF EQUATIONS TO MINIMIZE WAVEFRONT
+                       0  ADDITIONAL RESIDUAL EVALUATIONS FOR LINE SEARCHES
+                       0  ADDITIONAL OPERATOR EVALUATIONS FOR LINE SEARCHES
+                      12  WARNING MESSAGES DURING USER INPUT PROCESSING
+                       0  WARNING MESSAGES DURING ANALYSIS
+                       0  ANALYSIS WARNINGS ARE NUMERICAL PROBLEM MESSAGES
+                       0  ANALYSIS WARNINGS ARE NEGATIVE EIGENVALUE MESSAGES
+                       0  ERROR MESSAGES
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =      2.8    
+       SYSTEM TIME (SEC)    =     0.30    
+       TOTAL CPU TIME (SEC) =      3.1    
+       WALLCLOCK TIME (SEC) =            4
+       MEMORY PEAK (GB)     =            0
