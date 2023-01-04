@@ -258,7 +258,7 @@ def parent_export(w, next_generations, end_pop, results, results_1, topologies, 
             array_to_csv(f'topo_parent_{w + 1}.csv', topologies_1[i - end_pop], dtype=int, mode='a', save_as_int=True)
 
 
-def one_generation(w, restart, directory, p_conn, params):
+def one_generation(w, restart, p_conn, params):
     if restart:
         topologies, results, offspring = parent_import(w=w, restart_pop=params.restart_pop)
         offspring = offspring.reshape((params.end_pop, params.lx, params.ly, params.lz))
@@ -285,7 +285,7 @@ def one_generation(w, restart, directory, p_conn, params):
     print('iteration:', w)
     visualize(w=w, lx=params.lx, ly=params.ly, lz=params.lz,
               penalty_coefficient=params.penalty_coefficient, evaluation_version=params.evaluation_version,
-              max_rf22=params.MaxRF22, directory=directory, end_pop=params.end_pop, parent_conn=p_conn)
+              max_rf22=params.MaxRF22, parent_conn=p_conn)
 
 
 def plot_previous_data(conn_1):
@@ -316,14 +316,11 @@ if __name__ == '__main__':
         if parameters.mode == 'GA':
             if parameters.restart_pop == 0:
                 for gen_idx in range(parameters.ini_gen, parameters.end_gen + 1):
-                    one_generation(w=gen_idx, restart=False, params=parameters, directory=set_path,
-                                   p_conn=parent_conn)
+                    one_generation(w=gen_idx, restart=False, params=parameters, p_conn=parent_conn)
             else:
-                one_generation(w=parameters.ini_gen, restart=True, directory=set_path, params=parameters,
-                               p_conn=parent_conn)
+                one_generation(w=parameters.ini_gen, restart=True, params=parameters, p_conn=parent_conn)
                 for gen_idx in range(parameters.ini_gen + 1, parameters.end_gen + 1):
-                    one_generation(w=gen_idx, restart=False, params=parameters, directory=set_path,
-                                   p_conn=parent_conn)
+                    one_generation(w=gen_idx, restart=False, params=parameters, p_conn=parent_conn)
         elif parameters.mode == 'Something':
             pass
 

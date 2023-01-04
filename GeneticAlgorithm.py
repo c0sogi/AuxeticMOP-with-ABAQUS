@@ -70,25 +70,20 @@ def cutting_function(topologies):
     return cutting, candidate
 
 
-def candidates(candidate_list):  # correction: input: cutting >> cutting, candidate
-    # cuttingZ = cutting // (lx * ly)  # correction: variable name 'candidates' >> 'candidates_reslt'
-    # cuttingY = (cutting % (lx * ly)) // lx
-    # cuttingX = (cutting % (lx * ly)) % lx
+def candidates(candidate_list):
     candidates_results = list(itertools.combinations(candidate_list, 2))  # possible candidate pair of parents
     random.shuffle(candidates_results)
     return candidates_results
 
 
-def crossover(chromosome_1, chromosome_2, cutting_section,
-              topologies):  # Crossover process;      correction: add input 'cutting'
+def crossover(chromosome_1, chromosome_2, cutting_section):
     offspring1 = np.zeros_like(chromosome_1)
     offspring2 = np.zeros_like(chromosome_2)
     offspring1[0:cutting_section] = chromosome_1[0:cutting_section]
     offspring1[cutting_section:] = chromosome_2[cutting_section:]
     offspring2[0:cutting_section] = chromosome_2[0:cutting_section]
     offspring2[cutting_section:] = chromosome_1[cutting_section:]
-    offsprings = np.vstack([offspring1, offspring2])
-    return offsprings
+    return np.vstack([offspring1, offspring2])
 
 
 def generate_offspring(topologies, w, lx, ly, lz, end_pop, mutation_rate, add_probability, timeout):
@@ -102,13 +97,12 @@ def generate_offspring(topologies, w, lx, ly, lz, end_pop, mutation_rate, add_pr
         cutting_section, candidate_list = cutting_function(topologies=topologies)
         print('[Generate offspring] Candidate list: ', candidate_list)
         candidate_pairs_list = candidates(candidate_list=candidate_list)
-        # print('[Generate offspring] Candidate pair:', len(candidate_pairs_list))
         for pair_idx in range(len(candidate_pairs_list)):
             chromosome_1_idx = candidate_pairs_list[pair_idx][0]
             chromosome_2_idx = candidate_pairs_list[pair_idx][1]
             cross_overed_pairs = crossover(chromosome_1=topologies[chromosome_1_idx],
                                            chromosome_2=topologies[chromosome_2_idx],
-                                           cutting_section=cutting_section, topologies=topologies)
+                                           cutting_section=cutting_section)
             cross_overed_chromosome_1 = cross_overed_pairs[0].reshape((lx, ly, lz))
             cross_overed_chromosome_2 = cross_overed_pairs[1].reshape((lx, ly, lz))
             validated_chromosome_1 = mutate_and_validate_topology(cross_overed_chromosome_1,
@@ -152,12 +146,12 @@ def random_array(shape, probability):
         shape)
 
 
-def random_parent_generation(lx, ly, lz, total_offsprings, density, mutation_probability, add_probability, timeout,
-                             save_file=True):
+def random_parents_generation(lx, ly, lz, total_parents, density, mutation_probability, add_probability, timeout,
+                              save_file=True):
     parent_name = 'topo_parent_1.csv'
-    parents = np.empty((total_offsprings, lx * ly * lz))
+    parents = np.empty((total_parents, lx * ly * lz))
     total_volume_frac = 0
-    for parent_idx in range(total_offsprings):
+    for parent_idx in range(total_parents):
         rand_arr = random_array(shape=(lx, ly, lz), probability=density)
         print(f'<<<<< Parent {parent_idx + 1} >>>>>')
         parent = mutate_and_validate_topology(rand_arr, mutation_probability=mutation_probability,
@@ -166,43 +160,34 @@ def random_parent_generation(lx, ly, lz, total_offsprings, density, mutation_pro
         total_volume_frac += volume_frac
         print(f'Volume fraction: {volume_frac:.1f} %\n')
         parents[parent_idx] = parent.flatten()
-    print(f'Average volume fraction: {total_volume_frac / total_offsprings:.1f} %')
+    print(f'Average volume fraction: {total_volume_frac / total_parents:.1f} %')
     if save_file:
         array_to_csv(path=parent_name, arr=parents, dtype=int, mode='w', save_as_int=True)
-    else:
-        for parent in parents:
-            visualize_one_cube(parent.reshape((lx, ly, lz)), full=False)
+    return parents
 
 
 if __name__ == '__main__':
-    path = r'D:\pythoncode\23-1-2\data101010'
-    os.chdir(path)
-    topologies, results = parent_import(w=1, restart_pop=0)  # topo: (100, 1000), reslt: (100, 12)
-    lx = 10
-    ly = 10
-    lz = 10
-    end_pop = 100
+    number_of_voxels_x = 5
+    number_of_voxels_y = 5
+    number_of_voxels_z = 5
+    number_of_parents_to_generate = 5
+    parent_cell_density = 0.2
+    probability_of_mutation_in_structure = 0.05
+    addition_of_voxels_in_validation_process_probability = 0.01
+    timeout_of_validation_process = 0.5
 
-    offspring = generate_offspring(topologies=topologies, w=1, end_pop=end_pop,
-                                   mutation_rate=0.05, add_probability=0.01, timeout=1, lx=lx, ly=ly, lz=lz)
-    for i in range(100):
-        visualize_one_cube(offspring[i])
-    # with open('offspring', mode='wb') as f:
-    #     pickle.dump(offspring, f)
-
-    # cutting_section, candidate_list = cutting_function(topologies=topologies)
-    # candidate_pairs = candidates(candidate_list=candidate_list)
-    # print('[Generate offspring] Candidate pair:', len(candidate_pairs))
-    #
-    # numberings = 0
-    # for pair_idx in range(len(candidate_pairs)):
-    #     sames = False
-    #     topoend = 0
-    #     chromosome_1 = candidate_pairs[pair_idx][0]
-    #     chromosome_2 = candidate_pairs[pair_idx][1]
-    #     offsprings = crossover(chromosome_1=topologies[chromosome_1], chromosome_2=topologies[chromosome_2],
-    #                            cutting_section=cutting_section, topologies=topologies)  ## crossover stage
-    # import numpy as np
-    # print(cutting_function(topologies=topologies[:2]))
-    # random_parent_generation(lx=lx, ly=ly, lz=lz, total_offsprings=end_pop, density=0.1, mutation_probability=0.05,
-    #                          add_probability=0.01, timeout=0.5)
+    topology_2d = random_parents_generation(lx=number_of_voxels_x, ly=number_of_voxels_y, lz=number_of_voxels_z,
+                                            total_parents=number_of_parents_to_generate, density=parent_cell_density,
+                                            mutation_probability=probability_of_mutation_in_structure,
+                                            add_probability=addition_of_voxels_in_validation_process_probability,
+                                            timeout=timeout_of_validation_process,
+                                            save_file=True)
+    for i in range(number_of_parents_to_generate):
+        visualize_one_cube(topology_2d[i].reshape((number_of_voxels_x, number_of_voxels_y, number_of_voxels_z)))
+    offsprings = generate_offspring(topologies=topology_2d, w=1, end_pop=number_of_parents_to_generate,
+                                    mutation_rate=probability_of_mutation_in_structure,
+                                    add_probability=addition_of_voxels_in_validation_process_probability,
+                                    timeout=timeout_of_validation_process,
+                                    lx=number_of_voxels_x, ly=number_of_voxels_y, lz=number_of_voxels_z)
+    for i in range(number_of_parents_to_generate):
+        visualize_one_cube(offsprings[i])

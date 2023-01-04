@@ -118,6 +118,7 @@ def evaluation2(topo2, reslt2, lx, ly, lz, penalty_coefficient, evaluation_versi
 
 
 def max_fitval(w, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
+    fit_max, fit_min = 0, 0
     for i in range(1, w + 1):
         topo, result = parent_import(w=i, restart_pop=0)
         fitness_values = evaluation2(topo2=topo, reslt2=result, lx=lx, ly=ly, lz=lz,
@@ -129,11 +130,11 @@ def max_fitval(w, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22)
         else:
             fit_max1 = np.max(fitness_values, axis=0)
             fit_min1 = np.min(fitness_values, axis=0)
-            for i in range(2):
-                if fit_max1[i] > fit_max[i]:
-                    fit_max[i] = fit_max1[i]
-                if fit_min1[i] < fit_min[i]:
-                    fit_min[i] = fit_min1[i]
+            for j in range(2):
+                if fit_max1[j] > fit_max[j]:
+                    fit_max[j] = fit_max1[j]
+                if fit_min1[j] < fit_min[j]:
+                    fit_min[j] = fit_min1[j]
     return fit_max, fit_min
 
 
@@ -241,8 +242,7 @@ def pareto_front_finding(fitness_values, pop_index):
     return pop_index[pareto_front]
 
 
-def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, directory, end_pop, parent_conn,
-              file_io=True):
+def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, parent_conn, file_io=True):
     topo_p, reslt_p = parent_import(w + 1, restart_pop=0)
     fitness_values = evaluation2(topo2=topo_p, reslt2=reslt_p, lx=lx, ly=ly, lz=lz,
                                  penalty_coefficient=penalty_coefficient, evaluation_version=evaluation_version,
@@ -273,7 +273,7 @@ def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, 
     #     print("%dth generation %dth pop   [%E   %E]   Job-%d-%d" % (
     #         w + 1, q + 1, fitness_values[q, 0], fitness_values[q, 1], gen_num, pop_num))
     # print(fitness_values)
-    ##pareto_front
+    # pareto_front
     # fit_max, fit_min = max_fitval(w=w+1, lx=lx, ly=ly, lz=lz,
     #                               evaluation_version=evaluation_version, penalty_coefficient=penalty_coefficient,
     #                               max_rf22=max_rf22)
@@ -299,7 +299,7 @@ def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, 
     # plt.xlabel('Objective function 1')
     # plt.ylabel('Objective function 2')
     # plt.axis((rp_min1, rp_max1, rp_min2, rp_max2))
-    ##hypervolume
+    # hypervolume
     print('Hypervolume scatter: ', w, normalized_hypervolume)
     # app.scatter(1, w, normalized_hypervolume)
     # print(normalized_hypervolume, hypervolume)

@@ -47,7 +47,7 @@ params_main_loaded = [dict()]
 
 
 class App:
-    def __init__(self, conn):
+    def __init__(self, conn=None):
         self.conn = conn
         self.ready_to_run = False
         self.root = tk.Tk()
@@ -55,17 +55,34 @@ class App:
         self.root.title('APUCI: Abaqus-Python Unified Control Interface')
         self.root.config(background='#FFFFFF')
         self.root.resizable(False, False)
+
         self.up_frame = tk.Frame(self.root, width=left_width + right_width + 2 * padx, height=100)
         self.up_frame.config(background='#FFFFFF')
+        self.down_frame = tk.Frame(self.root, width=right_width + left_width + 2 * padx, height=height,
+                                   background='#FFFFFF')
+        self.left_frame = tk.Frame(self.down_frame, width=left_width, height=height, padx=padx, pady=pady)
+        self.right_frame = tk.Frame(self.down_frame, width=right_width, height=height, padx=padx, pady=pady)
+
         self.set_path_title = tk.Label(self.up_frame, text='Abaqus script와 Parent 파일이 들어있는 폴더를 골라 주세요')
         self.set_path_title.config(background='#FFFFFF')
         self.set_path_display = tk.Listbox(self.up_frame, width=50, height=1)
         self.set_path_btn = tk.Button(self.up_frame, text='폴더 찾기', width=8, command=self.onclick_set_path_button)
+        self.submit_btn = tk.Button(self.right_frame, width=button_width, text='프리셋 저장', command=self.onclick_submit_btn)
+        self.exit_btn = tk.Button(self.right_frame, width=button_width, text='종료',
+                                  command=self.onclick_exit_btn, background='#FF0000', foreground='#FFFFFF')
+        self.set_default_btn = tk.Button(self.right_frame, width=button_width, text='기본값 로드',
+                                         command=self.onclick_set_default_btn)
+        self.figure, self.ax = plt.subplots(nrows=1, ncols=2,
+                                            figsize=((left_width - padx) / 100, (height - pady) / 100), dpi=100)
+        self.bar = FigureCanvasTkAgg(self.figure, self.left_frame)
+
         self.up_frame.grid(row=0, column=0, padx=padx, pady=pady / 2)
         self.up_frame.grid_propagate(False)
         self.set_path_title.pack()
         self.set_path_display.pack()
         self.set_path_btn.pack()
+        self.bar.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
+
         self.setPath = tk.StringVar()
         self.string_vars = [tk.StringVar() for _ in params_main.keys()]
         self.root.mainloop()
@@ -74,16 +91,13 @@ class App:
         self.root.quit()
 
     def show_canvas(self):
-        self.figure, self.ax = plt.subplots(nrows=1, ncols=2,
-                                            figsize=((left_width - padx) / 100, (height - pady) / 100), dpi=100)
-        self.bar = FigureCanvasTkAgg(self.figure, self.left_frame)
-        self.bar.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
         self.ax[0].set(title='Pareto Fronts', xlabel='Objective function 1', ylabel='Objective function 2')
         self.ax[0].grid(True)
         self.ax[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
         self.ax[1].grid(True)
         self.ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
-        self.update_canvas()
+        if self.conn is not None:
+            self.update_canvas()
 
     def scatter(self, axis_idx, i, j):
         print('[GUI] Scattering: ', i, j)
@@ -162,7 +176,8 @@ class App:
         for params_idx, key in enumerate(params_main.keys()):
             params_main[key] = string_to_int_or_float_or_string(self.string_vars[params_idx].get())
         if self.ready_to_run:
-            self.conn.send(self.setPath.get())
+            if self.conn is not None:
+                self.conn.send(self.setPath.get())
             self.submit_btn.config(background='#0000FF', foreground='#FFFFFF', text='실행 중')
         else:
             with open('./PARAMS_MAIN', mode='wb') as f:
@@ -183,11 +198,6 @@ class App:
             'mode': ('GA', 'random'),
             'evaluation_version': ('ver1', 'ver2', 'ver3')
         }
-        self.down_frame = tk.Frame(self.root, width=right_width + left_width + 2 * padx, height=height)
-        self.down_frame.config(background='#FFFFFF')
-        self.left_frame = tk.Frame(self.down_frame, width=left_width, height=height, padx=padx, pady=pady)
-        # plot_frame[0] = left_frame  # $
-        self.right_frame = tk.Frame(self.down_frame, width=right_width, height=height, padx=padx, pady=pady)
         self.down_frame.grid(row=1, column=0, padx=padx, pady=pady / 2)
         self.down_frame.grid_propagate(False)
         self.left_frame.grid(row=1, column=0, padx=padx, pady=pady / 2)
@@ -211,12 +221,6 @@ class App:
             self.string_vars[i].set('')
 
         empty_label = tk.Label(self.right_frame)
-        self.submit_btn = tk.Button(self.right_frame, width=button_width, text='프리셋 저장', command=self.onclick_submit_btn)
-        self.exit_btn = tk.Button(self.right_frame, width=button_width, text='종료',
-                                  command=self.onclick_exit_btn, background='#FF0000', foreground='#FFFFFF')
-        self.set_default_btn = tk.Button(self.right_frame, width=button_width, text='기본값 로드',
-                                         command=self.onclick_set_default_btn)
-
         empty_label.grid(row=len(params_main.keys()))
         self.submit_btn.grid(row=len(params_main.keys()) + 1)
         self.exit_btn.grid(row=len(params_main.keys()) + 2)
@@ -274,3 +278,7 @@ def translator(s, to_korean):
                   'n_gpus': 'GPU 코어 수'
                   }
     return dictionary.get(s) if to_korean else {v: k for k, v in dictionary.items()}.get(s)
+
+
+if __name__ == '__main__':
+    app = App()
