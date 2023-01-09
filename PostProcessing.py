@@ -155,7 +155,7 @@ def fitval_sort(fv):
     return fv1_sort, fv2_sort, sort
 
 
-def calculate_hyper_volume(pareto_1_sorted, pareto_2_sorted, ref_x, ref_y):
+def calculate_hyper_volume(pareto_1_sorted, pareto_2_sorted, ref_x: float = 0.0, ref_y: float = 0.0):
     datum_point_x, datum_point_y = pareto_1_sorted[-1], pareto_2_sorted[0]
     x_lower_bound, x_upper_bound = pareto_1_sorted[0], pareto_1_sorted[-1]
     y_lower_bound, y_upper_bound = pareto_2_sorted[-1], pareto_2_sorted[0]
@@ -166,13 +166,7 @@ def calculate_hyper_volume(pareto_1_sorted, pareto_2_sorted, ref_x, ref_y):
     datum_hv = quad(lambda x: abs(f(x)), x_lower_bound, x_upper_bound)[0]
     datum_hv -= (x_upper_bound - x_lower_bound) * (y_upper_bound - y_lower_bound)
     hv = datum_hv + (ref_x - x_lower_bound) * (ref_y - y_lower_bound)
-    datum_values = {
-        'x_lower_bound': x_lower_bound,
-        'x_upper_bound': x_upper_bound,
-        'y_lower_bound': y_lower_bound,
-        'y_upper_bound': y_upper_bound,
-        'datum_hv': datum_hv}
-    return hv, datum_values
+    return hv, datum_hv
 
 
 def pareto_front_finding(fitness_values, pop_index):
@@ -260,7 +254,7 @@ def pareto_front_finding(fitness_values, pop_index):
 #     print(sort)
 
 
-def find_pareto_front_points(costs, return_index=False):
+def find_pareto_front_points(costs: np.ndarray, return_index: bool = False) -> np.ndarray:
     """
     A function calculating indices of pareto fronts or values of pareto points. The returned value is sorted by the
     first cost value.
@@ -299,26 +293,26 @@ def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, 
         ref_x, ref_y = float(fit_max[0]), float(fit_max[1])
     fitness_pareto = find_pareto_front_points(costs=fitness_values, return_index=False)
     pareto_1_sorted, pareto_2_sorted = fitness_pareto[:, 0], fitness_pareto[:, 1]
-    hyper_volume, datum_values = calculate_hyper_volume(
+    hv, datum_hv = calculate_hyper_volume(
         pareto_1_sorted=pareto_1_sorted, pareto_2_sorted=pareto_2_sorted, ref_x=ref_x, ref_y=ref_y)
     if file_io:
         if os.path.isfile(f'Plot_data'):
             with open(f'Plot_data', mode='rb') as f_read:
                 read_data = pickle.load(f_read)
             with open(f'Plot_data', mode='wb') as f_write:
-                read_data.update({w: (pareto_1_sorted, pareto_2_sorted, w, hyper_volume)})
+                read_data.update({w: (pareto_1_sorted, pareto_2_sorted, w, datum_hv)})
                 pickle.dump(read_data, f_write)
         else:
             with open(f'Plot_data', mode='wb') as f_write:
-                pickle.dump({w: (pareto_1_sorted, pareto_2_sorted, w, hyper_volume)}, f_write)
-        parent_conn.send((pareto_1_sorted, pareto_2_sorted, w, hyper_volume))
+                pickle.dump({w: (pareto_1_sorted, pareto_2_sorted, w, datum_hv)}, f_write)
+        parent_conn.send((pareto_1_sorted, pareto_2_sorted, w, datum_hv))
 
     print('[VISUALIZE] Plotting Pareto front of fitness values:')
     print(f'> Objective function 1:{pareto_1_sorted}')
     print(f'> Objective function 2:{pareto_2_sorted}')
     print('[VISUALIZE] Scattering Hyper volume:')
-    print(f'> Generation {w}: {hyper_volume}')
-    return pareto_1_sorted, pareto_2_sorted, w, hyper_volume
+    print(f'> Generation {w}: {datum_hv}')
+    return pareto_1_sorted, pareto_2_sorted, w, datum_hv
 
 
 def crowding_calculation(fitness_values):
