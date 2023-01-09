@@ -4,48 +4,21 @@ import itertools
 import os
 from functools import reduce
 from MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
-from numba import njit
+from FileIO import array_to_csv
 
 
-def parent_import(w, restart_pop):
-    topo = np.genfromtxt('topo_parent_' + str(w) + '.csv', delimiter=',', dtype=int)
-    reslt = np.genfromtxt('Output_parent_' + str(w) + '.csv', delimiter=',', dtype=np.float32)
-
-    if restart_pop == 0:
-        return topo, reslt
-
-    else:  # restart
-        offspring = np.genfromtxt('topo_offspring_' + str(w) + '.csv', delimiter=',', dtype=int)
-        return topo, reslt, offspring
+def inspect_clone_in_all_parents(w, topology_flattened, all_parent_topologies):
+    for generation_idx in range(w):
+        parents_topologies = all_parent_topologies[generation_idx]
+        for parent_idx in range(len(parents_topologies)):
+            if np.array_equal(parents_topologies[parent_idx], topology_flattened):
+                return True
+    return False
 
 
-def array_to_csv(path, arr, dtype, mode, save_as_int=False):
-    if mode == 'a' and os.path.isfile(path):
-        previous_arr = np.genfromtxt(path, delimiter=',', dtype=dtype)
-        # print('[array_to_csv] append shape: ', previous_arr.shape, arr.shape)
-        arr = np.vstack((previous_arr, arr))
-    fmt = '%i' if save_as_int else '%.18e'
-    np.savetxt(path, arr, delimiter=',', fmt=fmt)
-
-
-def inspect_clone_in_previous_generations(topology, end_pop, w, lx, ly, lz):  # inspect topology clones
-    if w == 1:
-        return False
-    else:
-        for generation_idx in range(1, w):
-            parents_topologies = np.genfromtxt('topo_parent_' + str(generation_idx) + '.csv', delimiter=',',
-                                               dtype=int).reshape((end_pop, lx * ly * lz))
-            for parent_idx in range(len(parents_topologies)):
-                if np.array_equal(parents_topologies[parent_idx], topology[0]) or np.array_equal(
-                        parents_topologies[parent_idx], topology[1]):
-                    return True
-        return False
-
-
-@njit
 def inspect_clone_in_current_offsprings(topology, offspring):  # inspect topology clones
     for offspring_idx in range(len(offspring)):
-        if np.array_equal(offspring[offspring_idx], topology) or np.array_equal(offspring[offspring_idx], topology[1]):
+        if np.array_equal(offspring[offspring_idx], topology):
             return True
     return False
 
@@ -59,8 +32,8 @@ def cutting_function(topologies):
         candidate = list()
         cutting = cuttings[-1]
         cuttings = np.delete(cuttings, obj=-1, axis=0)
-        for parent_idx in range(len(topologies)):  # correction: topo > topologys
-            if topologies[parent_idx, cutting] == 1:  # correction: topo > topologys
+        for parent_idx in range(len(topologies)):
+            if topologies[parent_idx, cutting] == 1:
                 candidate.append(parent_idx)
             if len(candidate) == 2:
                 candidate_found_flag = True
@@ -76,22 +49,27 @@ def candidates(candidate_list):
     return candidates_results
 
 
-def crossover(chromosome_1, chromosome_2, cutting_section):
+def crossover(chromosome_1, chromosome_2, cutting_section):  # Crossover process
     offspring1 = np.zeros_like(chromosome_1)
     offspring2 = np.zeros_like(chromosome_2)
     offspring1[0:cutting_section] = chromosome_1[0:cutting_section]
     offspring1[cutting_section:] = chromosome_2[cutting_section:]
     offspring2[0:cutting_section] = chromosome_2[0:cutting_section]
     offspring2[cutting_section:] = chromosome_1[cutting_section:]
-    return np.vstack([offspring1, offspring2])
+    offspring = np.vstack([offspring1, offspring2])
+    return offspring
 
 
-def generate_offspring(topologies, w, lx, ly, lz, end_pop, mutation_rate, add_probability, timeout):
+def generate_offspring(topologies, w, lx, ly, lz, end_pop, mutation_rate, timeout):
     offspring = np.empty((0, lx * ly * lz), int)
-    offspring_generation_complete = False
     trial = 1
     validation_count = 0
-    while not offspring_generation_complete:
+    all_parents_topologies = np.empty((0, end_pop, lx * ly * lz), int)
+    for generation_idx in range(w):
+        parent_topologies = np.genfromtxt('topo_parent_' + str(generation_idx + 1) + '.csv', delimiter=',',
+                                          dtype=int).reshape((1, end_pop, lx * ly * lz))
+        all_parents_topologies = np.vstack((all_parents_topologies, parent_topologies))
+    while True:
         print('[Generate offspring] Trial: ', trial)
         trial += 1
         cutting_section, candidate_list = cutting_function(topologies=topologies)
@@ -106,39 +84,32 @@ def generate_offspring(topologies, w, lx, ly, lz, end_pop, mutation_rate, add_pr
             cross_overed_chromosome_1 = cross_overed_pairs[0].reshape((lx, ly, lz))
             cross_overed_chromosome_2 = cross_overed_pairs[1].reshape((lx, ly, lz))
             validated_chromosome_1 = mutate_and_validate_topology(cross_overed_chromosome_1,
-                                                                  mutation_probability=mutation_rate,
-                                                                  add_probability=add_probability, timeout=timeout)
-            validation_count += 1
-            print(f'[Generate offspring] Validation of chromosome {validation_count} complete!')
+                                                                  mutation_probability=mutation_rate, timeout=timeout)
             validated_chromosome_2 = mutate_and_validate_topology(cross_overed_chromosome_2,
-                                                                  mutation_probability=mutation_rate,
-                                                                  add_probability=add_probability, timeout=timeout)
-            validation_count += 1
-            print(f'[Generate offspring] Validation of chromosome {validation_count} complete!')
-            validated_chromosomes = np.vstack((validated_chromosome_1.flatten(),
-                                               validated_chromosome_2.flatten()))
-            is_any_clone_in_previous_generations = inspect_clone_in_previous_generations(
-                topology=validated_chromosomes, end_pop=end_pop, w=w, lx=lx, ly=ly, lz=lz)
-            if is_any_clone_in_previous_generations:
-                print('[Generate offspring] Clone structure found in previous generations!')
-                continue
-            is_any_clone_in_current_offsprings = inspect_clone_in_current_offsprings(
-                topology=validated_chromosomes, offspring=offspring)
-            if is_any_clone_in_previous_generations or is_any_clone_in_current_offsprings:
-                print('[Generate offspring] Clone structure found in current offsprings!')
-                continue
-            offspring = np.vstack((offspring, validated_chromosome_1.flatten()))
-            if len(offspring) == end_pop:
-                offspring_generation_complete = True
-                print('[Generate offspring] Generating offspring complete')
-                break
-            offspring = np.vstack((offspring, validated_chromosome_2.flatten()))
-            if len(offspring) == end_pop:
-                offspring_generation_complete = True
-                print('[Generate offspring] Generating offspring complete')
-                break
-    array_to_csv(f'topo_offspring_{w}.csv', offspring, dtype=int, mode='w', save_as_int=True)
-    return offspring.reshape((end_pop, lx, ly, lz))
+                                                                  mutation_probability=mutation_rate, timeout=timeout)
+            for validated_chromosome in (validated_chromosome_1, validated_chromosome_2):
+                if validated_chromosome is None:
+                    print('[Generate offspring] <!> Non-connected tree detected')
+                    continue
+                else:
+                    is_any_clone_in_all_parents = inspect_clone_in_all_parents(
+                        w=w, topology_flattened=validated_chromosome, all_parent_topologies=all_parents_topologies)
+                    is_any_clone_in_current_offsprings = inspect_clone_in_current_offsprings(
+                        topology=validated_chromosome, offspring=offspring)
+                    if is_any_clone_in_all_parents:
+                        print('[Generate offspring] Clone structure found in parents!')
+                        continue
+                    elif is_any_clone_in_current_offsprings:
+                        print('[Generate offspring] Clone structure found in current offsprings!')
+                        continue
+                    else:
+                        offspring = np.vstack((offspring, validated_chromosome.flatten()))
+                        validation_count += 1
+                        print(f'[Generate offspring] Validation of chromosome {validation_count} complete!')
+                        if len(offspring) == end_pop:
+                            print('[Generate offspring] Generating offspring complete')
+                            array_to_csv(f'topo_offspring_{w}.csv', offspring, dtype=int, mode='w', save_as_int=True)
+                            return offspring.reshape((end_pop, lx, ly, lz))
 
 
 def random_array(shape, probability):
@@ -146,48 +117,129 @@ def random_array(shape, probability):
         shape)
 
 
-def random_parents_generation(lx, ly, lz, total_parents, density, mutation_probability, add_probability, timeout,
-                              save_file=True):
+def random_parent_generation(lx, ly, lz, total_offsprings, density, mutation_probability, timeout,
+                             save_file=True):
     parent_name = 'topo_parent_1.csv'
-    parents = np.empty((total_parents, lx * ly * lz))
+    parents = np.empty((total_offsprings, lx * ly * lz))
+    total_parent_generation_count = 0
     total_volume_frac = 0
-    for parent_idx in range(total_parents):
+    while total_parent_generation_count < total_offsprings:
         rand_arr = random_array(shape=(lx, ly, lz), probability=density)
-        print(f'<<<<< Parent {parent_idx + 1} >>>>>')
         parent = mutate_and_validate_topology(rand_arr, mutation_probability=mutation_probability,
-                                              add_probability=add_probability, timeout=timeout)
+                                              timeout=timeout)
+        if parent is None:
+            continue
+        total_parent_generation_count += 1
+        print(f'<<<<< Parent {total_parent_generation_count + 1} >>>>>')
+
         volume_frac = np.count_nonzero(parent) / (lx * ly * lz / 100)
         total_volume_frac += volume_frac
         print(f'Volume fraction: {volume_frac:.1f} %\n')
-        parents[parent_idx] = parent.flatten()
-    print(f'Average volume fraction: {total_volume_frac / total_parents:.1f} %')
+        parents[total_parent_generation_count] = parent.flatten()
+    print(f'Average volume fraction: {total_volume_frac / total_offsprings:.1f} %')
     if save_file:
         array_to_csv(path=parent_name, arr=parents, dtype=int, mode='w', save_as_int=True)
-    return parents
+    else:
+        for parent in parents:
+            visualize_one_cube(parent.reshape((lx, ly, lz)), full=False)
+
+
+def inspect_topologies(generation):
+    # offspring끼리 비교
+    for w in range(1, generation):
+        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
+        topo_2 = np.genfromtxt(path + f'topo_offspring_{w + 1}.csv', delimiter=',', dtype=int)
+        count = 0
+        for i in range(100):
+            flag = False
+            for j in range(100):
+                if np.array_equal(topo_1[i], topo_2[j]):
+                    flag = True
+            if flag:
+                count += 1
+        print(f'offspring {w} vs {w + 1}: ', count)
+
+    # parent끼리 비교
+    for w in range(1, generation):
+        topo_1 = np.genfromtxt(path + f'topo_parent_{w}.csv', delimiter=',', dtype=int)
+        topo_2 = np.genfromtxt(path + f'topo_parent_{w + 1}.csv', delimiter=',', dtype=int)
+        count = 0
+        for i in range(100):
+            flag = False
+            for j in range(100):
+                if np.array_equal(topo_1[i], topo_2[j]):
+                    flag = True
+            if flag:
+                count += 1
+        print(f'parent {w} vs {w + 1}: ', count)
+
+    # Parent와 offspring끼리 비교
+    for w in range(1, generation+1):
+        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
+        topo_2 = np.genfromtxt(path + f'topo_parent_{w}.csv', delimiter=',', dtype=int)
+        count = 0
+        for i in range(100):
+            flag = False
+            for j in range(100):
+                if np.array_equal(topo_1[i], topo_2[j]):
+                    flag = True
+            if flag:
+                count += 1
+        print(f'offspring {w} vs parent {w}: ', count)
+
+    # offspring 내부 비교
+    for w in range(1, generation+1):
+        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
+        count = 0
+        for i in range(100):
+            flag = False
+            for j in range(100):
+                if i != j and np.array_equal(topo_1[i], topo_1[j]):
+                    flag = True
+            if flag:
+                count += 1
+        print(f'offspring {w}: ', count)
+
+    # parent 내부 비교
+    for w in range(1, generation+1):
+        topo_1 = np.genfromtxt(path + f'topo_parent_{w}.csv', delimiter=',', dtype=int)
+        count = 0
+        for i in range(100):
+            flag = False
+            for j in range(100):
+                if i != j and np.array_equal(topo_1[i], topo_1[j]):
+                    flag = True
+            if flag:
+                count += 1
+        print(f'parent {w}: ', count)
+
+    # offspring vs parent 다음세대 비교
+    for w in range(1, generation):
+        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
+        topo_2 = np.genfromtxt(path + f'topo_parent_{w + 1}.csv', delimiter=',', dtype=int)
+        count = 0
+        for i in range(100):
+            flag = False
+            for j in range(100):
+                if np.array_equal(topo_1[i], topo_2[j]):
+                    flag = True
+            if flag:
+                count += 1
+        print(f'offspring {w} vs parent {w + 1}: ', count)
 
 
 if __name__ == '__main__':
-    number_of_voxels_x = 5
-    number_of_voxels_y = 5
-    number_of_voxels_z = 5
-    number_of_parents_to_generate = 5
-    parent_cell_density = 0.2
-    probability_of_mutation_in_structure = 0.05
-    addition_of_voxels_in_validation_process_probability = 0.01
-    timeout_of_validation_process = 0.5
-
-    topology_2d = random_parents_generation(lx=number_of_voxels_x, ly=number_of_voxels_y, lz=number_of_voxels_z,
-                                            total_parents=number_of_parents_to_generate, density=parent_cell_density,
-                                            mutation_probability=probability_of_mutation_in_structure,
-                                            add_probability=addition_of_voxels_in_validation_process_probability,
-                                            timeout=timeout_of_validation_process,
-                                            save_file=True)
-    for i in range(number_of_parents_to_generate):
-        visualize_one_cube(topology_2d[i].reshape((number_of_voxels_x, number_of_voxels_y, number_of_voxels_z)))
-    offsprings = generate_offspring(topologies=topology_2d, w=1, end_pop=number_of_parents_to_generate,
-                                    mutation_rate=probability_of_mutation_in_structure,
-                                    add_probability=addition_of_voxels_in_validation_process_probability,
-                                    timeout=timeout_of_validation_process,
+    from FileIO import parent_import
+    path = 'F:/shshsh/data-23-1-4/'
+    os.chdir(path)
+    topos, _ = parent_import(w=18, restart_pop=0)  # topo: (100, 1000), result: (100, 12)
+    number_of_voxels_x = 10
+    number_of_voxels_y = 10
+    number_of_voxels_z = 10
+    end_population = 100
+    offsprings = generate_offspring(topologies=topos, w=18, end_pop=end_population,
+                                    mutation_rate=0.05, timeout=0.5,
                                     lx=number_of_voxels_x, ly=number_of_voxels_y, lz=number_of_voxels_z)
-    for i in range(number_of_parents_to_generate):
-        visualize_one_cube(offsprings[i])
+    inspect_topologies(generation=19)
+    for off_idx in range(100):
+        visualize_one_cube(offsprings[off_idx])

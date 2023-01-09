@@ -2,43 +2,12 @@ import datetime as dt
 from scipy.ndimage import label
 from numba import njit
 import numpy as np
-import matplotlib.pyplot as plt
 import random
-
-
-def quaver_to_full(quaver):
-    quarter = np.concatenate((np.flip(quaver, axis=0), quaver), axis=0)
-    half = np.concatenate((np.flip(quarter, axis=1), quarter), axis=1)
-    full = np.concatenate((np.flip(half, axis=2), half), axis=2)
-    return np.swapaxes(full, axis1=0, axis2=2)
-
-
-def visualize_one_cube(cube_3d_array, full=False):
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10), subplot_kw={
-        'projection': '3d'
-    })
-    ax.set(ylabel='y', xticks=[], zticks=[])
-    ax.voxels(quaver_to_full(cube_3d_array) if full else cube_3d_array, facecolor='#e02050', edgecolors='k')
-    ax.grid(True)
-    plt.show()
-
-
-def visualize_n_cubes(arr_4d, full=False):
-    n_row = 1
-    n_col = arr_4d.shape[0]
-    fig, ax = plt.subplots(n_row, n_col, figsize=(20, 5), subplot_kw={
-        'projection': '3d'
-    })
-    for idx in range(n_col):
-        ax[idx].set(xlabel='x', ylabel='y', zlabel='z')
-        ax[idx].voxels(quaver_to_full(arr_4d[idx]) if full else arr_4d[idx],
-                       facecolor='r', edgecolors='k')
-        ax[idx].grid(True)
-    plt.show()
+from PostProcessing import visualize_one_cube
 
 
 @njit
-def design_const_add(topologies, lx, ly, lz):
+def make_voxels_surface_contact(topologies, lx, ly, lz):
     topo = topologies.copy()
     flag = 1
     direction = np.array([[1, 1],
@@ -133,7 +102,7 @@ def design_const_add(topologies, lx, ly, lz):
     return topo, np.array_equal(topologies, topo), changed_voxels
 
 
-def check_printability_by_slicing(arr_3d, max_distance=1):
+def make_3d_print_without_support(arr_3d, max_distance=1):  # arr[x,y,z]
     arr_3d_result = arr_3d.copy()
     x_size, y_size, z_size = arr_3d_result.shape[0], arr_3d_result.shape[1], arr_3d_result.shape[2]
     total_changed_voxels = 0
@@ -207,37 +176,34 @@ def voxel_elimination_by_islands(x_size, z_size, labeled_arr, dead_islands, surv
                         if arr_3d_result[x_position, y_idx - y_direction, z_position]:
                             is_any_around = True
                 if not is_any_around:
+                    # print(f'Overhang island Eliminated (x,y,z) = ({x_idx},{y_idx},{z_idx})')
                     arr_3d_result[x_idx, y_idx, z_idx] = 0
                     changed_voxels -= 1
     return arr_3d_result, changed_voxels
 
 
-def one_connected_tree(arr_3d, add_probability):
+def one_connected_tree(arr_3d):
     arr_shape = arr_3d.shape
     arr_copy = arr_3d.copy()
     is_no_change = False
-    add_random_voxels_count = 0
     total_changed_voxels = 0
     while True:
         labeled_arr, max_label_idx = label(arr_copy)
         survived_labels = set.intersection(
             *one_survived_tree_labels(labeled_arr, arr_shape[0], arr_shape[1], arr_shape[2])) - {0}
-
         unique = dict(zip(*np.unique(labeled_arr, return_counts=True)))
         unique = {key: unique[key] for key in survived_labels}
         try:
             last_survived_label = max(unique, key=unique.get)
-            arr_copy, changed_voxels = one_survived_tree(arr_copy, labeled_arr, arr_shape[0], arr_shape[1],
-                                                         arr_shape[2], last_survived_label)
+            arr_copy, changed_voxels = one_survived_tree(
+                arr_3d=arr_copy, labeled_arr=labeled_arr, last_survived_label=last_survived_label)
             total_changed_voxels += changed_voxels
             break
         except ValueError:
-            add_random_voxels_count += 1
-            arr_copy, changed_voxels = add_random_voxels(arr_copy, probability=add_probability)
-            total_changed_voxels += changed_voxels
+            return None, False, total_changed_voxels
     if np.array_equal(arr_3d, arr_copy):
         is_no_change = True
-    return arr_copy, is_no_change, add_random_voxels_count, total_changed_voxels
+    return arr_copy, is_no_change, total_changed_voxels
 
 
 @njit
@@ -271,15 +237,18 @@ def one_survived_tree_labels(labeled_arr, lx, ly, lz):
 
 
 @njit
-def one_survived_tree(arr_copy, labeled_arr, lx, ly, lz, last_survived_label):
+def one_survived_tree(arr_3d, labeled_arr, last_survived_label):
+    lx = arr_3d.shape[0]
+    ly = arr_3d.shape[1]
+    lz = arr_3d.shape[2]
     changed_voxels = 0
     for i in range(lx):
         for j in range(ly):
             for k in range(lz):
                 if labeled_arr[i, j, k] not in (0, last_survived_label):
                     changed_voxels -= 1
-                    arr_copy[i, j, k] = 0
-    return arr_copy, changed_voxels
+                    arr_3d[i, j, k] = 0
+    return arr_3d, changed_voxels
 
 
 @njit
@@ -301,45 +270,51 @@ def connect_island(local_arr, labeled_arr, max_label, x_start_gap, y_start_gap, 
         return arr_copy, changed_voxels
 
 
-def mutate_and_validate_topology(arr_3d, mutation_probability, add_probability, timeout):
+def mutate_and_validate_topology(arr_3d, mutation_probability, timeout):
     arr_3d_mutated, voxels_0 = mutation(arr_3d.copy(), mutation_probability=mutation_probability)
-    lx, ly, lz = arr_3d.shape[0], arr_3d.shape[1], arr_3d.shape[2]
-    timeout_count, voxels_1, voxels_2, voxels_3 = 0, 0, 0, 0
+    lx = arr_3d.shape[0]
+    ly = arr_3d.shape[1]
+    lz = arr_3d.shape[2]
+    timeout_count = 0
+    voxels_1, voxels_2, voxels_3 = 0, 0, 0
     while True:
-        total_random_voxel_additions = 0
         arr_3d_mutated_copy = arr_3d_mutated.copy()
         now1 = dt.datetime.now()
         is_timeout = False
         while not is_timeout:
-            arr_3d_mutated_copy, not_changed1, random_voxel_additions, voxels_1 = one_connected_tree(
-                arr_3d_mutated_copy, add_probability=add_probability)
-            total_random_voxel_additions += random_voxel_additions
-            arr_3d_mutated_copy, not_changed2, voxels_2 = check_printability_by_slicing(arr_3d_mutated_copy)
-            arr_3d_mutated_copy, not_changed3, voxels_3 = design_const_add(arr_3d_mutated_copy, lx, ly, lz)
+            arr_3d_mutated_copy, not_changed1, voxels_1 = one_connected_tree(arr_3d_mutated_copy)
+            if arr_3d_mutated_copy is None:
+                return None
+            arr_3d_mutated_copy, not_changed2, voxels_2 = make_3d_print_without_support(arr_3d_mutated_copy)
+            arr_3d_mutated_copy, not_changed3, voxels_3 = make_voxels_surface_contact(arr_3d_mutated_copy, lx, ly, lz)
             if not_changed1 and not_changed2 and not_changed3:  # while 문 처음과 끝에서 변한 구조가 없을 때 break
                 break
             now2 = dt.datetime.now()
             time_diff = now2 - now1
             if time_diff.seconds + time_diff.microseconds * 1e-6 >= timeout:
+                # Timeout due to too much long validation time
                 is_timeout = True
                 break
             if abs(voxels_0 + voxels_1 + voxels_2 + voxels_3) > mutation_probability * lx * ly * lz:
+                # Timeout due to too much voxel changes in structure
                 is_timeout = True
         if is_timeout:
             timeout_count += 1
             arr_3d_mutated, voxels_0 = mutation(arr_3d, mutation_probability=mutation_probability)
         else:
             break
+        # Timeout!
     print('> Total changes in structure: ', voxels_0 + voxels_1 + voxels_2 + voxels_3)
+    print('> Timeout count: ', timeout_count)
     return arr_3d_mutated_copy
 
 
-def mutate_and_validate_topologies(arr_4d, mutation_probability, add_probability, timeout, view_topo=False):
+def mutate_and_validate_topologies(arr_4d, mutation_probability, timeout, view_topo=False):
     arr_4d_copy = arr_4d.copy()
     for arr_idx, arr_3d in enumerate(arr_4d):
         print(f'\n<<<<<<<<<< Offspring {arr_idx + 1} >>>>>>>>>>')
         arr_4d_copy[arr_idx] = mutate_and_validate_topology(arr_3d, mutation_probability=mutation_probability,
-                                                            timeout=timeout, add_probability=add_probability)
+                                                            timeout=timeout)
         if view_topo:
             visualize_one_cube(arr_4d_copy[arr_idx])
     return arr_4d_copy
@@ -367,21 +342,53 @@ def mutation(arr_3d, mutation_probability):
     return arr_copy, changed_voxels
 
 
-@njit
-def add_random_voxels(arr_3d, probability=0.01):
-    arr_copy = arr_3d.copy()
-    changed_voxels = 0
-    lx = arr_3d.shape[0]
-    ly = arr_3d.shape[1]
-    lz = arr_3d.shape[2]
+# @njit
+# def move_one_random_voxel(arr_3d, probability=0.01):
+#     arr_copy = arr_3d.copy()
+#     lx = arr_3d.shape[0]
+#     ly = arr_3d.shape[1]
+#     lz = arr_3d.shape[2]
+#
+#     for i in range(lx):
+#         for j in range(ly):
+#             for k in range(lz):
+#                 if arr_copy[i, j, k] and (np.random.random() < probability):
+#                     arr_copy[i, j, k] = 0
+#                     p = np.random.random()
+#                     r1, r2, r3 = 0, 0, 0
+#                     if p < 1 / 6:
+#                         r1 = -1
+#                     elif 1 / 6 < p < 1 / 3:
+#                         r1 = 1
+#                     elif 1 / 3 < p < 1 / 2:
+#                         r2 = -1
+#                     elif 1 / 2 < p < 2 / 3:
+#                         r2 = 1
+#                     elif 2 / 3 < p < 5 / 6:
+#                         r3 = -1
+#                     else:
+#                         r3 = 1
+#                     if i + r1 < 0:
+#                         r1 = 1
+#
+#                     arr_copy[i + r1, j + r2, k + r3] = 1
 
-    for i in range(lx):
-        for j in range(ly):
-            for k in range(lz):
-                if (not arr_copy[i, j, k]) and (np.random.random() < probability):
-                    arr_copy[i, j, k] = 1
-                    changed_voxels += 1
-    return arr_copy, changed_voxels
+
+# @njit
+# def add_random_voxels(arr_3d, probability=0.01):
+#     arr_copy = arr_3d.copy()
+#     changed_voxels = 0
+#     lx = arr_3d.shape[0]
+#     ly = arr_3d.shape[1]
+#     lz = arr_3d.shape[2]
+#
+#     for i in range(lx):
+#         for j in range(ly):
+#             for k in range(lz):
+#                 if (not arr_copy[i, j, k]) and (np.random.random() < probability):
+#                     arr_copy[i, j, k] = 1
+#                     changed_voxels += 1
+#     return arr_copy, changed_voxels
 
 
 # def generate_gaussian_rv(shape, variance):
@@ -428,15 +435,22 @@ def add_random_voxels(arr_3d, probability=0.01):
 
 
 if __name__ == '__main__':
-    import timeit
-    from time import sleep
     path = rf'C:\Users\dcas\PythonCodes\Coop\pythoncode\10x10x10 - 복사본\topo_parent_1.csv'
     cube_4d_array = np.genfromtxt(path, dtype=int, delimiter=',').reshape((100, 10, 10, 10))
-    t = timeit.Timer(lambda: mutate_and_validate_topologies(cube_4d_array, mutation_probability=0.05,
-                                                            add_probability=0.01, timeout=0.5, view_topo=False))
-    sleep(5)
-    test_iteration = 1
-    print('Begin Testing...')
-    print(f'Total runtime of {test_iteration} generations: {t.timeit(test_iteration)}s')
-    # 10 generation runtime with njit: 38.94s on i5-8600K
-    # 10 generation runtime without njit: 225.04s on i5-8600K
+    # t = timeit.Timer(lambda: validate_mutated_topologies(cube_4d_array, mutation_probability=0.05,
+    #                                                      add_probability=0.01, timeout=0.5, view_topo=False))
+    # sleep(5)
+    # test_iteration = 1
+    # print('Begin Testing...')
+    # print(f'Total runtime of {test_iteration} generations: {t.timeit(test_iteration)}s')
+    # # 10 generation runtime with njit: 38.94s on i5-8600K
+    # # 10 generation runtime without njit: 225.04s on i5-8600K
+    #
+    # # validate_mutated_topologies(cube_4d_array, mutation_probability=0.05, add_probability=0.01,
+    # #                             timeout=0.5, view_topo=True)
+    # visualize_n_cubes(np.concatenate((rand_arr, arr)).reshape((2, 10, 10, 10)))
+
+    # arr_3d = np.zeros((10, 10, 10))
+    # arr_3d_pdf = generate_gaussian_rv_pdf_arr((10, 10, 10), variance=5)
+    # arr_3d = add_gaussian_random_voxels(arr_3d, arr_3d_pdf, probability_factor=0.01)
+    # visualize_one_cube(arr_3d)
