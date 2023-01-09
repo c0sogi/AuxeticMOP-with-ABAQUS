@@ -11,23 +11,23 @@ from FileIO import parent_import
 np.set_printoptions(linewidth=np.inf)
 
 
-def evaluation(topo, topo_1, reslt, reslt_1, q, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
+def evaluation(topo, topo_1, result, result_1, q, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
     fitness_values = np.zeros((2 * q, 2))
     k = penalty_coefficient
     if evaluation_version == 'ver1':
         for i in range(q):
-            dis11 = reslt[i][0]
-            dis22 = reslt[i][1]
-            rf22 = reslt[i][4]
+            dis11 = result[i][0]
+            dis22 = result[i][1]
+            rf22 = result[i][4]
             fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo[i]) / (lx * ly * lz))
             fitness_values[i][0] = fit_val1
             fit_val2 = - (dis11 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
             fitness_values[i][1] = fit_val2
 
         for i in range(q, 2 * q):
-            dis11 = reslt_1[i - q][0]
-            dis22 = reslt_1[i - q][1]
-            rf22 = reslt_1[i - q][4]
+            dis11 = result_1[i - q][0]
+            dis22 = result_1[i - q][1]
+            rf22 = result_1[i - q][4]
             fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
             fitness_values[i][0] = fit_val1
             fit_val2 = - (dis11 / dis22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
@@ -35,14 +35,14 @@ def evaluation(topo, topo_1, reslt, reslt_1, q, lx, ly, lz, evaluation_version, 
 
     if evaluation_version == 'ver2':
         for i in range(q):
-            rf22 = reslt[i][4]
+            rf22 = result[i][4]
             fit_val1 = np.sum(topo[i]) / (lx * ly * lz)
             fitness_values[i][0] = fit_val1
             fit_val2 = rf22 / max_rf22
             fitness_values[i][1] = fit_val2
 
         for i in range(q, 2 * q):
-            rf22 = reslt_1[i - q][4]
+            rf22 = result_1[i - q][4]
             fit_val1 = np.sum(topo_1[i - q]) / (lx * ly * lz)
             fitness_values[i][0] = fit_val1
             fit_val2 = rf22 / max_rf22
@@ -50,19 +50,18 @@ def evaluation(topo, topo_1, reslt, reslt_1, q, lx, ly, lz, evaluation_version, 
 
     if evaluation_version == 'ver3':
         for i in range(q):
-            dis11 = reslt[i][0]
-            dis22 = reslt[i][1]
-            dis33 = reslt[i][2]
+            dis11 = result[i][0]
+            dis22 = result[i][1]
+            dis33 = result[i][2]
             fit_val1 = - (dis11 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
             fitness_values[i][0] = fit_val1
             fit_val2 = - (dis33 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
             fitness_values[i][1] = fit_val2
 
         for i in range(q, 2 * q):
-            print('reslt1', reslt_1, reslt_1.shape)
-            dis11 = reslt_1[i - q][0]
-            dis22 = reslt_1[i - q][1]
-            dis33 = reslt_1[i - q][2]
+            dis11 = result_1[i - q][0]
+            dis22 = result_1[i - q][1]
+            dis33 = result_1[i - q][2]
             fit_val1 = - (dis11 / dis22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
             fitness_values[i][0] = fit_val1
             fit_val2 = - (dis33 / dis22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
@@ -70,12 +69,12 @@ def evaluation(topo, topo_1, reslt, reslt_1, q, lx, ly, lz, evaluation_version, 
 
     if evaluation_version == 'ver4':
         for i in range(q):
-            fit_val1 = reslt[i][9]
+            fit_val1 = result[i][9]
             fitness_values[i][0] = fit_val1
             fit_val2 = np.sum(topo[i]) / (lx * ly * lz)
             fitness_values[i][1] = fit_val2
         for i in range(q, 2 * q):
-            fit_val1 = reslt_1[i - q][9]
+            fit_val1 = result_1[i - q][9]
             fitness_values[i][0] = fit_val1
             fit_val2 = np.sum(topo_1[i - q]) / (lx * ly * lz)
             fitness_values[i][1] = fit_val2
@@ -123,7 +122,7 @@ def evaluation2(topo2, reslt2, lx, ly, lz, penalty_coefficient, evaluation_versi
     return fitness_values
 
 
-def max_fitval(w, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
+def get_fitness_value_limits(w, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
     fit_min, fit_max = 0, 0
     for i in range(1, w + 1):
         topo, result = parent_import(w=i, restart_pop=0)
@@ -156,105 +155,24 @@ def fitval_sort(fv):
     return fv1_sort, fv2_sort, sort
 
 
-def hypervolume_calculation(fv1_sort, fv2_sort, w, lx, ly, lz, evaluation_version,
-                            penalty_coefficient, max_rf22):
-    fit_max, fit_min = max_fitval(w=w, lx=lx, ly=ly, lz=lz,
-                                  evaluation_version=evaluation_version, penalty_coefficient=penalty_coefficient,
-                                  max_rf22=max_rf22)
-    rp_max1 = fit_max[0] + 0.05 * (fit_max[0] - fit_min[0])
-    rp_min1 = fit_min[0] - 0.05 * (fit_max[0] - fit_min[0])
-    rp_max2 = fit_max[1] + 0.05 * (fit_max[1] - fit_min[1])
-    rp_min2 = fit_min[1] - 0.05 * (fit_max[1] - fit_min[1])
-    hv = 0
-    area = (rp_max1 - rp_min1) * (rp_max2 - rp_min2)
-    pareto_no = len(fv1_sort)
-    for i in range(pareto_no):
-        if i == 0:
-            hv += (fv1_sort[i] - rp_min1) * (rp_max2 - fv2_sort[i]) + (rp_max1 - fv1_sort[pareto_no - 1 - i]) * (
-                    rp_max2 - fv2_sort[pareto_no - 1 - i])
-        else:
-            hv += ((fv1_sort[i] - fv1_sort[i - 1]) * (rp_max2 - fv2_sort[i]) + (
-                    fv1_sort[pareto_no - i] - fv1_sort[pareto_no - 1 - i]) * (
-                           rp_max2 - fv2_sort[pareto_no - 1 - i])) * 0.5
-    normalized_hv = hv / area
-    return normalized_hv, hv
-
-
-def hypervolume_calculation2(fv1_sort, fv2_sort):
-    pareto_no = len(fv1_sort)
-    hv = 0
-    for idx in range(pareto_no - 1):
-        hv += (fv1_sort[idx + 1] - fv1_sort[idx]) * (-fv2_sort[idx])
-    hv += fv1_sort[pareto_no - 1] * fv2_sort[pareto_no - 1]
-    return hv
-
-
-def hypervolume_calculation3(fv1_sort, fv2_sort, ref_x, ref_y):
-    x_relative = fv1_sort - ref_x
-    y_relative = fv2_sort - ref_y
-    x_integral_lower_limit = fv1_sort[0] - ref_x
-    x_integral_upper_limit = fv1_sort[-1] - ref_x
-    right_gap = ref_x - fv1_sort[-1]
-    right_height = -fv2_sort[-1]
-    interpolation_coefficient = 1  # 1: Linear interpolation
-
-    f = InterpolatedUnivariateSpline(x_relative, y_relative, k=interpolation_coefficient)
-    hv = quad(lambda x: abs(f(x)), x_integral_lower_limit, x_integral_upper_limit)[0] + abs(right_gap * right_height)
-    return hv
-
-
-# def find_model_output(w, q, directory, end_pop):
-#     no_of_datafile = w
-#     no_of_lines = end_pop
-#     if directory[-1] != '/' or directory[-1] != '\\':
-#         directory += '/'
-#
-#     f = open(directory + 'topo_parent_%d.csv' % w, 'r')
-#     rd = csv.reader(f)
-#     topo = [i for i in rd]
-#     topo = np.array(topo)
-#     topo = topo.astype(np.float32)
-#     gen_num_eng = 0
-#     pop_num_eng = 0
-#     f = open(directory + 'Output_parent_%d.csv' % w, 'r')
-#     rd = csv.reader(f)
-#     eng = [i for i in rd]
-#     eng = np.array(eng)
-#     eng = eng.astype(np.float32)
-#
-#     for j in range(no_of_datafile):
-#         break1 = 0
-#         if j == 0:
-#             f = open(directory + 'topo_parent_%d.csv' % (j + 1), 'r')
-#             rd = csv.reader(f)
-#             topo1 = [i for i in rd]
-#             topo1 = np.array(topo1)
-#             topo1 = topo1.astype(np.float32)
-#             f = open(directory + 'Output_parent_%d.csv' % (j + 1), 'r')
-#             rd = csv.reader(f)
-#             eng1 = [i for i in rd]
-#             eng1 = np.array(eng1)
-#             eng1 = eng1.astype(np.float32)
-#         else:
-#             f = open(directory + 'topo_offspring_%d.csv' % j, 'r')
-#             rd = csv.reader(f)
-#             topo1 = [i for i in rd]
-#             topo1 = np.array(topo1)
-#             topo1 = topo1.astype(np.float32)
-#             f = open(directory + 'Output_offspring_%d.csv' % j, 'r')
-#             rd = csv.reader(f)
-#             eng1 = [i for i in rd]
-#             eng1 = np.array(eng1)
-#             eng1 = eng1.astype(np.float32)
-#         for k in range(no_of_lines):
-#             if np.array_equal(topo[q], topo1[k]) and np.less_equal(np.absolute(eng[q] - eng1[k]), 2E-07).all():
-#                 gen_num_eng = j
-#                 pop_num_eng = k + 1
-#                 break1 = 1
-#                 break
-#         if break1 == 1:
-#             break
-#     return gen_num_eng, pop_num_eng
+def calculate_hyper_volume(pareto_1_sorted, pareto_2_sorted, ref_x, ref_y):
+    datum_point_x, datum_point_y = pareto_1_sorted[-1], pareto_2_sorted[0]
+    x_lower_bound, x_upper_bound = pareto_1_sorted[0], pareto_1_sorted[-1]
+    y_lower_bound, y_upper_bound = pareto_2_sorted[-1], pareto_2_sorted[0]
+    if ref_x < x_upper_bound or ref_y < y_upper_bound:
+        print('<!> Hyper volume cannot be calculated')
+        exit()
+    f = InterpolatedUnivariateSpline(pareto_1_sorted - datum_point_x, pareto_2_sorted - datum_point_y, k=1)
+    datum_hv = quad(lambda x: abs(f(x)), x_lower_bound, x_upper_bound)[0]
+    datum_hv -= (x_upper_bound - x_lower_bound) * (y_upper_bound - y_lower_bound)
+    hv = datum_hv + (ref_x - x_lower_bound) * (ref_y - y_lower_bound)
+    datum_values = {
+        'x_lower_bound': x_lower_bound,
+        'x_upper_bound': x_upper_bound,
+        'y_lower_bound': y_lower_bound,
+        'y_upper_bound': y_upper_bound,
+        'datum_hv': datum_hv}
+    return hv, datum_values
 
 
 def pareto_front_finding(fitness_values, pop_index):
@@ -271,75 +189,75 @@ def pareto_front_finding(fitness_values, pop_index):
     return pop_index[pareto_front]
 
 
-def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, parent_conn,
-              file_io=True):
-    topo_p, reslt_p = parent_import(w + 1, restart_pop=0)
-    fitness_values = evaluation2(topo2=topo_p, reslt2=reslt_p, lx=lx, ly=ly, lz=lz,
-                                 penalty_coefficient=penalty_coefficient, evaluation_version=evaluation_version,
-                                 max_rf22=max_rf22)
-    index = np.arange(topo_p.shape[0], dtype=int)
-    pareto_front_index = pareto_front_finding(fitness_values, index)
-    # index = reslt_p[pareto_front_index, :]  # correction: index >> reslt_p
-    fitness_values_pareto = fitness_values[pareto_front_index]
-    fv1_sort, fv2_sort, sort = fitval_sort(fitness_values_pareto)
-    normalized_hypervolume, hypervolume = hypervolume_calculation(fv1_sort=fv1_sort, fv2_sort=fv2_sort, w=w,
-                                                                  lx=lx, ly=ly, lz=lz,
-                                                                  evaluation_version=evaluation_version,
-                                                                  penalty_coefficient=penalty_coefficient,
-                                                                  max_rf22=max_rf22)
-    # print('\n')
-    # print("iteration: %d" % w)
-    # print("_________________")
-    # print("Optimal solutions:")
-    # print("       x1               x2                 x3")
-    # print(index)  # show optimal solutions
-    # print("______________")
-    # print("Fitness values:")
-    # # print("  objective 1    objective 2")
-    # print("          Model              objective 1      objective 2      Job")
-    # print("            |                     |                |            |")
-    # for q in range(len(index)):
-    #     gen_num, pop_num = find_model_output(w=w+1, q=sort[q], directory=directory, end_pop=end_pop)
-    #     print("%dth generation %dth pop   [%E   %E]   Job-%d-%d" % (
-    #         w + 1, q + 1, fitness_values[q, 0], fitness_values[q, 1], gen_num, pop_num))
-    # print(fitness_values)
-    # ** pareto_front
-    # fit_max, fit_min = max_fitval(w=w+1, lx=lx, ly=ly, lz=lz,
-    #                               evaluation_version=evaluation_version, penalty_coefficient=penalty_coefficient,
-    #                               max_rf22=max_rf22)
-    # rp_max1 = fit_max[0] + 0.05 * (fit_max[0] - fit_min[0])
-    # rp_min1 = fit_min[0] - 0.05 * (fit_max[0] - fit_min[0])
-    # rp_max2 = fit_max[1] + 0.05 * (fit_max[1] - fit_min[1])
-    # rp_min2 = fit_min[1] - 0.05 * (fit_max[1] - fit_min[1])
-    if file_io:
-        if os.path.isfile(f'Plot_data'):
-            with open(f'Plot_data', mode='rb') as f_read:
-                read_data = pickle.load(f_read)
-            with open(f'Plot_data', mode='wb') as f_write:
-                read_data.update({w: (fv1_sort, fv2_sort, w, normalized_hypervolume)})
-                pickle.dump(read_data, f_write)
-        else:
-            with open(f'Plot_data', mode='wb') as f_write:
-                pickle.dump({w: (fv1_sort, fv2_sort, w, normalized_hypervolume)}, f_write)
-        parent_conn.send((fv1_sort, fv2_sort, w, normalized_hypervolume))
-    print('Fitness Value 1,2 plot: ', fv1_sort, fv2_sort)
-    # app.plot(0, fv1_sort, fv2_sort)
-    # plt.figure(1)
-    # plt.plot(fv1_sort, fv2_sort, marker='o', color='#2ca02c')
-    # plt.xlabel('Objective function 1')
-    # plt.ylabel('Objective function 2')
-    # plt.axis((rp_min1, rp_max1, rp_min2, rp_max2))
-    # ** hypervolume
-    print('Hypervolume scatter: ', w, normalized_hypervolume)
-    # app.scatter(1, w, normalized_hypervolume)
-    # print(normalized_hypervolume, hypervolume)
-    # plt.figure(2)
-    # plt.scatter(w, normalized_hypervolume)
-    # plt.xlabel('Iteration')
-    # plt.ylabel('Hypervolume')
-    # plt.axis((0, end_gen + 1, 0, 1))  # plt.axis((xmin, xmax, ymin, ymax))
-    # plt.pause(0.1)
-    print(sort)
+# def visualize_old(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, parent_conn,
+#               file_io=True):
+#     topo_p, reslt_p = parent_import(w + 1, restart_pop=0)
+#     fitness_values = evaluation2(topo2=topo_p, reslt2=reslt_p, lx=lx, ly=ly, lz=lz,
+#                                  penalty_coefficient=penalty_coefficient, evaluation_version=evaluation_version,
+#                                  max_rf22=max_rf22)
+#     index = np.arange(topo_p.shape[0], dtype=int)
+#     pareto_front_index = pareto_front_finding(fitness_values, index)
+#     # index = reslt_p[pareto_front_index, :]  # correction: index >> reslt_p
+#     fitness_values_pareto = fitness_values[pareto_front_index]
+#     fv1_sort, fv2_sort, sort = fitval_sort(fitness_values_pareto)
+#     normalized_hypervolume, hypervolume = hypervolume_calculation(fv1_sort=fv1_sort, fv2_sort=fv2_sort, w=w,
+#                                                                   lx=lx, ly=ly, lz=lz,
+#                                                                   evaluation_version=evaluation_version,
+#                                                                   penalty_coefficient=penalty_coefficient,
+#                                                                   max_rf22=max_rf22)
+#     # print('\n')
+#     # print("iteration: %d" % w)
+#     # print("_________________")
+#     # print("Optimal solutions:")
+#     # print("       x1               x2                 x3")
+#     # print(index)  # show optimal solutions
+#     # print("______________")
+#     # print("Fitness values:")
+#     # # print("  objective 1    objective 2")
+#     # print("          Model              objective 1      objective 2      Job")
+#     # print("            |                     |                |            |")
+#     # for q in range(len(index)):
+#     #     gen_num, pop_num = find_model_output(w=w+1, q=sort[q], directory=directory, end_pop=end_pop)
+#     #     print("%dth generation %dth pop   [%E   %E]   Job-%d-%d" % (
+#     #         w + 1, q + 1, fitness_values[q, 0], fitness_values[q, 1], gen_num, pop_num))
+#     # print(fitness_values)
+#     # ** pareto_front
+#     # fit_max, fit_min = max_fitval(w=w+1, lx=lx, ly=ly, lz=lz,
+#     #                               evaluation_version=evaluation_version, penalty_coefficient=penalty_coefficient,
+#     #                               max_rf22=max_rf22)
+#     # rp_max1 = fit_max[0] + 0.05 * (fit_max[0] - fit_min[0])
+#     # rp_min1 = fit_min[0] - 0.05 * (fit_max[0] - fit_min[0])
+#     # rp_max2 = fit_max[1] + 0.05 * (fit_max[1] - fit_min[1])
+#     # rp_min2 = fit_min[1] - 0.05 * (fit_max[1] - fit_min[1])
+#     if file_io:
+#         if os.path.isfile(f'Plot_data'):
+#             with open(f'Plot_data', mode='rb') as f_read:
+#                 read_data = pickle.load(f_read)
+#             with open(f'Plot_data', mode='wb') as f_write:
+#                 read_data.update({w: (fv1_sort, fv2_sort, w, normalized_hypervolume)})
+#                 pickle.dump(read_data, f_write)
+#         else:
+#             with open(f'Plot_data', mode='wb') as f_write:
+#                 pickle.dump({w: (fv1_sort, fv2_sort, w, normalized_hypervolume)}, f_write)
+#         parent_conn.send((fv1_sort, fv2_sort, w, normalized_hypervolume))
+#     print('Fitness Value 1,2 plot: ', fv1_sort, fv2_sort)
+#     # app.plot(0, fv1_sort, fv2_sort)
+#     # plt.figure(1)
+#     # plt.plot(fv1_sort, fv2_sort, marker='o', color='#2ca02c')
+#     # plt.xlabel('Objective function 1')
+#     # plt.ylabel('Objective function 2')
+#     # plt.axis((rp_min1, rp_max1, rp_min2, rp_max2))
+#     # ** hypervolume
+#     print('Hypervolume scatter: ', w, normalized_hypervolume)
+#     # app.scatter(1, w, normalized_hypervolume)
+#     # print(normalized_hypervolume, hypervolume)
+#     # plt.figure(2)
+#     # plt.scatter(w, normalized_hypervolume)
+#     # plt.xlabel('Iteration')
+#     # plt.ylabel('Hypervolume')
+#     # plt.axis((0, end_gen + 1, 0, 1))  # plt.axis((xmin, xmax, ymin, ymax))
+#     # plt.pause(0.1)
+#     print(sort)
 
 
 def find_pareto_front_points(costs, return_index=False):
@@ -369,69 +287,38 @@ def find_pareto_front_points(costs, return_index=False):
         return sorted_pareto_points
 
 
-def visualize2(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, parent_conn=None, file_io=True):
-    topo_p, result_p = parent_import(w + 1, restart_pop=0)
-    fitness_values = evaluation2(topo2=topo_p, reslt2=result_p, lx=lx, ly=ly, lz=lz,
-                                 penalty_coefficient=penalty_coefficient, evaluation_version=evaluation_version,
-                                 max_rf22=max_rf22)
-    fitness_pareto = find_pareto_front_points(costs=fitness_values, return_index=False)
-    fv1_pareto_sorted = fitness_pareto[:, 0]
-    fv2_pareto_sorted = fitness_pareto[:, 1]
-    hyper_volume = hypervolume_calculation2(fv1_sort=fv1_pareto_sorted, fv2_sort=fv2_pareto_sorted)
-    if file_io:
-        if os.path.isfile(f'Plot_data'):
-            with open(f'Plot_data', mode='rb') as f_read:
-                read_data = pickle.load(f_read)
-            with open(f'Plot_data', mode='wb') as f_write:
-                read_data.update({w: (fv1_pareto_sorted, fv2_pareto_sorted, w, hyper_volume)})
-                pickle.dump(read_data, f_write)
-        else:
-            with open(f'Plot_data', mode='wb') as f_write:
-                pickle.dump({w: (fv1_pareto_sorted, fv2_pareto_sorted, w, hyper_volume)}, f_write)
-        parent_conn.send((fv1_pareto_sorted, fv2_pareto_sorted, w, hyper_volume))
-
-    print('[VISUALIZE] Plotting Pareto front of fitness values:')
-    print(f'> Objective function 1:{fv1_pareto_sorted}')
-    print(f'> Objective function 2:{fv2_pareto_sorted}')
-    print('[VISUALIZE] Scattering Hyper volume:')
-    print(f'> Generation {w}: {hyper_volume}')
-    return fv1_pareto_sorted, fv2_pareto_sorted, w, hyper_volume
-
-
-def visualize3(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, is_realtime, ref_x=0.0, ref_y=0.0,
-               parent_conn=None, file_io=True):
+def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, is_realtime, ref_x=0.0, ref_y=0.0,
+              parent_conn=None, file_io=True):
     topo_p, result_p = parent_import(w + 1, restart_pop=0)
     fitness_values = evaluation2(topo2=topo_p, reslt2=result_p, lx=lx, ly=ly, lz=lz,
                                  penalty_coefficient=penalty_coefficient, evaluation_version=evaluation_version,
                                  max_rf22=max_rf22)
     if not is_realtime:
-        fit_max, _ = max_fitval(w=w + 1, lx=lx, ly=ly, lz=ly, evaluation_version=evaluation_version,
-                                penalty_coefficient=penalty_coefficient, max_rf22=max_rf22)
-        ref_x = float(fit_max[0])
-        ref_y = float(fit_max[1])
+        fit_max, _ = get_fitness_value_limits(w=w + 1, lx=lx, ly=ly, lz=ly, evaluation_version=evaluation_version,
+                                              penalty_coefficient=penalty_coefficient, max_rf22=max_rf22)
+        ref_x, ref_y = float(fit_max[0]), float(fit_max[1])
     fitness_pareto = find_pareto_front_points(costs=fitness_values, return_index=False)
-    fv1_pareto_sorted = fitness_pareto[:, 0]
-    fv2_pareto_sorted = fitness_pareto[:, 1]
-    normalized_hv = hypervolume_calculation3(fv1_sort=fv1_pareto_sorted, fv2_sort=fv2_pareto_sorted,
-                                             ref_x=ref_x, ref_y=ref_y)
+    pareto_1_sorted, pareto_2_sorted = fitness_pareto[:, 0], fitness_pareto[:, 1]
+    hyper_volume, datum_values = calculate_hyper_volume(
+        pareto_1_sorted=pareto_1_sorted, pareto_2_sorted=pareto_2_sorted, ref_x=ref_x, ref_y=ref_y)
     if file_io:
         if os.path.isfile(f'Plot_data'):
             with open(f'Plot_data', mode='rb') as f_read:
                 read_data = pickle.load(f_read)
             with open(f'Plot_data', mode='wb') as f_write:
-                read_data.update({w: (fv1_pareto_sorted, fv2_pareto_sorted, w, normalized_hv)})
+                read_data.update({w: (pareto_1_sorted, pareto_2_sorted, w, hyper_volume)})
                 pickle.dump(read_data, f_write)
         else:
             with open(f'Plot_data', mode='wb') as f_write:
-                pickle.dump({w: (fv1_pareto_sorted, fv2_pareto_sorted, w, normalized_hv)}, f_write)
-        parent_conn.send((fv1_pareto_sorted, fv2_pareto_sorted, w, normalized_hv))
+                pickle.dump({w: (pareto_1_sorted, pareto_2_sorted, w, hyper_volume)}, f_write)
+        parent_conn.send((pareto_1_sorted, pareto_2_sorted, w, hyper_volume))
 
     print('[VISUALIZE] Plotting Pareto front of fitness values:')
-    print(f'> Objective function 1:{fv1_pareto_sorted}')
-    print(f'> Objective function 2:{fv2_pareto_sorted}')
+    print(f'> Objective function 1:{pareto_1_sorted}')
+    print(f'> Objective function 2:{pareto_2_sorted}')
     print('[VISUALIZE] Scattering Hyper volume:')
-    print(f'> Generation {w}: {normalized_hv}')
-    return fv1_pareto_sorted, fv2_pareto_sorted, w, normalized_hv
+    print(f'> Generation {w}: {hyper_volume}')
+    return pareto_1_sorted, pareto_2_sorted, w, hyper_volume
 
 
 def crowding_calculation(fitness_values):
@@ -601,7 +488,6 @@ def visualize_n_cubes(arr_4d, full=False):
 
 if __name__ == '__main__':
     from GraphicUserInterface import plot_test
-    from time import sleep
 
     path = r'F:\shshsh\data-23-1-4'
     number_of_generations = 19
@@ -615,8 +501,8 @@ if __name__ == '__main__':
     axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
     for gen_idx in range(number_of_generations):
-        px, py, sx, sy = visualize3(w=gen_idx + 1, lx=10, ly=10, lz=10, penalty_coefficient=0.1,
-                                    evaluation_version='ver3', is_realtime=True, ref_x=0.2, ref_y=1.75,
-                                    max_rf22=9900.0, parent_conn=None, file_io=False)
+        px, py, sx, sy = visualize(w=gen_idx + 1, lx=10, ly=10, lz=10, penalty_coefficient=0.1,
+                                   evaluation_version='ver3', is_realtime=True, ref_x=0.2, ref_y=1.75,
+                                   max_rf22=9900.0, parent_conn=None, file_io=False)
         plot_test(axes, px, py, sx, sy)
     plt.show()

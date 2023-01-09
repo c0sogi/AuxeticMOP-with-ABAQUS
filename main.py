@@ -7,7 +7,7 @@ from GraphicUserInterface import App
 from multiprocessing import Process, Pipe
 from dataclasses import asdict
 from GeneticAlgorithm import generate_offspring
-from PostProcessing import evaluation, visualize2, selection
+from PostProcessing import evaluation, visualize, selection
 from FileIO import parent_import, parent_export, offspring_import
 
 
@@ -65,7 +65,7 @@ def one_generation(w, restart, p_conn, params):
     wait_for_abaqus_to_complete(check_exit_time=1, restart=restart, w=w, offspring=offspring)
 
     topologies_1, results_1 = offspring_import(w=w, mode=params.mode)
-    fitness_values = evaluation(topo=topologies, topo_1=topologies_1, reslt=results, reslt_1=results_1,
+    fitness_values = evaluation(topo=topologies, topo_1=topologies_1, result=results, result_1=results_1,
                                 lx=params.lx, ly=params.ly, lz=params.lz, max_rf22=params.MaxRF22,
                                 evaluation_version=params.evaluation_version, q=params.end_pop,
                                 penalty_coefficient=params.penalty_coefficient)
@@ -77,9 +77,9 @@ def one_generation(w, restart, p_conn, params):
     if restart:
         params.restart_pop = 0
     print('iteration:', w)
-    visualize2(w=w, lx=params.lx, ly=params.ly, lz=params.lz,
-               penalty_coefficient=params.penalty_coefficient, evaluation_version=params.evaluation_version,
-               max_rf22=params.MaxRF22, parent_conn=p_conn, file_io=True)
+    visualize(w=w, lx=params.lx, ly=params.ly, lz=params.lz, ref_x=0.0, ref_y=0.0,
+              penalty_coefficient=params.penalty_coefficient, evaluation_version=params.evaluation_version,
+              max_rf22=params.MaxRF22, parent_conn=p_conn, file_io=True, is_realtime=True)
 
 
 def plot_previous_data(conn_1):

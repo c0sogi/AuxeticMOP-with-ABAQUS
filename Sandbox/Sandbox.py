@@ -259,7 +259,7 @@ def one_generation(w, restart, set_path, parent_conn, parameters):
     wait_for_abaqus_to_complete(check_exit_time=1, restart=restart, w=w, offspring=offspring)
 
     topologies_1, results_1 = offspring_import(w=w, mode=parameters.mode)
-    fitness_values = evaluation(topo=topologies, topo_1=topologies_1, reslt=results, reslt_1=results_1,
+    fitness_values = evaluation(topo=topologies, topo_1=topologies_1, result=results, result_1=results_1,
                                 lx=parameters.lx, ly=parameters.ly, lz=parameters.lz, max_rf22=parameters.MaxRF22,
                                 evaluation_version=parameters.evaluation_version, q=parameters.end_pop,
                                 penalty_coefficient=parameters.penalty_coefficient)

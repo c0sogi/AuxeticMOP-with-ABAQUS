@@ -45,13 +45,12 @@ class Parameters:
         self.ly *= self.divide_number
         self.lz *= self.divide_number  # number of voxels after increasing resolution
         self.unit_l /= self.divide_number
-        self.unit_l_half = self.unit_l * 0.5
-        self.unit_lx_total = self.lx * self.unit_l
-        self.unit_ly_total = self.ly * self.unit_l
-        self.unit_lz_total = self.lz * self.unit_l
+        unit_lx_total = self.lx * self.unit_l
+        unit_ly_total = self.ly * self.unit_l
+        unit_lz_total = self.lz * self.unit_l
         self.mesh_size *= self.unit_l
-        self.dis_y *= self.unit_ly_total  # boundary condition (displacement)
-        self.MaxRF22 *= self.unit_lx_total * self.unit_lz_total * self.material_modulus  # 0.01 is strain
+        self.dis_y *= unit_ly_total  # boundary condition (displacement)
+        self.MaxRF22 *= unit_lx_total * unit_lz_total * self.material_modulus  # 0.01 is strain
 
 
 PARAMETER_FILE_NAME = '_PARAMETERS_'

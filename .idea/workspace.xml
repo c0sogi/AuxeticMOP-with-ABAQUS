@@ -6,6 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Auxetic MOP Genetic Algorithm with ABAQUS">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphicUserInterface.py" beforeDir="false" afterPath="$PROJECT_DIR$/GraphicUserInterface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PostProcessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/PostProcessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/Sandbox.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/Sandbox.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abaqus data/ABQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/ABQ.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,15 +49,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/dcas/PythonCodes/Coop/pythoncode&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/dcas/PythonCodes/Coop/pythoncode",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode" />
@@ -215,7 +220,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672839910167</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Auxetic MOP Genetic Algorithm with ABAQUS">
+      <created>1673261956852</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1673261956852</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

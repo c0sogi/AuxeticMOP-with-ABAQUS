@@ -1,4 +1,5 @@
-# execfile('abaqus_scripts.py', __main__.__dict__)
+from abaqus import *
+from abaqusConstants import *
 from load import *
 from mesh import *
 from optimization import *
