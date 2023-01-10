@@ -4,18 +4,171 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from scipy.ndimage import gaussian_filter
-from scipy.interpolate import InterpolatedUnivariateSpline
-from scipy.integrate import quad
 from FileIO import parent_import
 
 np.set_printoptions(linewidth=np.inf)
 
 
-def evaluation(topo, topo_1, result, result_1, q, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
-    fitness_values = np.zeros((2 * q, 2))
+def get_datum_hv(pareto_1_sorted, pareto_2_sorted):
+    datum_point_x, datum_point_y = pareto_1_sorted[-1], pareto_2_sorted[0]
+    x_relative = pareto_1_sorted - datum_point_x
+    y_relative = pareto_2_sorted - datum_point_y
+    print(x_relative, y_relative)
+    datum_hv = 0
+    for i in range(len(x_relative) - 1):
+        datum_hv -= (x_relative[i + 1] - x_relative[i]) * (y_relative[i + 1] + y_relative[i]) * 0.5
+    return datum_hv
+
+
+def get_hv_from_datum_hv(datum_hv, lower_bounds, ref_x, ref_y):
+    return datum_hv + (ref_x - lower_bounds[0]) * (ref_y - lower_bounds[1])
+
+
+class Mop:
+    def __init__(self, conn_to_gui=None):
+        self.conn_to_gui = conn_to_gui
+        self.ref_x = 0
+        self.ref_y = 0
+        self.all_datum_hv = np.empty((0,), dtype=float)
+        self.all_lower_bounds = np.empty((0, 2), dtype=float)
+
+    def plot(self, pareto_1_sorted, pareto_2_sorted, use_manual_rp, ref_x=0.0, ref_y=0.0):
+        if pareto_1_sorted[-1] > self.ref_x:
+            self.ref_x = pareto_1_sorted[-1]
+        if pareto_2_sorted[0] > self.ref_y:
+            self.ref_y = pareto_2_sorted[0]
+        if not use_manual_rp:
+            ref_x, ref_y = self.ref_x, self.ref_y
+        datum_hv = get_datum_hv(pareto_1_sorted, pareto_2_sorted)
+        lower_bounds = [pareto_1_sorted[0], pareto_2_sorted[-1]]
+        self.all_datum_hv = np.hstack((self.all_datum_hv, datum_hv))
+        self.all_lower_bounds = np.vstack((self.all_lower_bounds, lower_bounds))
+        all_hv = [get_hv_from_datum_hv(self.all_datum_hv[gen_idx], self.all_lower_bounds[gen_idx],
+                                       ref_x=ref_x, ref_y=ref_y) for gen_idx in range(len(self.all_datum_hv))]
+        current_gen = len(all_hv)
+        print(f'Gen {current_gen}: ref_x:{ref_x}, ref_y:{ref_y}')
+        file_name = '_plotting_data_'
+        if os.path.isfile(file_name):
+            with open(file_name, mode='rb') as f_read:
+                read_data = pickle.load(f_read)
+            with open(file_name, mode='wb') as f_write:
+                read_data.update({current_gen: (pareto_1_sorted, pareto_2_sorted, datum_hv, lower_bounds)})
+                pickle.dump(read_data, f_write)
+        else:
+            with open(file_name, mode='wb') as f_write:
+                pickle.dump({current_gen: (pareto_1_sorted, pareto_2_sorted, datum_hv, lower_bounds)}, f_write)
+        if self.conn_to_gui is not None:
+            self.conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, current_gen, all_hv))
+        else:
+            color_1 = np.random.rand(3, )
+            color_2 = np.random.rand(3, )
+            plot_options = {
+                'marker': np.random.choice(('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')),
+                'color': color_1,
+                'markeredgecolor': color_1,
+                'markerfacecolor': color_2,
+                'markersize': 8,
+                'markeredgewidth': 2,
+
+            }
+            print('[VISUALIZE] Plotting Pareto front of fitness values:')
+            print(f'> Objective function 1:{pareto_1_sorted}')
+            print(f'> Objective function 2:{pareto_2_sorted}')
+            print('[VISUALIZE] Scattering Hyper volume:')
+            print(f'> Generation {current_gen}: {all_hv}')
+            axes[0].plot(pareto_1_sorted, pareto_2_sorted, **plot_options)
+            axes[1].clear()
+            axes[1].plot([gen_idx + 1 for gen_idx in range(len(self.all_datum_hv))], all_hv, **plot_options)
+
+    def visualize(self, params, w, use_manual_rp, ref_x=0.0, ref_y=0.0):
+        topo_p, result_p = parent_import(w + 1)
+        fitness_values = evaluate_one_topology(topo=topo_p, result=result_p,
+                                               lx=params['lx'], ly=params['ly'], lz=params['lz'],
+                                               penalty_coefficient=params['penalty_coefficient'],
+                                               evaluation_version=params['evaluation_version'],
+                                               max_rf22=params['max_rf22'])
+        fitness_pareto = find_pareto_front_points(costs=fitness_values, return_index=False)
+        pareto_1_sorted, pareto_2_sorted = fitness_pareto[:, 0], fitness_pareto[:, 1]
+        self.plot(pareto_1_sorted=pareto_1_sorted, pareto_2_sorted=pareto_2_sorted, use_manual_rp=use_manual_rp,
+                  ref_x=ref_x, ref_y=ref_y)
+
+
+def evaluate_two_topologies(topo_parent, topo_offspring, result_parent, result_offspring, population_size, lx, ly, lz,
+                            evaluation_version, penalty_coefficient, max_rf22):
+    fitness_values = np.zeros((2 * population_size, 2))
     k = penalty_coefficient
     if evaluation_version == 'ver1':
-        for i in range(q):
+        for i in range(population_size):
+            dis11 = result_parent[i][0]
+            dis22 = result_parent[i][1]
+            rf22 = result_parent[i][4]
+            fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo_parent[i]) / (lx * ly * lz))
+            fitness_values[i][0] = fit_val1
+            fit_val2 = - (dis11 / dis22) + k * (np.sum(topo_parent[i]) / (lx * ly * lz))
+            fitness_values[i][1] = fit_val2
+
+        for i in range(population_size, 2 * population_size):
+            dis11 = result_offspring[i - population_size][0]
+            dis22 = result_offspring[i - population_size][1]
+            rf22 = result_offspring[i - population_size][4]
+            fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo_offspring[i - population_size]) / (lx * ly * lz))
+            fitness_values[i][0] = fit_val1
+            fit_val2 = - (dis11 / dis22) + k * (np.sum(topo_offspring[i - population_size]) / (lx * ly * lz))
+            fitness_values[i][1] = fit_val2
+
+    if evaluation_version == 'ver2':
+        for i in range(population_size):
+            rf22 = result_parent[i][4]
+            fit_val1 = np.sum(topo_parent[i]) / (lx * ly * lz)
+            fitness_values[i][0] = fit_val1
+            fit_val2 = rf22 / max_rf22
+            fitness_values[i][1] = fit_val2
+
+        for i in range(population_size, 2 * population_size):
+            rf22 = result_offspring[i - population_size][4]
+            fit_val1 = np.sum(topo_offspring[i - population_size]) / (lx * ly * lz)
+            fitness_values[i][0] = fit_val1
+            fit_val2 = rf22 / max_rf22
+            fitness_values[i][1] = fit_val2
+
+    if evaluation_version == 'ver3':
+        for i in range(population_size):
+            dis11 = result_parent[i][0]
+            dis22 = result_parent[i][1]
+            dis33 = result_parent[i][2]
+            fit_val1 = - (dis11 / dis22) + k * (np.sum(topo_parent[i]) / (lx * ly * lz))
+            fitness_values[i][0] = fit_val1
+            fit_val2 = - (dis33 / dis22) + k * (np.sum(topo_parent[i]) / (lx * ly * lz))
+            fitness_values[i][1] = fit_val2
+
+        for i in range(population_size, 2 * population_size):
+            dis11 = result_offspring[i - population_size][0]
+            dis22 = result_offspring[i - population_size][1]
+            dis33 = result_offspring[i - population_size][2]
+            fit_val1 = - (dis11 / dis22) + k * (np.sum(topo_offspring[i - population_size]) / (lx * ly * lz))
+            fitness_values[i][0] = fit_val1
+            fit_val2 = - (dis33 / dis22) + k * (np.sum(topo_offspring[i - population_size]) / (lx * ly * lz))
+            fitness_values[i][1] = fit_val2
+
+    if evaluation_version == 'ver4':
+        for i in range(population_size):
+            fit_val1 = result_parent[i][9]
+            fitness_values[i][0] = fit_val1
+            fit_val2 = np.sum(topo_parent[i]) / (lx * ly * lz)
+            fitness_values[i][1] = fit_val2
+        for i in range(population_size, 2 * population_size):
+            fit_val1 = result_offspring[i - population_size][9]
+            fitness_values[i][0] = fit_val1
+            fit_val2 = np.sum(topo_offspring[i - population_size]) / (lx * ly * lz)
+            fitness_values[i][1] = fit_val2
+    return fitness_values
+
+
+def evaluate_one_topology(topo, result, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22):
+    fitness_values = np.zeros((topo.shape[0], 2))
+    k = penalty_coefficient
+    if evaluation_version == 'ver1':
+        for i in range(topo.shape[0]):
             dis11 = result[i][0]
             dis22 = result[i][1]
             rf22 = result[i][4]
@@ -24,32 +177,16 @@ def evaluation(topo, topo_1, result, result_1, q, lx, ly, lz, evaluation_version
             fit_val2 = - (dis11 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
             fitness_values[i][1] = fit_val2
 
-        for i in range(q, 2 * q):
-            dis11 = result_1[i - q][0]
-            dis22 = result_1[i - q][1]
-            rf22 = result_1[i - q][4]
-            fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
-            fitness_values[i][0] = fit_val1
-            fit_val2 = - (dis11 / dis22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
-            fitness_values[i][1] = fit_val2
-
     if evaluation_version == 'ver2':
-        for i in range(q):
+        for i in range(topo.shape[0]):
             rf22 = result[i][4]
             fit_val1 = np.sum(topo[i]) / (lx * ly * lz)
             fitness_values[i][0] = fit_val1
             fit_val2 = rf22 / max_rf22
             fitness_values[i][1] = fit_val2
 
-        for i in range(q, 2 * q):
-            rf22 = result_1[i - q][4]
-            fit_val1 = np.sum(topo_1[i - q]) / (lx * ly * lz)
-            fitness_values[i][0] = fit_val1
-            fit_val2 = rf22 / max_rf22
-            fitness_values[i][1] = fit_val2
-
     if evaluation_version == 'ver3':
-        for i in range(q):
+        for i in range(topo.shape[0]):
             dis11 = result[i][0]
             dis22 = result[i][1]
             dis33 = result[i][2]
@@ -58,65 +195,11 @@ def evaluation(topo, topo_1, result, result_1, q, lx, ly, lz, evaluation_version
             fit_val2 = - (dis33 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
             fitness_values[i][1] = fit_val2
 
-        for i in range(q, 2 * q):
-            dis11 = result_1[i - q][0]
-            dis22 = result_1[i - q][1]
-            dis33 = result_1[i - q][2]
-            fit_val1 = - (dis11 / dis22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
-            fitness_values[i][0] = fit_val1
-            fit_val2 = - (dis33 / dis22) + k * (np.sum(topo_1[i - q]) / (lx * ly * lz))
-            fitness_values[i][1] = fit_val2
-
     if evaluation_version == 'ver4':
-        for i in range(q):
+        for i in range(topo.shape[0]):
             fit_val1 = result[i][9]
             fitness_values[i][0] = fit_val1
             fit_val2 = np.sum(topo[i]) / (lx * ly * lz)
-            fitness_values[i][1] = fit_val2
-        for i in range(q, 2 * q):
-            fit_val1 = result_1[i - q][9]
-            fitness_values[i][0] = fit_val1
-            fit_val2 = np.sum(topo_1[i - q]) / (lx * ly * lz)
-            fitness_values[i][1] = fit_val2
-    return fitness_values
-
-
-def evaluation2(topo2, reslt2, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22):
-    fitness_values = np.zeros((topo2.shape[0], 2))
-    k = penalty_coefficient
-    if evaluation_version == 'ver1':
-        for i in range(topo2.shape[0]):
-            dis11 = reslt2[i][0]
-            dis22 = reslt2[i][1]
-            rf22 = reslt2[i][4]
-            fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo2[i]) / (lx * ly * lz))
-            fitness_values[i][0] = fit_val1
-            fit_val2 = - (dis11 / dis22) + k * (np.sum(topo2[i]) / (lx * ly * lz))
-            fitness_values[i][1] = fit_val2
-
-    if evaluation_version == 'ver2':
-        for i in range(topo2.shape[0]):
-            rf22 = reslt2[i][4]
-            fit_val1 = np.sum(topo2[i]) / (lx * ly * lz)
-            fitness_values[i][0] = fit_val1
-            fit_val2 = rf22 / max_rf22
-            fitness_values[i][1] = fit_val2
-
-    if evaluation_version == 'ver3':
-        for i in range(topo2.shape[0]):
-            dis11 = reslt2[i][0]
-            dis22 = reslt2[i][1]
-            dis33 = reslt2[i][2]
-            fit_val1 = - (dis11 / dis22) + k * (np.sum(topo2[i]) / (lx * ly * lz))
-            fitness_values[i][0] = fit_val1
-            fit_val2 = - (dis33 / dis22) + k * (np.sum(topo2[i]) / (lx * ly * lz))
-            fitness_values[i][1] = fit_val2
-
-    if evaluation_version == 'ver4':
-        for i in range(topo2.shape[0]):
-            fit_val1 = reslt2[i][9]
-            fitness_values[i][0] = fit_val1
-            fit_val2 = np.sum(topo2[i]) / (lx * ly * lz)
             fitness_values[i][1] = fit_val2
 
     return fitness_values
@@ -125,10 +208,10 @@ def evaluation2(topo2, reslt2, lx, ly, lz, penalty_coefficient, evaluation_versi
 def get_fitness_value_limits(w, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
     fit_min, fit_max = 0, 0
     for i in range(1, w + 1):
-        topo, result = parent_import(w=i, restart_pop=0)
-        fitness_values = evaluation2(topo2=topo, reslt2=result, lx=lx, ly=ly, lz=lz,
-                                     evaluation_version=evaluation_version,
-                                     max_rf22=max_rf22, penalty_coefficient=penalty_coefficient)
+        topo, result = parent_import(w=i)
+        fitness_values = evaluate_one_topology(topo=topo, result=result, lx=lx, ly=ly, lz=lz,
+                                               evaluation_version=evaluation_version,
+                                               max_rf22=max_rf22, penalty_coefficient=penalty_coefficient)
         if i == 1:
             fit_max = np.max(fitness_values, axis=0)
             fit_min = np.min(fitness_values, axis=0)
@@ -153,20 +236,6 @@ def fitval_sort(fv):
     fv1_sort = fv1[sort]
     fv2_sort = fv2[sort]
     return fv1_sort, fv2_sort, sort
-
-
-def calculate_hyper_volume(pareto_1_sorted, pareto_2_sorted, ref_x: float = 0.0, ref_y: float = 0.0):
-    datum_point_x, datum_point_y = pareto_1_sorted[-1], pareto_2_sorted[0]
-    x_lower_bound, x_upper_bound = pareto_1_sorted[0], pareto_1_sorted[-1]
-    y_lower_bound, y_upper_bound = pareto_2_sorted[-1], pareto_2_sorted[0]
-    if ref_x < x_upper_bound or ref_y < y_upper_bound:
-        print('<!> Hyper volume cannot be calculated')
-        exit()
-    f = InterpolatedUnivariateSpline(pareto_1_sorted - datum_point_x, pareto_2_sorted - datum_point_y, k=1)
-    datum_hv = quad(lambda x: abs(f(x)), x_lower_bound, x_upper_bound)[0]
-    datum_hv -= (x_upper_bound - x_lower_bound) * (y_upper_bound - y_lower_bound)
-    hv = datum_hv + (ref_x - x_lower_bound) * (ref_y - y_lower_bound)
-    return hv, datum_hv
 
 
 def pareto_front_finding(fitness_values, pop_index):
@@ -281,40 +350,6 @@ def find_pareto_front_points(costs: np.ndarray, return_index: bool = False) -> n
         return sorted_pareto_points
 
 
-def visualize(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, is_realtime, ref_x=0.0, ref_y=0.0,
-              parent_conn=None, file_io=True):
-    topo_p, result_p = parent_import(w + 1, restart_pop=0)
-    fitness_values = evaluation2(topo2=topo_p, reslt2=result_p, lx=lx, ly=ly, lz=lz,
-                                 penalty_coefficient=penalty_coefficient, evaluation_version=evaluation_version,
-                                 max_rf22=max_rf22)
-    if not is_realtime:
-        fit_max, _ = get_fitness_value_limits(w=w + 1, lx=lx, ly=ly, lz=ly, evaluation_version=evaluation_version,
-                                              penalty_coefficient=penalty_coefficient, max_rf22=max_rf22)
-        ref_x, ref_y = float(fit_max[0]), float(fit_max[1])
-    fitness_pareto = find_pareto_front_points(costs=fitness_values, return_index=False)
-    pareto_1_sorted, pareto_2_sorted = fitness_pareto[:, 0], fitness_pareto[:, 1]
-    hv, datum_hv = calculate_hyper_volume(
-        pareto_1_sorted=pareto_1_sorted, pareto_2_sorted=pareto_2_sorted, ref_x=ref_x, ref_y=ref_y)
-    if file_io:
-        if os.path.isfile(f'Plot_data'):
-            with open(f'Plot_data', mode='rb') as f_read:
-                read_data = pickle.load(f_read)
-            with open(f'Plot_data', mode='wb') as f_write:
-                read_data.update({w: (pareto_1_sorted, pareto_2_sorted, w, datum_hv)})
-                pickle.dump(read_data, f_write)
-        else:
-            with open(f'Plot_data', mode='wb') as f_write:
-                pickle.dump({w: (pareto_1_sorted, pareto_2_sorted, w, datum_hv)}, f_write)
-        parent_conn.send((pareto_1_sorted, pareto_2_sorted, w, datum_hv))
-
-    print('[VISUALIZE] Plotting Pareto front of fitness values:')
-    print(f'> Objective function 1:{pareto_1_sorted}')
-    print(f'> Objective function 2:{pareto_2_sorted}')
-    print('[VISUALIZE] Scattering Hyper volume:')
-    print(f'> Generation {w}: {datum_hv}')
-    return pareto_1_sorted, pareto_2_sorted, w, datum_hv
-
-
 def crowding_calculation(fitness_values):
     pop_size = len(fitness_values[:, 0])
     fitness_value_number = len(fitness_values[0, :])
@@ -372,29 +407,27 @@ def remove_using_crowding(fitness_values, number_solutions_needed):
     return selected_pop_index
 
 
-def selection(pop, fitness_values, pop_size):
-    pop_index_0 = np.arange(pop.shape[0])
-    pop_index = np.arange(pop.shape[0])
-    pareto_front_index = []
+def selection(all_topologies, all_fitness_values, population_size):  # More efficient algorithm
+    total_pop_idx = set(np.arange(len(all_topologies)))
+    remaining_population_idx = np.arange(len(all_topologies))
+    total_pareto_front_idx = set()
+    while len(total_pareto_front_idx) < population_size:
+        new_pareto_front_idx = find_pareto_front_points(costs=all_fitness_values[remaining_population_idx],
+                                                        return_index=True)
+        total_pareto_size = len(total_pareto_front_idx) + len(new_pareto_front_idx)
 
-    while len(pareto_front_index) < pop_size:
-        new_pareto_front = pareto_front_finding(fitness_values[pop_index_0, :], pop_index_0)
-        total_pareto_size = len(pareto_front_index) + len(new_pareto_front)
+        # check the size of pareto front, if larger than self.population_size,
+        # remove some solutions using crowding criterion
+        if total_pareto_size > population_size:
+            number_solutions_needed = population_size - len(total_pareto_front_idx)
+            selected_solutions = remove_using_crowding(all_fitness_values[new_pareto_front_idx],
+                                                       number_solutions_needed)
+            new_pareto_front_idx = new_pareto_front_idx[selected_solutions]
 
-        # check the size of pareto front, if larger than pop_size, remove some solutions using crowding criterion
-        if total_pareto_size > pop_size:
-            number_solutions_needed = pop_size - len(pareto_front_index)
-            selected_solutions = (remove_using_crowding(fitness_values[new_pareto_front], number_solutions_needed))
-            new_pareto_front = new_pareto_front[selected_solutions]
-
-        pareto_front_index = np.hstack((pareto_front_index, new_pareto_front))  # add to pareto
-        # print('Total pareto front: ', pareto_front_index)
-        remaining_index = set(pop_index) - set(pareto_front_index)
-        pop_index_0 = np.array(list(remaining_index))
-
-    selected_pop_index = pareto_front_index.astype(int)
-    selected_pop_topo = pop[pareto_front_index.astype(int)]
-    return selected_pop_topo, selected_pop_index
+        total_pareto_front_idx = total_pareto_front_idx.union(remaining_population_idx[new_pareto_front_idx])
+        remaining_population_idx = np.array(list(total_pop_idx - total_pareto_front_idx))
+    selected_populations = all_topologies[list(total_pareto_front_idx)]
+    return selected_populations, list(total_pareto_front_idx)
 
 
 def selection2(pop, fitness_values, pop_size):  # More efficient algorithm, 20 times faster than selection
@@ -481,12 +514,11 @@ def visualize_n_cubes(arr_4d, full=False):
 
 
 if __name__ == '__main__':
-    from GraphicUserInterface import plot_test
-
-    path = r'F:\shshsh\data-23-1-4'
-    number_of_generations = 19
-
+    path = r'F:\shshsh\temp'
+    number_of_generations = 5
     os.chdir(path)
+    mop = Mop(conn_to_gui=None)
+
     figure, axes = plt.subplots(nrows=1, ncols=2, figsize=((1400 - 5) / 100, (700 - 5) / 100), dpi=100)
     axes[0].set(title='Pareto Fronts', xlabel='Objective function 1', ylabel='Objective function 2')
     axes[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
@@ -494,9 +526,11 @@ if __name__ == '__main__':
     axes[1].grid(True)
     axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    for gen_idx in range(number_of_generations):
-        px, py, sx, sy = visualize(w=gen_idx + 1, lx=10, ly=10, lz=10, penalty_coefficient=0.1,
-                                   evaluation_version='ver3', is_realtime=True, ref_x=0.2, ref_y=1.75,
-                                   max_rf22=9900.0, parent_conn=None, file_io=False)
-        plot_test(axes, px, py, sx, sy)
+    d = dict()
+    with open('Plot_data', 'rb') as f:
+        plot_data = pickle.load(f)
+    for gen in range(len(plot_data)):
+        pareto_sort_1 = plot_data[gen+1][0]
+        pareto_sort_2 = plot_data[gen+1][1]
+        mop.plot(pareto_1_sorted=pareto_sort_1, pareto_2_sorted=pareto_sort_2, use_manual_rp=False)
     plt.show()

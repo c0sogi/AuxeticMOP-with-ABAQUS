@@ -4,8 +4,6 @@ from tkinter import messagebox
 import os
 import pickle
 from dataclasses import dataclass, asdict
-
-import matplotlib.axes
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -101,8 +99,6 @@ class App:
                                             figsize=((left_width - padx) / 100, (height - pady) / 100), dpi=100)
         self.bar = FigureCanvasTkAgg(self.figure, self.left_frame)
         self.bar.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
-        self.ref_x = 0
-        self.ref_y = 0
 
         self.set_path_title.pack()
         self.set_path_display.pack()
@@ -125,17 +121,8 @@ class App:
         if self.conn.poll():
             try:
                 print('[GUI] Trying to receive plot data...')
-                x1, y1, w, datum_hv = self.conn.recv()
-
-                if x1[-1] > self.ref_x:
-                    self.ref_x = x1[-1]
-                if y1[0] > self.ref_y:
-                    self.ref_y = y1[0]
-                print('[GUI] I received something!', x1, y1, w, datum_hv)
-                x2 = [gen_idx+1 for gen_idx in range(w)]
-                y2 = [self.ax[1].points[gen_idx] + (
-                        self.ref_x - self.ax[0].lines[gen_idx][0][0]) * (
-                        self.ref_y - self.ax[0].lines[gen_idx][1][-1]) for gen_idx in range(w)]
+                x1, y1, current_gen, all_hv = self.conn.recv()
+                print('[GUI] I received something!', x1, y1, current_gen, all_hv)
                 # Randomize plotting options to make data more noticeable
                 color_1, color_2 = np.random.rand(3, ), np.random.rand(3, )
                 plot_options = {
@@ -147,8 +134,8 @@ class App:
                     'markersize': 8,
                     'markeredgewidth': 2}
                 self.ax[0].plot(x1, y1, **plot_options)
-                self.ax[1].scatter(w, datum_hv, **plot_options)
-                self.ax[1].lines[0] = [x2, y2]
+                self.ax[1].clear()
+                self.ax[1].plot(current_gen, all_hv, **plot_options)
                 self.bar.draw()
             except Exception as error_message:
                 print('[GUI] An plotting error occurred:', error_message)

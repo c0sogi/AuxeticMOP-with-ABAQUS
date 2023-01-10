@@ -7,7 +7,7 @@ from GraphicUserInterface import App
 from multiprocessing import Process, Pipe
 from dataclasses import asdict
 from GeneticAlgorithm import generate_offspring
-from PostProcessing import evaluation, visualize, selection
+from PostProcessing import evaluate_two_topologies, selection, Mop, get_hv_from_datum_hv
 from FileIO import parent_import, parent_export, offspring_import
 
 
@@ -53,41 +53,60 @@ def wait_for_abaqus_to_complete(check_exit_time, restart, w, offspring):
     print(f"========== An abaqus job done on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
 
 
-def one_generation(w, restart, p_conn, params):
+def one_generation(w, restart, params, mop):
     if restart:
-        topologies, results, offspring = parent_import(w=w, restart_pop=params.restart_pop)
-        offspring = offspring.reshape((params.end_pop, params.lx, params.ly, params.lz))
+        topo_parent, result_parent = parent_import(w=w)
+        topo_offspring = np.genfromtxt('topo_offspring_' + str(w) + '.csv', delimiter=',', dtype=int)
+        topo_offspring = topo_offspring.reshape((params.end_pop, params.lx, params.ly, params.lz))
     else:
-        topologies, results = parent_import(w=w, restart_pop=0)
-        offspring = generate_offspring(topologies=topologies, w=w, end_pop=params.end_pop,
-                                       timeout=params.timeout, mutation_rate=params.mutation_rate,
-                                       lx=params.lx, ly=params.ly, lz=params.lz)
-    wait_for_abaqus_to_complete(check_exit_time=1, restart=restart, w=w, offspring=offspring)
+        topo_parent, result_parent = parent_import(w=w)
+        topo_offspring = generate_offspring(topo_parent=topo_parent, w=w, end_pop=params.end_pop,
+                                            timeout=params.timeout, mutation_rate=params.mutation_rate,
+                                            lx=params.lx, ly=params.ly, lz=params.lz)
+    wait_for_abaqus_to_complete(check_exit_time=1, restart=restart, w=w, offspring=topo_offspring)
 
-    topologies_1, results_1 = offspring_import(w=w, mode=params.mode)
-    fitness_values = evaluation(topo=topologies, topo_1=topologies_1, result=results, result_1=results_1,
-                                lx=params.lx, ly=params.ly, lz=params.lz, max_rf22=params.MaxRF22,
-                                evaluation_version=params.evaluation_version, q=params.end_pop,
-                                penalty_coefficient=params.penalty_coefficient)
+    topo_offspring, result_offspring = offspring_import(w=w)
+    two_fit_vals = evaluate_two_topologies(topo_parent=topo_parent, topo_offspring=topo_offspring,
+                                           result_parent=result_parent, result_offspring=result_offspring,
+                                           lx=params.lx, ly=params.ly, lz=params.lz, max_rf22=params.max_rf22,
+                                           evaluation_version=params.evaluation_version, population_size=params.end_pop,
+                                           penalty_coefficient=params.penalty_coefficient)
 
-    pop, next_generations = selection(pop=np.append(topologies, topologies_1, axis=0), fitness_values=fitness_values,
-                                      pop_size=params.end_pop)
-    parent_export(topologies=topologies, topologies_1=topologies_1, results=results, results_1=results_1,
-                  w=w, end_pop=params.end_pop, next_generations=next_generations)
+    _, next_generations = selection(all_topologies=np.vstack((topo_parent, topo_offspring)),
+                                    all_fitness_values=two_fit_vals, population_size=params.end_pop)
+    parent_export(topo_parent=topo_parent, topo_offspring=topo_offspring,
+                  result_parent=result_parent, result_offspring=result_offspring,
+                  w=w, population_size=params.end_pop, next_generations=next_generations)
     if restart:
         params.restart_pop = 0
-    print('iteration:', w)
-    visualize(w=w, lx=params.lx, ly=params.ly, lz=params.lz, ref_x=0.0, ref_y=0.0,
-              penalty_coefficient=params.penalty_coefficient, evaluation_version=params.evaluation_version,
-              max_rf22=params.MaxRF22, parent_conn=p_conn, file_io=True, is_realtime=True)
+    print('Generation:', w)
+    mop.visualize(params=params, w=w, use_manual_rp=False, ref_x=0.0, ref_y=0.0)
 
 
-def plot_previous_data(conn_1):
-    if os.path.isfile(f'Plot_data'):
-        with open(f'Plot_data', mode='rb') as f_read:
+def plot_previous_data(conn_to_gui, use_manual_rp, ref_x=0.0, ref_y=0.0):
+    if os.path.isfile('_plotting_data_'):
+        with open('_plotting_data_', mode='rb') as f_read:
             read_data = pickle.load(f_read)
-        for key, value in read_data.items():
-            conn_1.send(value)
+        all_datum_hv = np.empty((0,), dtype=float)
+        all_lower_bounds = np.empty((0, 2), dtype=float)
+        all_gens = np.empty((0,), dtype=int)
+        _ref_x, _ref_y = 0.0, 0.0
+        for generation_num in read_data.keys():
+            pareto_1_sorted, pareto_2_sorted, datum_hv, lower_bounds = read_data[generation_num]
+            all_datum_hv = np.hstack((all_datum_hv, datum_hv))
+            all_lower_bounds = np.vstack((all_lower_bounds, lower_bounds))
+            all_gens = np.hstack((all_gens, generation_num))
+            if pareto_1_sorted[-1] > _ref_x:
+                _ref_x = pareto_1_sorted[-1]
+            if pareto_2_sorted[0] > _ref_y:
+                _ref_y = pareto_2_sorted[0]
+            if use_manual_rp:
+                _ref_x, _ref_y = ref_x, ref_y
+            all_hv = [get_hv_from_datum_hv(all_datum_hv[idx], all_lower_bounds[idx],
+                                           ref_x=_ref_x, ref_y=_ref_y) for idx in range(len(all_gens))]
+
+            print('')
+            conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, all_gens, all_hv))
 
 
 if __name__ == '__main__':
@@ -99,7 +118,8 @@ if __name__ == '__main__':
 
     # load previous plotting data
     remove_file(file_name='args')
-    plot_previous_data(conn_1=parent_conn)
+    mop_for_plot = Mop(conn_to_gui=parent_conn)
+    plot_previous_data(conn_to_gui=parent_conn, use_manual_rp=False)
 
     # Open an abaqus process
     abaqus_process = open_abaqus(abaqus_script_name=parameters.abaqus_script_name, params=parameters,
@@ -110,12 +130,11 @@ if __name__ == '__main__':
         if parameters.mode == 'GA':
             if parameters.restart_pop == 0:
                 for gen_idx in range(parameters.ini_gen, parameters.end_gen + 1):
-                    one_generation(w=gen_idx, restart=False, params=parameters, p_conn=parent_conn)
+                    one_generation(w=gen_idx, restart=False, params=parameters, mop=mop_for_plot)
             else:
-                one_generation(w=parameters.ini_gen, restart=True, params=parameters,
-                               p_conn=parent_conn)
+                one_generation(w=parameters.ini_gen, restart=True, params=parameters, mop=mop_for_plot)
                 for gen_idx in range(parameters.ini_gen + 1, parameters.end_gen + 1):
-                    one_generation(w=gen_idx, restart=False, params=parameters, p_conn=parent_conn)
+                    one_generation(w=gen_idx, restart=False, params=parameters, mop=mop_for_plot)
         elif parameters.mode == 'Something':
             pass
 

@@ -60,7 +60,7 @@ def crossover(chromosome_1, chromosome_2, cutting_section):  # Crossover process
     return offspring
 
 
-def generate_offspring(topologies, w, lx, ly, lz, end_pop, mutation_rate, timeout):
+def generate_offspring(topo_parent, w, lx, ly, lz, end_pop, mutation_rate, timeout):
     offspring = np.empty((0, lx * ly * lz), int)
     trial = 1
     validation_count = 0
@@ -72,14 +72,14 @@ def generate_offspring(topologies, w, lx, ly, lz, end_pop, mutation_rate, timeou
     while True:
         print('[Generate offspring] Trial: ', trial)
         trial += 1
-        cutting_section, candidate_list = cutting_function(topologies=topologies)
+        cutting_section, candidate_list = cutting_function(topologies=topo_parent)
         print('[Generate offspring] Candidate list: ', candidate_list)
         candidate_pairs_list = candidates(candidate_list=candidate_list)
         for pair_idx in range(len(candidate_pairs_list)):
             chromosome_1_idx = candidate_pairs_list[pair_idx][0]
             chromosome_2_idx = candidate_pairs_list[pair_idx][1]
-            cross_overed_pairs = crossover(chromosome_1=topologies[chromosome_1_idx],
-                                           chromosome_2=topologies[chromosome_2_idx],
+            cross_overed_pairs = crossover(chromosome_1=topo_parent[chromosome_1_idx],
+                                           chromosome_2=topo_parent[chromosome_2_idx],
                                            cutting_section=cutting_section)
             cross_overed_chromosome_1 = cross_overed_pairs[0].reshape((lx, ly, lz))
             cross_overed_chromosome_2 = cross_overed_pairs[1].reshape((lx, ly, lz))
@@ -232,12 +232,12 @@ if __name__ == '__main__':
     from FileIO import parent_import
     path = 'F:/shshsh/data-23-1-4/'
     os.chdir(path)
-    topos, _ = parent_import(w=18, restart_pop=0)  # topo: (100, 1000), result: (100, 12)
+    topos, _ = parent_import(w=18)  # topo: (100, 1000), result: (100, 12)
     number_of_voxels_x = 10
     number_of_voxels_y = 10
     number_of_voxels_z = 10
     end_population = 100
-    offsprings = generate_offspring(topologies=topos, w=18, end_pop=end_population,
+    offsprings = generate_offspring(topo_parent=topos, w=18, end_pop=end_population,
                                     mutation_rate=0.05, timeout=0.5,
                                     lx=number_of_voxels_x, ly=number_of_voxels_y, lz=number_of_voxels_z)
     inspect_topologies(generation=19)
