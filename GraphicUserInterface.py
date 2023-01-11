@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
+from PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_fitness_values
+from FileIO import parent_import
 
 
 @dataclass(kw_only=True)
@@ -121,8 +123,9 @@ class App:
         if self.conn.poll():
             try:
                 print('[GUI] Trying to receive plot data...')
-                x1, y1, current_gen, all_hv = self.conn.recv()
-                print('[GUI] I received something!', x1, y1, current_gen, all_hv)
+                x1, y1, x2y2 = self.conn.recv()
+                x2, y2 = zip(*x2y2.items())
+                print('[GUI] I received something!', x1, y1, x2, y2)
                 # Randomize plotting options to make data more noticeable
                 color_1, color_2 = np.random.rand(3, ), np.random.rand(3, )
                 plot_options = {
@@ -135,11 +138,16 @@ class App:
                     'markeredgewidth': 2}
                 self.ax[0].plot(x1, y1, **plot_options)
                 self.ax[1].clear()
-                self.ax[1].plot(current_gen, all_hv, **plot_options)
+                for generation, hv, line in zip(x2, y2, self.ax[0].lines):
+                    self.ax[1].scatter(generation, hv, marker=line.get_marker(), c=[line.get_markerfacecolor()],
+                                       edgecolors=line.get_markeredgecolor(), s=line.get_markersize() ** 2,
+                                       linewidth=line.get_markeredgewidth())
+                self.ax[0].grid(True)
+                self.ax[1].grid(True)
                 self.bar.draw()
             except Exception as error_message:
                 print('[GUI] An plotting error occurred:', error_message)
-        self.root.after(int(1000/polling_rate), self.update_canvas)
+        self.root.after(int(1000 / polling_rate), self.update_canvas)
 
     def onclick_set_path_button(self):
         try:
@@ -152,10 +160,10 @@ class App:
 
             params_main_already_exists = True if os.path.isfile(PARAMETER_FILE_NAME) else False
             if params_main_already_exists:
-                with open(PARAMETER_FILE_NAME, mode='rb') as f:
+                with open(PARAMETER_FILE_NAME, mode='rb') as f_params:
                     self.set_path_display.config(background='#00FF00')
                     self.set_path_title.config(text='미리 설정된 파라미터 값을 찾았습니다.')
-                    self.show_parameters(loaded=pickle.load(f))
+                    self.show_parameters(loaded=pickle.load(f_params))
                     self.ready_to_run = False
             else:
                 self.set_path_display.config(background='#FF0000')
@@ -197,8 +205,8 @@ class App:
             self.conn.send((self.setPath.get(), Parameters(**parameters_dict)))
             self.submit_btn.config(background='#0000FF', foreground='#FFFFFF', text='실행 중')
         else:
-            with open(PARAMETER_FILE_NAME, mode='wb') as f:
-                pickle.dump(parameters_dict, f)
+            with open(PARAMETER_FILE_NAME, mode='wb') as f_params:
+                pickle.dump(parameters_dict, f_params)
                 print(f'[GUI] Dumping to "{os.getcwd()}" Complete')
                 for key, value in parameters_dict.items():
                     print(f'- {key}: {value}')
@@ -296,23 +304,105 @@ def translator(s, to_korean):
     return dictionary.get(s) if to_korean else {v: k for k, v in dictionary.items()}.get(s)
 
 
-def plot_test(ax, px, py, sx, sy):
-    color_1 = np.random.rand(3, )
-    color_2 = np.random.rand(3, )
-    plot_options = {
-        'marker': np.random.choice(('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')),
-        'color': color_1,
-        'markeredgecolor': color_1,
-        'markerfacecolor': color_2,
-        'markersize': 8,
-        'markeredgewidth': 2,
+class Visualizer:
+    def __init__(self, conn_to_gui=None):
+        self.conn_to_gui = conn_to_gui
+        self.ref_x = None
+        self.ref_y = None
+        self.all_lower_bounds = dict()
+        self.all_datum_hv = dict()
+        if conn_to_gui is None:
+            self.figure, self.axes = plt.subplots(nrows=1, ncols=2,
+                                                  figsize=((1400 - 5) / 100, (700 - 5) / 100), dpi=100)
+            self.axes[0].set(title='Pareto Fronts', xlabel='Objective function 1', ylabel='Objective function 2')
+            self.axes[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
+            self.axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    }
-    ax[0].plot(px, py, **plot_options)
-    ax[1].scatter(sx, sy, marker=plot_options['marker'], edgecolors=plot_options['markeredgecolor'],
-                  facecolor=plot_options['markerfacecolor'], linewidth=plot_options['markeredgewidth'],
-                  s=plot_options['markersize'] ** 2)
+    def plot(self, gen_num, pareto_1_sorted, pareto_2_sorted, use_manual_rp, ref_x=0.0, ref_y=0.0):
+        if use_manual_rp:
+            self.ref_x, self.ref_y = ref_x, ref_y
+        elif (self.ref_x is None) or (self.ref_y is None):
+            self.ref_x = pareto_1_sorted[-1]
+            self.ref_y = pareto_2_sorted[0]
+        else:
+            if pareto_1_sorted[-1] > self.ref_x:
+                self.ref_x = pareto_1_sorted[-1]
+            if pareto_2_sorted[0] > self.ref_y:
+                self.ref_y = pareto_2_sorted[0]
+        datum_hv = get_datum_hv(pareto_1_sorted, pareto_2_sorted)
+        lower_bounds = [pareto_1_sorted[0], pareto_2_sorted[-1]]
+        self.all_datum_hv.update({gen_num: datum_hv})
+        self.all_lower_bounds.update({gen_num: lower_bounds})
+        all_hv = {key: get_hv_from_datum_hv(self.all_datum_hv[key], self.all_lower_bounds[key],
+                                            ref_x=self.ref_x, ref_y=self.ref_y) for key in self.all_datum_hv.keys()}
+        generations, hvs = zip(*all_hv.items())
+        file_name = '_plotting_data_'
+        if os.path.isfile(file_name):
+            with open(file_name, mode='rb') as f_read:
+                read_data = pickle.load(f_read)
+            with open(file_name, mode='wb') as f_write:
+                read_data.update({gen_num: (pareto_1_sorted, pareto_2_sorted)})
+                pickle.dump(read_data, f_write)
+        else:
+            with open(file_name, mode='wb') as f_write:
+                pickle.dump({gen_num: (pareto_1_sorted, pareto_2_sorted)}, f_write)
+        if self.conn_to_gui is not None:
+            self.conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, all_hv))
+        else:
+            color_1 = np.random.rand(3, )
+            color_2 = np.random.rand(3, )
+            plot_options = {
+                'marker': np.random.choice(('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')),
+                'color': color_1,
+                'markeredgecolor': color_1,
+                'markerfacecolor': color_2,
+                'markersize': 8,
+                'markeredgewidth': 2}
+            print(f'[VISUALIZE] Generation {gen_num}:')
+            print(f'> Objective function 1:{pareto_1_sorted}')
+            print(f'> Objective function 2:{pareto_2_sorted}\n')
+            self.axes[0].plot(pareto_1_sorted, pareto_2_sorted, **plot_options)
+            self.axes[1].clear()
+            for generation, hv, line in zip(generations, hvs, self.axes[0].lines):
+                self.axes[1].scatter(generation, hv, marker=line.get_marker(), c=[line.get_markerfacecolor()],
+                                     edgecolors=line.get_markeredgecolor(), s=line.get_markersize() ** 2,
+                                     linewidth=line.get_markeredgewidth())
+            self.axes[0].grid(True)
+            self.axes[1].grid(True)
+
+    def visualize(self, params, w, use_manual_rp, ref_x=0.0, ref_y=0.0):
+        topo_next_parent, result_next_parent = parent_import(w+1)
+        fitness_values_next_parent = evaluate_fitness_values(topo=topo_next_parent, result=result_next_parent,
+                                                             params=params)
+        fitness_pareto_next_parent = find_pareto_front_points(costs=fitness_values_next_parent, return_index=False)
+        self.plot(gen_num=w,
+                  pareto_1_sorted=fitness_pareto_next_parent[:, 0], pareto_2_sorted=fitness_pareto_next_parent[:, 1],
+                  use_manual_rp=use_manual_rp, ref_x=ref_x, ref_y=ref_y)
 
 
 if __name__ == '__main__':
-    App()
+    use_gui = False
+
+    if use_gui:
+        from main import make_and_start_process
+
+        gui_process, parent_conn, child_conn = make_and_start_process(target=App)
+        set_path, parameters = parent_conn.recv()
+        parameters.post_initialize()
+        os.chdir(set_path)
+        visualizer = Visualizer(conn_to_gui=parent_conn)
+    else:
+        plot_data_path = r'F:\shshsh\data-23-1-4'
+        os.chdir(plot_data_path)
+        visualizer = Visualizer(conn_to_gui=None)
+
+    with open('Plot_data', 'rb') as f:
+        plot_data = pickle.load(f)
+    for gen in range(len(plot_data)):
+        pareto_sort_1, pareto_sort_2 = plot_data[gen + 1][0], plot_data[gen + 1][1]
+        visualizer.plot(gen_num=gen + 1, pareto_1_sorted=pareto_sort_1, pareto_2_sorted=pareto_sort_2,
+                        use_manual_rp=False)
+    if use_gui:
+        input()
+    else:
+        plt.show()

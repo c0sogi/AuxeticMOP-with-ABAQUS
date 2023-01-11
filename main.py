@@ -3,110 +3,152 @@ import pickle
 import numpy as np
 from time import sleep
 from datetime import datetime
-from GraphicUserInterface import App
-from multiprocessing import Process, Pipe
+import multiprocessing as mp
 from dataclasses import asdict
+from typing import Tuple
+
 from GeneticAlgorithm import generate_offspring
-from PostProcessing import evaluate_two_topologies, selection, Mop, get_hv_from_datum_hv
+from GraphicUserInterface import App, Visualizer, Parameters
+from PostProcessing import evaluate_fitness_values, selection
 from FileIO import parent_import, parent_export, offspring_import
 
 
-def make_and_start_process(target, duplex=True, daemon=True):
-    conn_1, conn_2 = Pipe(duplex=duplex)
-    process = Process(target=target, args=(conn_2,), daemon=daemon)
+def make_and_start_process(target: any, duplex: bool = True, daemon: bool = True) -> Tuple[mp.Process,
+                                                                                           mp.connection.Connection,
+                                                                                           mp.connection.Connection]:
+    """
+    Make GUI process and return a process and two connections between main process and GUI process.
+    :param target: The GUI class to run as another process.
+    :param duplex: If True, both receiving and sending data between main process and GUI process will be allowed.
+    Otherwise, conn_1 is only allowed for receiving data and conn_2 is only allowed for sending data.
+    :param daemon: If True, GUI process will be terminated when main process is terminated.
+    Otherwise, GUI process will be orphan process.
+    :return: A running process, Pipe connections of main process, GUI process, respectively.
+    """
+    conn_1, conn_2 = mp.Pipe(duplex=duplex)
+    process = mp.Process(target=target, args=(conn_2,), daemon=daemon)
     process.start()
     return process, conn_1, conn_2
 
 
-def remove_file(file_name):
+def remove_file(file_name: str) -> None:
+    """
+    Remove a file before beginning GA.
+    :param file_name: The filename to remove.
+    :return: None
+    """
     if os.path.isfile(file_name):
         os.remove(file_name)
 
 
-def open_abaqus(abaqus_script_name, directory, params, abaqus_execution_mode):
-    with open('./PARAMS', mode='wb') as f_params:
+def open_abaqus(abaqus_script_name: str, directory: str, params: Parameters, abaqus_execution_mode: str) -> mp.Process:
+    """
+    Open an abaqus CAE process
+    :param abaqus_script_name: Name of python script file for abaqus. For example, ABQ.py
+    :param directory: The directory for abaqus to work, where abaqus script file and other csv files are located.
+    :param params: Parameters retrieved from GUI.
+    :param abaqus_execution_mode: 'noGUI' for abaqus non-gui mode, 'script' for abaqus gui mode.
+    :return: Abaqus process.
+    """
+    with open('./PARAMS', mode='wb') as f_params:  # Saving a parameter file for abaqus
         pickle.dump({**asdict(params), **{'setPath': directory}}, f_params, protocol=2)
     print(f"========== Opening ABAQUS on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
-    process = Process(target=os.system, args=(f'abaqus cae {abaqus_execution_mode}={abaqus_script_name}',), daemon=True)
-    process.start()
+    process = mp.Process(target=os.system, args=(f'abaqus cae {abaqus_execution_mode}={abaqus_script_name}',),
+                         daemon=True)
+    process.start()  # Start abaqus
     return process
 
 
-def wait_for_abaqus_to_complete(check_exit_time, restart, w, offspring):
-    args = {
-        'restart': restart,
-        'w': w,
+def wait_for_abaqus_to_complete(check_exit_time: float, restart: bool, w: int, offspring: np.ndarray) -> None:
+    """
+    Hold main process until one generation of abaqus job is done.
+    :param check_exit_time: The time in seconds checking whether abaqus job is done.
+    :param restart: Restarting evolution from unfinished generation previously done.
+    :param w: current generation number.
+    :param offspring: Topologies of an offspring of current generation.
+    :return: Nothing
+    """
+    args = {  # arguments for abaqus job, args will be transferred to abaqus
+        'restart': restart,  # True for continue working from population of unfinished generation previously done
+        'w': w,  # Generation number
         'offspring': np.swapaxes(offspring, axis1=1, axis2=3)
         # Changing offspring axis: (end_pop, lx, ly, lz) -> (end_pop, lz, ly, lx)
     }
-    with open('./args', mode='wb') as f_args:
+    with open('./args', mode='wb') as f_args:  # Saving args file
         pickle.dump(args, f_args, protocol=2)
     print('Waiting for abaqus')
-    while True:
+    while True:  # Checking if one generation of abaqus job is done
         sleep(check_exit_time)
-        if os.path.isfile('./args'):
+        if os.path.isfile('./args'):  # If args file exists, abaqus job is not done yet
             print('.', end='')
             continue
-        else:
+        else:  # If args file doesn't exist, it means abaqus job is done
             print()
             break
     print(f"========== An abaqus job done on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
 
 
-def one_generation(w, restart, params, mop):
+def one_generation(gen_num: int, restart: bool, params: Parameters, visualizer: Visualizer = None) -> None:
+    """
+    Evolution of one generation will be done.
+    :param gen_num: Current generation number. (1~)
+    :param restart: Restarting evolution from unfinished generation previously done.
+    :param params: Parameters from GUI.
+    :param visualizer: A class for visualizing every result of GA.
+    :return: Nothing
+    """
+    # Import parent topologies and outputs of current generation
+    topo_parent, result_parent = parent_import(gen_num=gen_num)
     if restart:
-        topo_parent, result_parent = parent_import(w=w)
-        topo_offspring = np.genfromtxt('topo_offspring_' + str(w) + '.csv', delimiter=',', dtype=int)
+        topo_offspring = np.genfromtxt('topo_offspring_' + str(gen_num) + '.csv', delimiter=',', dtype=int)
         topo_offspring = topo_offspring.reshape((params.end_pop, params.lx, params.ly, params.lz))
     else:
-        topo_parent, result_parent = parent_import(w=w)
-        topo_offspring = generate_offspring(topo_parent=topo_parent, w=w, end_pop=params.end_pop,
+        topo_offspring = generate_offspring(topo_parent=topo_parent, w=gen_num, end_pop=params.end_pop,
                                             timeout=params.timeout, mutation_rate=params.mutation_rate,
                                             lx=params.lx, ly=params.ly, lz=params.lz)
-    wait_for_abaqus_to_complete(check_exit_time=1, restart=restart, w=w, offspring=topo_offspring)
+    wait_for_abaqus_to_complete(check_exit_time=1, restart=restart, w=gen_num, offspring=topo_offspring)
 
-    topo_offspring, result_offspring = offspring_import(w=w)
-    two_fit_vals = evaluate_two_topologies(topo_parent=topo_parent, topo_offspring=topo_offspring,
-                                           result_parent=result_parent, result_offspring=result_offspring,
-                                           lx=params.lx, ly=params.ly, lz=params.lz, max_rf22=params.max_rf22,
-                                           evaluation_version=params.evaluation_version, population_size=params.end_pop,
-                                           penalty_coefficient=params.penalty_coefficient)
+    # Import parent outputs of current generation from abaqus
+    _, result_offspring = offspring_import(gen_num=gen_num)
+    fitness_values_parent = evaluate_fitness_values(topo=topo_parent, result=result_parent, params=params)
+    fitness_values_offspring = evaluate_fitness_values(topo=topo_offspring, result=result_offspring, params=params)
+    fitness_values_parent_and_offspring = np.vstack((fitness_values_parent, fitness_values_offspring))
 
+    # Topologies of parent of next generation will be selected by pareto fronts
     _, next_generations = selection(all_topologies=np.vstack((topo_parent, topo_offspring)),
-                                    all_fitness_values=two_fit_vals, population_size=params.end_pop)
+                                    all_fitness_values=fitness_values_parent_and_offspring,
+                                    population_size=params.end_pop)
+
+    # The selected parent topologies are now exported as a CSV file
     parent_export(topo_parent=topo_parent, topo_offspring=topo_offspring,
                   result_parent=result_parent, result_offspring=result_offspring,
-                  w=w, population_size=params.end_pop, next_generations=next_generations)
+                  gen_num=gen_num, population_size=params.end_pop, next_generations=next_generations)
+
     if restart:
         params.restart_pop = 0
-    print('Generation:', w)
-    mop.visualize(params=params, w=w, use_manual_rp=False, ref_x=0.0, ref_y=0.0)
+    print('Generation:', gen_num)
+    if visualizer is not None:
+        visualizer.visualize(params=params, w=gen_num, use_manual_rp=False, ref_x=0.0, ref_y=0.0)
 
 
-def plot_previous_data(conn_to_gui, use_manual_rp, ref_x=0.0, ref_y=0.0):
-    if os.path.isfile('_plotting_data_'):
-        with open('_plotting_data_', mode='rb') as f_read:
+def plot_previous_data(visualizer: Visualizer, use_manual_rp: bool, ref_x: float = 0.0, ref_y: float = 0.0) -> None:
+    """
+    Plot pareto fronts and hyper volumes of all worked generations.
+    :param visualizer: Visualizer class
+    :param use_manual_rp: If True, a reference point coordinate is fixed as your input point (ref_x, ref_y).
+    If False, reference point will be calculated automatically.
+    The reference point is used as a point for calculating hyper volume.
+    :param ref_x: X coordinate of reference point for reference point if the use_manual_rp is True.
+    :param ref_y: Y coordinate of reference point for reference point if the use_manual_rp is True.
+    :return: Nothing
+    """
+    plotting_data_file_name = '_plotting_data_'
+    if os.path.isfile(plotting_data_file_name):
+        with open(plotting_data_file_name, mode='rb') as f_read:
             read_data = pickle.load(f_read)
-        all_datum_hv = np.empty((0,), dtype=float)
-        all_lower_bounds = np.empty((0, 2), dtype=float)
-        all_gens = np.empty((0,), dtype=int)
-        _ref_x, _ref_y = 0.0, 0.0
-        for generation_num in read_data.keys():
-            pareto_1_sorted, pareto_2_sorted, datum_hv, lower_bounds = read_data[generation_num]
-            all_datum_hv = np.hstack((all_datum_hv, datum_hv))
-            all_lower_bounds = np.vstack((all_lower_bounds, lower_bounds))
-            all_gens = np.hstack((all_gens, generation_num))
-            if pareto_1_sorted[-1] > _ref_x:
-                _ref_x = pareto_1_sorted[-1]
-            if pareto_2_sorted[0] > _ref_y:
-                _ref_y = pareto_2_sorted[0]
-            if use_manual_rp:
-                _ref_x, _ref_y = ref_x, ref_y
-            all_hv = [get_hv_from_datum_hv(all_datum_hv[idx], all_lower_bounds[idx],
-                                           ref_x=_ref_x, ref_y=_ref_y) for idx in range(len(all_gens))]
-
-            print('')
-            conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, all_gens, all_hv))
+        for generation_num, (pareto_1_sorted, pareto_2_sorted) in read_data.items():
+            visualizer.plot(gen_num=generation_num, pareto_1_sorted=pareto_1_sorted, pareto_2_sorted=pareto_2_sorted,
+                            use_manual_rp=use_manual_rp, ref_x=ref_x, ref_y=ref_y)
 
 
 if __name__ == '__main__':
@@ -118,23 +160,23 @@ if __name__ == '__main__':
 
     # load previous plotting data
     remove_file(file_name='args')
-    mop_for_plot = Mop(conn_to_gui=parent_conn)
-    plot_previous_data(conn_to_gui=parent_conn, use_manual_rp=False)
+    mop_for_plot = Visualizer(conn_to_gui=parent_conn)
+    plot_previous_data(visualizer=mop_for_plot, use_manual_rp=False)
 
     # Open an abaqus process
     abaqus_process = open_abaqus(abaqus_script_name=parameters.abaqus_script_name, params=parameters,
                                  abaqus_execution_mode=parameters.abaqus_execution_mode, directory=set_path)
 
-    # Start working
+    # Start GA
     try:
         if parameters.mode == 'GA':
             if parameters.restart_pop == 0:
                 for gen_idx in range(parameters.ini_gen, parameters.end_gen + 1):
-                    one_generation(w=gen_idx, restart=False, params=parameters, mop=mop_for_plot)
+                    one_generation(gen_num=gen_idx, restart=False, params=parameters, visualizer=mop_for_plot)
             else:
-                one_generation(w=parameters.ini_gen, restart=True, params=parameters, mop=mop_for_plot)
+                one_generation(gen_num=parameters.ini_gen, restart=True, params=parameters, visualizer=mop_for_plot)
                 for gen_idx in range(parameters.ini_gen + 1, parameters.end_gen + 1):
-                    one_generation(w=gen_idx, restart=False, params=parameters, mop=mop_for_plot)
+                    one_generation(gen_num=gen_idx, restart=False, params=parameters, visualizer=mop_for_plot)
         elif parameters.mode == 'Something':
             pass
 

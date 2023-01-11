@@ -60,7 +60,23 @@ def crossover(chromosome_1, chromosome_2, cutting_section):  # Crossover process
     return offspring
 
 
-def generate_offspring(topo_parent, w, lx, ly, lz, end_pop, mutation_rate, timeout):
+def generate_offspring(topo_parent: np.ndarray, w: int, lx: int, ly: int, lz: int,
+                       end_pop: int, mutation_rate: float, timeout: float):
+    """
+    Generating offspring from parents. Crossover & Mutation & Validating processes will be held.
+    Validating processes contain, checking 3d-print-ability without support, one voxel tree contacting six faces
+    in the cube
+    :param topo_parent: Topology array of parent, shape: (end_pop, lx * ly * lz)
+    :param w: Current generation
+    :param lx: Total Voxels in x direction of a cube
+    :param ly: Total Voxels in y direction of a cube
+    :param lz: Total Voxels in z direction of a cube
+    :param end_pop: The size of population in one generation
+    :param mutation_rate: The mutation rate in range between 0~1, in the function "mutate_and_validate_topology"
+    :param timeout: The time in seconds which will prevent validation process from infinite-looping.
+    The more timeout, the longer time will be allowed for the function "mutate_and_validate_topology".
+    :return:
+    """
     offspring = np.empty((0, lx * ly * lz), int)
     trial = 1
     validation_count = 0
@@ -232,7 +248,7 @@ if __name__ == '__main__':
     from FileIO import parent_import
     path = 'F:/shshsh/data-23-1-4/'
     os.chdir(path)
-    topos, _ = parent_import(w=18)  # topo: (100, 1000), result: (100, 12)
+    topos, _ = parent_import(gen_num=18)  # topo: (100, 1000), result: (100, 12)
     number_of_voxels_x = 10
     number_of_voxels_y = 10
     number_of_voxels_z = 10
