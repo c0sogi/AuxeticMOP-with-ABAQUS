@@ -4,20 +4,26 @@ import numpy as np
 from time import sleep
 from datetime import datetime
 import multiprocessing as mp
+import multiprocessing.connection as connection
 from dataclasses import asdict
 from typing import Tuple
 
-from GeneticAlgorithm import generate_offspring
+from GeneticAlgorithm import generate_offspring, random_parent_generation
 from GraphicUserInterface import App, Visualizer, Parameters
 from PostProcessing import evaluate_fitness_values, selection
 from FileIO import parent_import, parent_export, offspring_import
 
+ABAQUS_ARGUMENTS_FILENAME = 'args'
+ABAQUS_PROCESS_END_FILENAME = 'args_end'
+ABAQUS_PARAMETER_FILENAME = 'PARAMS'
+PLOTTING_DATA_FILENAME = '_plotting_data_'
+
 
 def make_and_start_process(target: any, duplex: bool = True, daemon: bool = True) -> Tuple[mp.Process,
-                                                                                           mp.connection.Connection,
-                                                                                           mp.connection.Connection]:
+                                                                                           connection.Connection,
+                                                                                           connection.Connection]:
     """
-    Make GUI process and return a process and two connections between main process and GUI process.
+    Make GUI process and return a process and two Pipe connections between main process and GUI process.
     :param target: The GUI class to run as another process.
     :param duplex: If True, both receiving and sending data between main process and GUI process will be allowed.
     Otherwise, conn_1 is only allowed for receiving data and conn_2 is only allowed for sending data.
@@ -50,7 +56,7 @@ def open_abaqus(abaqus_script_name: str, directory: str, params: Parameters, aba
     :param abaqus_execution_mode: 'noGUI' for abaqus non-gui mode, 'script' for abaqus gui mode.
     :return: Abaqus process.
     """
-    with open('./PARAMS', mode='wb') as f_params:  # Saving a parameter file for abaqus
+    with open(ABAQUS_PARAMETER_FILENAME, mode='wb') as f_params:  # Saving a parameter file for abaqus
         pickle.dump({**asdict(params), **{'setPath': directory}}, f_params, protocol=2)
     print(f"========== Opening ABAQUS on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
     process = mp.Process(target=os.system, args=(f'abaqus cae {abaqus_execution_mode}={abaqus_script_name}',),
@@ -59,7 +65,7 @@ def open_abaqus(abaqus_script_name: str, directory: str, params: Parameters, aba
     return process
 
 
-def wait_for_abaqus_to_complete(check_exit_time: float, restart: bool, w: int, offspring: np.ndarray) -> None:
+def wait_for_abaqus_until_complete(check_exit_time: float, restart: bool, w: int, offspring: np.ndarray) -> None:
     """
     Hold main process until one generation of abaqus job is done.
     :param check_exit_time: The time in seconds checking whether abaqus job is done.
@@ -68,18 +74,19 @@ def wait_for_abaqus_to_complete(check_exit_time: float, restart: bool, w: int, o
     :param offspring: Topologies of an offspring of current generation.
     :return: Nothing
     """
+
     args = {  # arguments for abaqus job, args will be transferred to abaqus
         'restart': restart,  # True for continue working from population of unfinished generation previously done
         'w': w,  # Generation number
         'offspring': np.swapaxes(offspring, axis1=1, axis2=3)
         # Changing offspring axis: (end_pop, lx, ly, lz) -> (end_pop, lz, ly, lx)
     }
-    with open('./args', mode='wb') as f_args:  # Saving args file
+    with open(ABAQUS_ARGUMENTS_FILENAME, mode='wb') as f_args:  # Saving args file
         pickle.dump(args, f_args, protocol=2)
     print('Waiting for abaqus')
     while True:  # Checking if one generation of abaqus job is done
         sleep(check_exit_time)
-        if os.path.isfile('./args'):  # If args file exists, abaqus job is not done yet
+        if os.path.isfile(ABAQUS_ARGUMENTS_FILENAME):  # If args file exists, abaqus job is not done yet
             print('.', end='')
             continue
         else:  # If args file doesn't exist, it means abaqus job is done
@@ -88,33 +95,37 @@ def wait_for_abaqus_to_complete(check_exit_time: float, restart: bool, w: int, o
     print(f"========== An abaqus job done on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
 
 
-def one_generation(gen_num: int, restart: bool, params: Parameters, visualizer: Visualizer = None) -> None:
+def one_generation(gen: int, restart: bool, params: Parameters, visualizer: Visualizer = None) -> None:
     """
     Evolution of one generation will be done.
-    :param gen_num: Current generation number. (1~)
+    :param gen: Current generation number. (1~)
     :param restart: Restarting evolution from unfinished generation previously done.
     :param params: Parameters from GUI.
     :param visualizer: A class for visualizing every result of GA.
     :return: Nothing
     """
     # Import parent topologies and outputs of current generation
-    topo_parent, result_parent = parent_import(gen_num=gen_num)
+    topo_parent, result_parent = parent_import(gen_num=gen)
+
+    # Make offspring topologies
     if restart:
-        topo_offspring = np.genfromtxt('topo_offspring_' + str(gen_num) + '.csv', delimiter=',', dtype=int)
+        topo_offspring = np.genfromtxt('topo_offspring_' + str(gen) + '.csv', delimiter=',', dtype=int)
         topo_offspring = topo_offspring.reshape((params.end_pop, params.lx, params.ly, params.lz))
     else:
-        topo_offspring = generate_offspring(topo_parent=topo_parent, w=gen_num, end_pop=params.end_pop,
+        topo_offspring = generate_offspring(topo_parent=topo_parent, gen=gen, end_pop=params.end_pop,
                                             timeout=params.timeout, mutation_rate=params.mutation_rate,
                                             lx=params.lx, ly=params.ly, lz=params.lz)
-    wait_for_abaqus_to_complete(check_exit_time=1, restart=restart, w=gen_num, offspring=topo_offspring)
+
+    # Make abaqus work
+    wait_for_abaqus_until_complete(check_exit_time=1, restart=restart, w=gen, offspring=topo_offspring)
 
     # Import parent outputs of current generation from abaqus
-    _, result_offspring = offspring_import(gen_num=gen_num)
+    _, result_offspring = offspring_import(gen_num=gen)
     fitness_values_parent = evaluate_fitness_values(topo=topo_parent, result=result_parent, params=params)
     fitness_values_offspring = evaluate_fitness_values(topo=topo_offspring, result=result_offspring, params=params)
     fitness_values_parent_and_offspring = np.vstack((fitness_values_parent, fitness_values_offspring))
 
-    # Topologies of parent of next generation will be selected by pareto fronts
+    # Topologies of parent of next generation will be selected by pareto fronts criterion
     _, next_generations = selection(all_topologies=np.vstack((topo_parent, topo_offspring)),
                                     all_fitness_values=fitness_values_parent_and_offspring,
                                     population_size=params.end_pop)
@@ -122,13 +133,16 @@ def one_generation(gen_num: int, restart: bool, params: Parameters, visualizer: 
     # The selected parent topologies are now exported as a CSV file
     parent_export(topo_parent=topo_parent, topo_offspring=topo_offspring,
                   result_parent=result_parent, result_offspring=result_offspring,
-                  gen_num=gen_num, population_size=params.end_pop, next_generations=next_generations)
+                  gen_num=gen, population_size=params.end_pop, next_generations=next_generations)
 
+    # Next generations do not restart
     if restart:
         params.restart_pop = 0
-    print('Generation:', gen_num)
+    print('Generation:', gen)
+
+    # Visualize
     if visualizer is not None:
-        visualizer.visualize(params=params, w=gen_num, use_manual_rp=False, ref_x=0.0, ref_y=0.0)
+        visualizer.visualize(params=params, w=gen, use_manual_rp=False, ref_x=0.0, ref_y=0.0)
 
 
 def plot_previous_data(visualizer: Visualizer, use_manual_rp: bool, ref_x: float = 0.0, ref_y: float = 0.0) -> None:
@@ -142,9 +156,8 @@ def plot_previous_data(visualizer: Visualizer, use_manual_rp: bool, ref_x: float
     :param ref_y: Y coordinate of reference point for reference point if the use_manual_rp is True.
     :return: Nothing
     """
-    plotting_data_file_name = '_plotting_data_'
-    if os.path.isfile(plotting_data_file_name):
-        with open(plotting_data_file_name, mode='rb') as f_read:
+    if os.path.isfile(PLOTTING_DATA_FILENAME):
+        with open(PLOTTING_DATA_FILENAME, mode='rb') as f_read:
             read_data = pickle.load(f_read)
         for generation_num, (pareto_1_sorted, pareto_2_sorted) in read_data.items():
             visualizer.plot(gen_num=generation_num, pareto_1_sorted=pareto_1_sorted, pareto_2_sorted=pareto_2_sorted,
@@ -159,30 +172,35 @@ if __name__ == '__main__':
     os.chdir(set_path)
 
     # load previous plotting data
-    remove_file(file_name='args')
-    mop_for_plot = Visualizer(conn_to_gui=parent_conn)
-    plot_previous_data(visualizer=mop_for_plot, use_manual_rp=False)
+    remove_file(file_name=ABAQUS_ARGUMENTS_FILENAME)
+    v = Visualizer(conn_to_gui=parent_conn)
+    plot_previous_data(visualizer=v, use_manual_rp=False)
 
     # Open an abaqus process
     abaqus_process = open_abaqus(abaqus_script_name=parameters.abaqus_script_name, params=parameters,
                                  abaqus_execution_mode=parameters.abaqus_execution_mode, directory=set_path)
 
     # Start GA
+    if not os.path.isfile(f'topo_parent_{parameters.ini_gen}.csv'):
+        random_parent_generation(params=parameters, density=0.3, show_parent=False)
+    if not os.path.isfile(f'Output_parent_{parameters.ini_gen}.csv'):
+        one_generation(gen=parameters.ini_gen, restart=False, params=parameters, visualizer=v)
     try:
         if parameters.mode == 'GA':
             if parameters.restart_pop == 0:
-                for gen_idx in range(parameters.ini_gen, parameters.end_gen + 1):
-                    one_generation(gen_num=gen_idx, restart=False, params=parameters, visualizer=mop_for_plot)
+                for gen_num in range(parameters.ini_gen, parameters.end_gen + 1):
+                    one_generation(gen=gen_num, restart=False, params=parameters, visualizer=v)
             else:
-                one_generation(gen_num=parameters.ini_gen, restart=True, params=parameters, visualizer=mop_for_plot)
-                for gen_idx in range(parameters.ini_gen + 1, parameters.end_gen + 1):
-                    one_generation(gen_num=gen_idx, restart=False, params=parameters, visualizer=mop_for_plot)
+                one_generation(gen=parameters.ini_gen, restart=True, params=parameters, visualizer=v)
+                for gen_num in range(parameters.ini_gen + 1, parameters.end_gen + 1):
+                    one_generation(gen=gen_num, restart=False, params=parameters, visualizer=v)
         elif parameters.mode == 'Something':
             pass
 
         # Make abaqus exit itself
-        with open('args_end', mode='wb') as f_args_end:
+        with open(ABAQUS_PROCESS_END_FILENAME, mode='wb') as f_args_end:
             pickle.dump('end', f_args_end, protocol=2)
+
     except Exception as error_message:
         # An error message
         print('[MAIN] An error in main function occurred while generating generations: \n', error_message)

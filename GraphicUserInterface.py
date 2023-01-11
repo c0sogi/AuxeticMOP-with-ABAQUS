@@ -61,7 +61,7 @@ pady = 5
 left_width = 1400  # original: 400
 right_width = 400
 height = 750
-button_width = 10
+button_width = 15
 parameters = Parameters()
 parameters_dict = asdict(parameters)
 
@@ -72,7 +72,7 @@ class App:
         self.ready_to_run = False
         self.root = tk.Tk()
         self.root.protocol("WM_DELETE_WINDOW", self.callback)
-        self.root.title('APUCI: Abaqus-Python Unified Control Interface')
+        self.root.title('Abaqus-Python Unified Control Interface')
         self.root.config(background='#FFFFFF')
         self.root.resizable(False, False)
 
@@ -85,15 +85,17 @@ class App:
         self.left_frame = tk.Frame(self.down_frame, width=left_width, height=height, padx=padx, pady=pady)
         self.right_frame = tk.Frame(self.down_frame, width=right_width, height=height, padx=padx, pady=pady)
 
-        self.set_path_title = tk.Label(self.up_frame, text='Abaqus script와 Parent 파일이 들어있는 폴더를 골라 주세요')
+        self.set_path_title = tk.Label(self.up_frame,
+                                       text='Choose the folder containing the Abaqus script and CSV files.')
         self.set_path_title.config(background='#FFFFFF')
         self.set_path_display = tk.Listbox(self.up_frame, width=50, height=1)
-        self.set_path_btn = tk.Button(self.up_frame, text='폴더 찾기', width=8, command=self.onclick_set_path_button)
-        self.submit_btn = tk.Button(self.right_frame, width=button_width, text='프리셋 저장',
+        self.set_path_btn = tk.Button(self.up_frame, text='Browse folder...', width=button_width,
+                                      command=self.onclick_set_path_button)
+        self.submit_btn = tk.Button(self.right_frame, width=button_width, text='Save presets',
                                     command=self.onclick_submit_btn)
-        self.exit_btn = tk.Button(self.right_frame, width=button_width, text='종료',
+        self.exit_btn = tk.Button(self.right_frame, width=button_width, text='Exit',
                                   command=self.onclick_exit_btn, background='#FF0000', foreground='#FFFFFF')
-        self.set_default_btn = tk.Button(self.right_frame, width=button_width, text='기본값 로드',
+        self.set_default_btn = tk.Button(self.right_frame, width=button_width, text='Load defaults',
                                          command=self.onclick_set_default_btn)
         self.setPath = tk.StringVar()
         self.string_vars = [tk.StringVar() for _ in Parameters.__dict__]
@@ -105,6 +107,7 @@ class App:
         self.set_path_title.pack()
         self.set_path_display.pack()
         self.set_path_btn.pack()
+
         self.root.mainloop()
 
     def callback(self):
@@ -162,17 +165,17 @@ class App:
             if params_main_already_exists:
                 with open(PARAMETER_FILE_NAME, mode='rb') as f_params:
                     self.set_path_display.config(background='#00FF00')
-                    self.set_path_title.config(text='미리 설정된 파라미터 값을 찾았습니다.')
+                    self.set_path_title.config(text='Preset parameter value found.')
                     self.show_parameters(loaded=pickle.load(f_params))
                     self.ready_to_run = False
             else:
                 self.set_path_display.config(background='#FF0000')
-                self.set_path_title.config(text='파라미터를 찾지 못했습니다. 밑에서 설정해주세요.')
+                self.set_path_title.config(text='Parameter not found. Please set below.')
                 self.show_parameters(loaded=False)
                 self.ready_to_run = False
 
         except Exception as error_message:
-            messagebox.showerror("Error", f"오류가 발생했습니다:\n{error_message}")
+            messagebox.showerror("Error", f"An error occurred:\n{error_message}")
 
     def onclick_set_default_btn(self):
         for idx, value in enumerate(parameters_dict.values()):
@@ -188,8 +191,8 @@ class App:
             lb_width = 24
             rb_width = 5
         else:
-            raise ValueError('체크박스의 개수가 3개 이하가 되도록 해주세요.')
-        lb = tk.Label(radiobutton_frame, width=lb_width, text=translator(s=key, to_korean=True), anchor='w')
+            raise ValueError('Please make sure the number of checkboxes is less than 3.')
+        lb = tk.Label(radiobutton_frame, width=lb_width, text=translator(s=key, translate=True), anchor='w')
         lb.grid(row=0, column=0)
 
         for menu_idx, menu in enumerate(d[key]):
@@ -203,14 +206,14 @@ class App:
             parameters_dict[key] = string_to_int_or_float_or_string(self.string_vars[params_idx].get())
         if self.ready_to_run and self.conn is not None:
             self.conn.send((self.setPath.get(), Parameters(**parameters_dict)))
-            self.submit_btn.config(background='#0000FF', foreground='#FFFFFF', text='실행 중')
+            self.submit_btn.config(background='#0000FF', foreground='#FFFFFF', text='Running...')
         else:
             with open(PARAMETER_FILE_NAME, mode='wb') as f_params:
                 pickle.dump(parameters_dict, f_params)
                 print(f'[GUI] Dumping to "{os.getcwd()}" Complete')
                 for key, value in parameters_dict.items():
                     print(f'- {key}: {value}')
-            self.submit_btn.config(background='#00FF00', text='실행')
+            self.submit_btn.config(background='#00FF00', text='Run')
             self.ready_to_run = True
 
     def onclick_exit_btn(self):
@@ -237,7 +240,7 @@ class App:
             else:
                 ef = tk.Frame(self.right_frame, width=left_width - 2 * padx,
                               height=height / len(asdict(Parameters()).keys()) - pady)
-                lb = tk.Label(ef, width=25, text=translator(s=key, to_korean=True), anchor='w')
+                lb = tk.Label(ef, width=25, text=translator(s=key, translate=True), anchor='w')
                 ee = tk.Entry(ef, width=25, textvariable=self.string_vars[i])
                 ef.grid(row=i, column=0)
                 lb.grid(row=0, column=0)
@@ -272,36 +275,35 @@ def string_to_int_or_float_or_string(s):
         return s
 
 
-def translator(s, to_korean):
-    dictionary = {'abaqus_script_name': 'ABAQUS 스크립트 파일명',
-                  'abaqus_execution_mode': 'ABAQUS 실행 모드',
-                  'mode': '모드',
-                  'evaluation_version': '평가 버전',
-                  'restart_pop': '재시작 Population',
-                  'ini_pop': '첫 Population',
-                  'end_pop': '끝 Population',
-                  'ini_gen': '첫 Generation',
-                  'end_gen': '끝 Generation',
-                  'mutation_rate': '돌연변이율(0~1)',
-                  'unit_l': 'Voxel 크기(mm)',
-                  'lx': 'X방향 Voxel 수',
-                  'ly': 'Y방향 Voxel 수',
-                  'lz': 'Z방향 Voxel 수',
-                  'divide_number': '정밀도(1이상 자연수)',
-                  'mesh_size': '메쉬 정밀도(0~1)',
-                  'dis_y': 'Y방향 압축률(-1~1)',
-                  'material_modulus': '재료 영률값(MPa)',
-                  'poissons_ratio': '포아송 비(0~1)',
-                  'density': '재료 밀도(ton/mm3)',
-                  'MaxRF22': 'RF22 최댓값(N)',
-                  'penalty_coefficient': '패널티 계수',
-                  'sigma': '시그마',
-                  'threshold': '임계값',
-                  'n_cpus': 'CPU 코어 수',
-                  'n_gpus': 'GPU 코어 수',
-                  # 'add_probability': '트리 덧셈 확률(0~1)',
-                  'timeout': '타임 아웃(s)'}
-    return dictionary.get(s) if to_korean else {v: k for k, v in dictionary.items()}.get(s)
+def translator(s: str, translate: bool) -> str:
+    dictionary = {'abaqus_script_name': 'Filename of ABAQUS script',
+                  'abaqus_execution_mode': 'ABAQUS execution mode',
+                  'mode': 'GA Mode',
+                  'evaluation_version': 'GA evaluation version',
+                  'restart_pop': '[P] Restart from population',
+                  'ini_pop': '[P] First Population',
+                  'end_pop': '[P] Last Population',
+                  'ini_gen': '[G] First Generation',
+                  'end_gen': '[G] Last Generation',
+                  'mutation_rate': 'Mutation rate(0~1)',
+                  'unit_l': 'Voxel unit length(mm)',
+                  'lx': 'Voxel number in X-direction',
+                  'ly': 'Voxel number in Y-direction',
+                  'lz': 'Voxel number in Z-direction',
+                  'divide_number': 'Upscale multiplier(1~)',
+                  'mesh_size': 'Mesh size/Voxel size(0~1)',
+                  'dis_y': 'Y Compression ratio(-1~1)',
+                  'material_modulus': "Young's modulus(MPa)",
+                  'poissons_ratio': "Poisson's ratio(0~1)",
+                  'density': 'Material density(ton/mm3)',
+                  'MaxRF22': 'Maximum RF22(N)',
+                  'penalty_coefficient': 'Penalty coefficient',
+                  'sigma': 'Sigma for filtering',
+                  'threshold': 'Threshold for filtering',
+                  'n_cpus': 'CPU cores for abaqus',
+                  'n_gpus': 'GPU cores for abaqus',
+                  'timeout': 'Timeout of validation process(s)'}
+    return dictionary.get(s) if translate else {v: k for k, v in dictionary.items()}.get(s)
 
 
 class Visualizer:
@@ -381,28 +383,18 @@ class Visualizer:
 
 
 if __name__ == '__main__':
-    use_gui = False
+    from main import make_and_start_process
 
-    if use_gui:
-        from main import make_and_start_process
-
-        gui_process, parent_conn, child_conn = make_and_start_process(target=App)
-        set_path, parameters = parent_conn.recv()
-        parameters.post_initialize()
-        os.chdir(set_path)
-        visualizer = Visualizer(conn_to_gui=parent_conn)
-    else:
-        plot_data_path = r'F:\shshsh\data-23-1-4'
-        os.chdir(plot_data_path)
-        visualizer = Visualizer(conn_to_gui=None)
+    gui_process, parent_conn, child_conn = make_and_start_process(target=App)
+    set_path, parameters = parent_conn.recv()
+    parameters.post_initialize()
+    os.chdir(set_path)
+    visualizer = Visualizer(conn_to_gui=parent_conn)
 
     with open('Plot_data', 'rb') as f:
         plot_data = pickle.load(f)
-    for gen in range(len(plot_data)):
-        pareto_sort_1, pareto_sort_2 = plot_data[gen + 1][0], plot_data[gen + 1][1]
-        visualizer.plot(gen_num=gen + 1, pareto_1_sorted=pareto_sort_1, pareto_2_sorted=pareto_sort_2,
+    for gen_idx in range(len(plot_data)):
+        pareto_sort_1, pareto_sort_2 = plot_data[gen_idx + 1][0], plot_data[gen_idx + 1][1]
+        visualizer.plot(gen_num=gen_idx + 1, pareto_1_sorted=pareto_sort_1, pareto_2_sorted=pareto_sort_2,
                         use_manual_rp=False)
-    if use_gui:
-        input()
-    else:
-        plt.show()
+    input('Press enter to exit')

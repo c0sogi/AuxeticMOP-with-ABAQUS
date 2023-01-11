@@ -3,11 +3,12 @@ from scipy.ndimage import label
 from numba import njit
 import numpy as np
 import random
+from typing import Tuple, Union
 from PostProcessing import visualize_one_cube
 
 
 @njit
-def make_voxels_surface_contact(topologies, lx, ly, lz):
+def make_voxels_surface_contact(topologies: np.ndarray, lx: int, ly: int, lz: int) -> Tuple[np.ndarray, bool, int]:
     topo = topologies.copy()
     flag = 1
     direction = np.array([[1, 1],
@@ -63,8 +64,11 @@ def make_voxels_surface_contact(topologies, lx, ly, lz):
                                 if k + direction[m, 0] in range(lz) and j + direction[m, 1] in range(
                                         ly) and i + z in range(lx):
                                     if topo[k + direction[m, 0], j + direction[m, 1], i + z] == 1:
-                                        if topo[k + direction[m, 0], j, i] == 0 and topo[k, j + direction[m, 1], i] == 0 and topo[k, j, i + z] == 0:
-                                            if topo[k + direction[m, 0], j + direction[m, 1], i] == 0 and topo[k + direction[m, 0], j, i + z] == 0 and topo[k, j + direction[m, 1], i + z] == 0:
+                                        if topo[k + direction[m, 0], j, i] == 0 and topo[
+                                            k, j + direction[m, 1], i] == 0 and topo[k, j, i + z] == 0:
+                                            if topo[k + direction[m, 0], j + direction[m, 1], i] == 0 and topo[
+                                                k + direction[m, 0], j, i + z] == 0 and topo[
+                                                k, j + direction[m, 1], i + z] == 0:
                                                 rand1 = random.randint(1, 3)
                                                 rand2 = random.randint(1, 2)
 
@@ -102,7 +106,7 @@ def make_voxels_surface_contact(topologies, lx, ly, lz):
     return topo, np.array_equal(topologies, topo), changed_voxels
 
 
-def make_3d_print_without_support(arr_3d, max_distance=1):  # arr[x,y,z]
+def make_3d_print_without_support(arr_3d: np.ndarray, max_distance: int = 1) -> Tuple[np.ndarray, bool, int]:
     arr_3d_result = arr_3d.copy()
     x_size, y_size, z_size = arr_3d_result.shape[0], arr_3d_result.shape[1], arr_3d_result.shape[2]
     total_changed_voxels = 0
@@ -135,7 +139,8 @@ def make_3d_print_without_support(arr_3d, max_distance=1):  # arr[x,y,z]
 
 
 @njit
-def dead_and_survived_islands(y_idx, y_direction, x_size, z_size, max_island_idx, labeled_arr, arr_3d_result):
+def dead_and_survived_islands(y_idx: int, y_direction: int, x_size: int, z_size: int, max_island_idx: int,
+                              labeled_arr: np.ndarray, arr_3d_result: np.ndarray) -> Tuple[set, set]:
     survived_islands, dead_islands = set(), set()
     # Determining which ones are the dead islands
     for x_idx in range(x_size):
@@ -150,8 +155,9 @@ def dead_and_survived_islands(y_idx, y_direction, x_size, z_size, max_island_idx
 
 
 @njit
-def voxel_elimination_by_islands(x_size, z_size, labeled_arr, dead_islands, survived_islands, arr_3d_result, y_idx,
-                                 max_distance, changed_voxels, y_direction):
+def voxel_elimination_by_islands(x_size: int, z_size: int, labeled_arr: np.ndarray, dead_islands: np.ndarray,
+                                 survived_islands: np.ndarray, arr_3d_result: np.ndarray, y_idx: int,
+                                 max_distance: int, changed_voxels: int, y_direction: int) -> Tuple[np.ndarray, int]:
     for x_idx in range(x_size):
         for z_idx in range(z_size):
             island_idx = labeled_arr[x_idx, z_idx]
@@ -182,7 +188,7 @@ def voxel_elimination_by_islands(x_size, z_size, labeled_arr, dead_islands, surv
     return arr_3d_result, changed_voxels
 
 
-def one_connected_tree(arr_3d):
+def one_connected_tree(arr_3d: np.ndarray) -> Tuple[Union[np.ndarray, None], bool, int]:
     arr_shape = arr_3d.shape
     arr_copy = arr_3d.copy()
     is_no_change = False
@@ -207,7 +213,7 @@ def one_connected_tree(arr_3d):
 
 
 @njit
-def one_survived_tree_labels(labeled_arr, lx, ly, lz):
+def one_survived_tree_labels(labeled_arr: np.ndarray, lx: int, ly: int, lz: int) -> Tuple[set, set, set, set, set, set]:
     labels_plane_1 = set()
     labels_plane_2 = set()
     labels_plane_3 = set()
@@ -237,7 +243,7 @@ def one_survived_tree_labels(labeled_arr, lx, ly, lz):
 
 
 @njit
-def one_survived_tree(arr_3d, labeled_arr, last_survived_label):
+def one_survived_tree(arr_3d: np.ndarray, labeled_arr: np.ndarray, last_survived_label: int) -> Tuple[np.ndarray, int]:
     lx = arr_3d.shape[0]
     ly = arr_3d.shape[1]
     lz = arr_3d.shape[2]
@@ -251,26 +257,28 @@ def one_survived_tree(arr_3d, labeled_arr, last_survived_label):
     return arr_3d, changed_voxels
 
 
-@njit
-def connect_island(local_arr, labeled_arr, max_label, x_start_gap, y_start_gap, z_start_gap):
-    arr_copy = local_arr.copy()
-    llx = local_arr.shape[0]
-    lly = local_arr.shape[1]
-    llz = local_arr.shape[2]
-    changed_voxels = 0
-    main_label = labeled_arr[1 - x_start_gap, 1 - y_start_gap, 1 - z_start_gap]
-    other_labels = set([label_idx for label_idx in range(1, max_label + 1)])
-    other_labels.remove(main_label)
-    for i in range(llx):
-        for j in range(lly):
-            for k in range(llz):
-                if labeled_arr[i, j, k] in other_labels:
-                    changed_voxels += 1
-                    arr_copy[i, j, k] = 0
-        return arr_copy, changed_voxels
+# @njit  # Currently not in use. Instead, make_voxels_surface_contact is used.
+# def connect_island(local_arr: np.ndarray, labeled_arr: np.ndarray, max_label: int,
+#                    x_start_gap: int, y_start_gap: int, z_start_gap: int) -> Tuple[np.ndarray, int]:
+#     arr_copy = local_arr.copy()
+#     llx = local_arr.shape[0]
+#     lly = local_arr.shape[1]
+#     llz = local_arr.shape[2]
+#     changed_voxels = 0
+#     main_label = labeled_arr[1 - x_start_gap, 1 - y_start_gap, 1 - z_start_gap]
+#     other_labels = set([label_idx for label_idx in range(1, max_label + 1)])
+#     other_labels.remove(main_label)
+#     for i in range(llx):
+#         for j in range(lly):
+#             for k in range(llz):
+#                 if labeled_arr[i, j, k] in other_labels:
+#                     changed_voxels += 1
+#                     arr_copy[i, j, k] = 0
+#         return arr_copy, changed_voxels
 
 
-def mutate_and_validate_topology(arr_3d, mutation_probability, timeout):
+def mutate_and_validate_topology(arr_3d: np.ndarray,
+                                 mutation_probability: float, timeout: float) -> Union[None, np.ndarray]:
     arr_3d_mutated, voxels_0 = mutation(arr_3d.copy(), mutation_probability=mutation_probability)
     lx = arr_3d.shape[0]
     ly = arr_3d.shape[1]
@@ -309,7 +317,8 @@ def mutate_and_validate_topology(arr_3d, mutation_probability, timeout):
     return arr_3d_mutated_copy
 
 
-def mutate_and_validate_topologies(arr_4d, mutation_probability, timeout, view_topo=False):
+def mutate_and_validate_topologies(arr_4d: np.ndarray, mutation_probability: float, timeout: float,
+                                   view_topo: bool = False) -> np.ndarray:
     arr_4d_copy = arr_4d.copy()
     for arr_idx, arr_3d in enumerate(arr_4d):
         print(f'\n<<<<<<<<<< Offspring {arr_idx + 1} >>>>>>>>>>')
@@ -321,7 +330,7 @@ def mutate_and_validate_topologies(arr_4d, mutation_probability, timeout, view_t
 
 
 @njit
-def mutation(arr_3d, mutation_probability):
+def mutation(arr_3d: np.ndarray, mutation_probability: float) -> Tuple[np.ndarray, int]:
     arr_copy = arr_3d.copy()
     lx = arr_3d.shape[0]
     ly = arr_3d.shape[1]

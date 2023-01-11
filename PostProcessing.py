@@ -1,5 +1,7 @@
+from typing import Tuple
 import numpy as np
 import matplotlib.pyplot as plt
+from GraphicUserInterface import Parameters
 from scipy.ndimage import gaussian_filter
 
 
@@ -20,42 +22,42 @@ def get_hv_from_datum_hv(datum_hv, lower_bounds, ref_x, ref_y):
     return datum_hv + (ref_x - lower_bounds[0]) * (ref_y - lower_bounds[1])
 
 
-def evaluate_fitness_values(topo, result, params):
+def evaluate_fitness_values(topo: np.ndarray, result: np.ndarray, params: Parameters) -> np.ndarray:
     fitness_values = np.empty_like(result)
     max_rf22 = params.MaxRF22
     lx, ly, lz = params.lx, params.ly, params.lz
     k = params.penalty_coefficient
     if params.evaluation_version == 'ver1':
-        for i in range(topo.shape[0]):
-            dis11 = result[i, 0]
-            dis22 = result[i, 1]
-            rf22 = result[i, 4]
-            fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo[i]) / (lx * ly * lz))
-            fitness_values[i, 0] = fit_val1
-            fit_val2 = - (dis11 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
-            fitness_values[i, 1] = fit_val2
+        for offspring_idx in range(topo.shape[0]):
+            dis11 = result[offspring_idx, 0]
+            dis22 = result[offspring_idx, 1]
+            rf22 = result[offspring_idx, 4]
+            fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
+            fitness_values[offspring_idx, 0] = fit_val1
+            fit_val2 = - (dis11 / dis22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
+            fitness_values[offspring_idx, 1] = fit_val2
     elif params.evaluation_version == 'ver2':
-        for i in range(topo.shape[0]):
-            rf22 = result[i, 4]
-            fit_val1 = np.sum(topo[i]) / (lx * ly * lz)
-            fitness_values[i, 0] = fit_val1
+        for offspring_idx in range(topo.shape[0]):
+            rf22 = result[offspring_idx, 4]
+            fit_val1 = np.sum(topo[offspring_idx]) / (lx * ly * lz)
+            fitness_values[offspring_idx, 0] = fit_val1
             fit_val2 = rf22 / max_rf22
-            fitness_values[i, 1] = fit_val2
+            fitness_values[offspring_idx, 1] = fit_val2
     elif params.evaluation_version == 'ver3':
-        for i in range(topo.shape[0]):
-            dis11 = result[i, 0]
-            dis22 = result[i, 1]
-            dis33 = result[i, 2]
-            fit_val1 = - (dis11 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
-            fitness_values[i, 0] = fit_val1
-            fit_val2 = - (dis33 / dis22) + k * (np.sum(topo[i]) / (lx * ly * lz))
-            fitness_values[i, 1] = fit_val2
+        for offspring_idx in range(topo.shape[0]):
+            dis11 = result[offspring_idx, 0]
+            dis22 = result[offspring_idx, 1]
+            dis33 = result[offspring_idx, 2]
+            fit_val1 = - (dis11 / dis22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
+            fitness_values[offspring_idx, 0] = fit_val1
+            fit_val2 = - (dis33 / dis22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
+            fitness_values[offspring_idx, 1] = fit_val2
     elif params.evaluation_version == 'ver4':
-        for i in range(topo.shape[0]):
-            fit_val1 = result[i, 9]
-            fitness_values[i, 0] = fit_val1
-            fit_val2 = np.sum(topo[i]) / (lx * ly * lz)
-            fitness_values[i, 1] = fit_val2
+        for offspring_idx in range(topo.shape[0]):
+            fit_val1 = result[offspring_idx, 9]
+            fitness_values[offspring_idx, 0] = fit_val1
+            fit_val2 = np.sum(topo[offspring_idx]) / (lx * ly * lz)
+            fitness_values[offspring_idx, 1] = fit_val2
     return fitness_values
 
 
@@ -92,18 +94,18 @@ def evaluate_fitness_values(topo, result, params):
 #     return fv1_sort, fv2_sort, sort
 
 
-def pareto_front_finding(fitness_values, pop_index):
-    pop_size = fitness_values.shape[0]
-    pareto_front = np.ones(pop_size, dtype=bool)  # initially assume all solutions are in pareto front by using "1"
-
-    for i in range(pop_size):
-        for j in range(pop_size):
-            if np.less_equal(fitness_values[j], fitness_values[i]).all() and np.less(fitness_values[j],
-                                                                                     fitness_values[i]).any():
-                pareto_front[i] = 0  # i is not in pareto front because j dominates i
-                break  # no more comparision is needed to find out which one is dominated
-
-    return pop_index[pareto_front]
+# def pareto_front_finding(fitness_values, pop_index):
+#     pop_size = len(fitness_values)
+#     pareto_front = np.ones(pop_size, dtype=bool)  # initially assume all solutions are in pareto front by using "1"
+#
+#     for i in range(pop_size):
+#         for j in range(pop_size):
+#             if np.less_equal(fitness_values[j], fitness_values[i]).all() and np.less(fitness_values[j],
+#                                                                                      fitness_values[i]).any():
+#                 pareto_front[i] = 0  # i is not in pareto front because j dominates i
+#                 break  # no more comparision is needed to find out which one is dominated
+#
+#     return pop_index[pareto_front]
 
 
 # def visualize_old(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, parent_conn,
@@ -209,7 +211,8 @@ def remove_using_crowding(fitness_values, number_solutions_needed):
     return selected_pop_index
 
 
-def selection(all_topologies, all_fitness_values, population_size):  # More efficient algorithm
+def selection(all_topologies: np.ndarray, all_fitness_values: np.ndarray,
+              population_size: int) -> Tuple[np.ndarray, list]:
     total_pop_idx = set(np.arange(len(all_topologies)))
     remaining_population_idx = np.arange(len(all_topologies))
     total_pareto_front_idx = set()

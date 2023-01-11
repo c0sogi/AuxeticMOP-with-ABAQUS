@@ -3,6 +3,7 @@ import numpy as np
 import itertools
 import os
 from functools import reduce
+from GraphicUserInterface import Parameters
 from MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
 from FileIO import array_to_csv
 
@@ -60,14 +61,14 @@ def crossover(chromosome_1, chromosome_2, cutting_section):  # Crossover process
     return offspring
 
 
-def generate_offspring(topo_parent: np.ndarray, w: int, lx: int, ly: int, lz: int,
-                       end_pop: int, mutation_rate: float, timeout: float):
+def generate_offspring(topo_parent: np.ndarray, gen: int, lx: int, ly: int, lz: int,
+                       end_pop: int, mutation_rate: float, timeout: float) -> np.ndarray:
     """
     Generating offspring from parents. Crossover & Mutation & Validating processes will be held.
     Validating processes contain, checking 3d-print-ability without support, one voxel tree contacting six faces
-    in the cube
+    in a cube
     :param topo_parent: Topology array of parent, shape: (end_pop, lx * ly * lz)
-    :param w: Current generation
+    :param gen: Current generation
     :param lx: Total Voxels in x direction of a cube
     :param ly: Total Voxels in y direction of a cube
     :param lz: Total Voxels in z direction of a cube
@@ -81,7 +82,7 @@ def generate_offspring(topo_parent: np.ndarray, w: int, lx: int, ly: int, lz: in
     trial = 1
     validation_count = 0
     all_parents_topologies = np.empty((0, end_pop, lx * ly * lz), int)
-    for generation_idx in range(w):
+    for generation_idx in range(gen):
         parent_topologies = np.genfromtxt('topo_parent_' + str(generation_idx + 1) + '.csv', delimiter=',',
                                           dtype=int).reshape((1, end_pop, lx * ly * lz))
         all_parents_topologies = np.vstack((all_parents_topologies, parent_topologies))
@@ -109,7 +110,7 @@ def generate_offspring(topo_parent: np.ndarray, w: int, lx: int, ly: int, lz: in
                     continue
                 else:
                     is_any_clone_in_all_parents = inspect_clone_in_all_parents(
-                        w=w, topology_flattened=validated_chromosome, all_parent_topologies=all_parents_topologies)
+                        w=gen, topology_flattened=validated_chromosome, all_parent_topologies=all_parents_topologies)
                     is_any_clone_in_current_offsprings = inspect_clone_in_current_offsprings(
                         topology=validated_chromosome, offspring=offspring)
                     if is_any_clone_in_all_parents:
@@ -124,7 +125,7 @@ def generate_offspring(topo_parent: np.ndarray, w: int, lx: int, ly: int, lz: in
                         print(f'[Generate offspring] Validation of chromosome {validation_count} complete!')
                         if len(offspring) == end_pop:
                             print('[Generate offspring] Generating offspring complete')
-                            array_to_csv(f'topo_offspring_{w}.csv', offspring, dtype=int, mode='w', save_as_int=True)
+                            array_to_csv(f'topo_offspring_{gen}.csv', offspring, dtype=int, mode='w', save_as_int=True)
                             return offspring.reshape((end_pop, lx, ly, lz))
 
 
@@ -133,31 +134,30 @@ def random_array(shape, probability):
         shape)
 
 
-def random_parent_generation(lx, ly, lz, total_offsprings, density, mutation_probability, timeout,
-                             save_file=True):
-    parent_name = 'topo_parent_1.csv'
-    parents = np.empty((total_offsprings, lx * ly * lz))
+def random_parent_generation(density: float, params: Parameters, show_parent: bool = False) -> np.ndarray:
+    parent_name = f'topo_parent_{params.ini_gen}.csv'
+    parents = np.empty((params.end_pop, params.lx * params.ly * params.lz))
     total_parent_generation_count = 0
     total_volume_frac = 0
-    while total_parent_generation_count < total_offsprings:
-        rand_arr = random_array(shape=(lx, ly, lz), probability=density)
-        parent = mutate_and_validate_topology(rand_arr, mutation_probability=mutation_probability,
-                                              timeout=timeout)
+    while total_parent_generation_count < params.end_pop:
+        rand_arr = random_array(shape=(params.lx, params.ly, params.lz), probability=density)
+        parent = mutate_and_validate_topology(rand_arr, mutation_probability=params.mutation_rate,
+                                              timeout=params.timeout)
         if parent is None:
             continue
         total_parent_generation_count += 1
         print(f'<<<<< Parent {total_parent_generation_count + 1} >>>>>')
 
-        volume_frac = np.count_nonzero(parent) / (lx * ly * lz / 100)
+        volume_frac = np.count_nonzero(parent) / (params.lx * params.ly * params.lz / 100)
         total_volume_frac += volume_frac
         print(f'Volume fraction: {volume_frac:.1f} %\n')
         parents[total_parent_generation_count] = parent.flatten()
-    print(f'Average volume fraction: {total_volume_frac / total_offsprings:.1f} %')
-    if save_file:
-        array_to_csv(path=parent_name, arr=parents, dtype=int, mode='w', save_as_int=True)
-    else:
+    print(f'Average volume fraction: {total_volume_frac / params.end_pop:.1f} %')
+    array_to_csv(path=parent_name, arr=parents, dtype=int, mode='w', save_as_int=True)
+    if show_parent:
         for parent in parents:
-            visualize_one_cube(parent.reshape((lx, ly, lz)), full=False)
+            visualize_one_cube(parent.reshape((params.lx, params.ly, params.lz)), full=False)
+    return parents
 
 
 def inspect_topologies(generation):
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     number_of_voxels_y = 10
     number_of_voxels_z = 10
     end_population = 100
-    offsprings = generate_offspring(topo_parent=topos, w=18, end_pop=end_population,
+    offsprings = generate_offspring(topo_parent=topos, gen=18, end_pop=end_population,
                                     mutation_rate=0.05, timeout=0.5,
                                     lx=number_of_voxels_x, ly=number_of_voxels_y, lz=number_of_voxels_z)
     inspect_topologies(generation=19)
