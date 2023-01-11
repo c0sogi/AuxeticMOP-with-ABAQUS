@@ -1,7 +1,6 @@
 from typing import Tuple
 import numpy as np
 import matplotlib.pyplot as plt
-from GraphicUserInterface import Parameters
 from scipy.ndimage import gaussian_filter
 
 
@@ -22,7 +21,7 @@ def get_hv_from_datum_hv(datum_hv, lower_bounds, ref_x, ref_y):
     return datum_hv + (ref_x - lower_bounds[0]) * (ref_y - lower_bounds[1])
 
 
-def evaluate_fitness_values(topo: np.ndarray, result: np.ndarray, params: Parameters) -> np.ndarray:
+def evaluate_fitness_values(topo: np.ndarray, result: np.ndarray, params) -> np.ndarray:
     fitness_values = np.empty_like(result)
     max_rf22 = params.MaxRF22
     lx, ly, lz = params.lx, params.ly, params.lz
@@ -297,4 +296,7 @@ def visualize_n_cubes(arr_4d, full=False):
 
 
 if __name__ == '__main__':
-    pass
+    path = r'F:\shshsh\data-23-1-4\topo_parent_35.csv'
+    arr_4d = np.genfromtxt(path, dtype=int, delimiter=',').reshape((100, 10, 10, 10))
+    for arr_3d in arr_4d:
+        visualize_one_cube(arr_3d, True)

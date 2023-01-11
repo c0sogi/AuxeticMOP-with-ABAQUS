@@ -3,7 +3,6 @@ import numpy as np
 import itertools
 import os
 from functools import reduce
-from GraphicUserInterface import Parameters
 from MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
 from FileIO import array_to_csv
 
@@ -134,7 +133,7 @@ def random_array(shape, probability):
         shape)
 
 
-def random_parent_generation(density: float, params: Parameters, show_parent: bool = False) -> np.ndarray:
+def random_parent_generation(density: float, params, show_parent: bool = False) -> np.ndarray:
     parent_name = f'topo_parent_{params.ini_gen}.csv'
     parents = np.empty((params.end_pop, params.lx * params.ly * params.lz))
     total_parent_generation_count = 0
