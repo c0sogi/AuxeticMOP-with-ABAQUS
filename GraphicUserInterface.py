@@ -8,41 +8,42 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
+from typing import TYPE_CHECKING
 from PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_fitness_values
 from FileIO import parent_import
 
 
-@dataclass(kw_only=True)
+@dataclass  # Use @dataclass(kw_only=True) for Python version >= 3.10
 class Parameters:
-    abaqus_script_name: str = 'ABQ.py'
-    abaqus_execution_mode: str = 'script'
-    mode: str = 'GA'
-    evaluation_version: str = 'ver3'
-    restart_pop: int = 0
-    ini_pop: int = 1
-    end_pop: int = 100
-    ini_gen: int = 1
-    end_gen: int = 50
-    mutation_rate: float = 0.1
-    unit_l: float = 3
-    lx: int = 10
-    ly: int = 10
-    lz: int = 10
-    divide_number: int = 1
-    mesh_size: float = 0.25
-    dis_y: float = -0.005
-    material_modulus: float = 1100
-    poissons_ratio: float = 0.4
-    density: float = 1
-    MaxRF22: float = 0.01
-    penalty_coefficient: float = 0.1
-    sigma: float = 1
-    threshold: float = 0.5
-    n_cpus: int = 16
-    n_gpus: int = 0
-    timeout: float = 0.5
+    abaqus_script_name: str = 'ABQ.py'  # abaqus python script filename e.g., ABQ.py
+    abaqus_execution_mode: str = 'script'  # noGUI: without abaqus gui, script: with abaqus gui
+    mode: str = 'GA'  # GA mode
+    evaluation_version: str = 'ver3'  # fitness value evaluation mode
+    restart_pop: int = 0  # 0 for no-restart, 1~ for initial restarting population
+    ini_pop: int = 1  # First population number, default: 1
+    end_pop: int = 100  # Last population number
+    ini_gen: int = 1  # First generation number, default: 1
+    end_gen: int = 50  # Last generation number
+    mutation_rate: float = 0.1  # mutation process option
+    unit_l: float = 3  # Voxel length
+    lx: int = 10  # Number of voxels in x-direction
+    ly: int = 10  # Number of voxels in y-direction
+    lz: int = 10  # Number of voxels in z-direction
+    divide_number: int = 1  # up-scaling factor
+    mesh_size: float = 0.25  # abaqus meshing option
+    dis_y: float = -0.005  # abaqus boundary condition option
+    material_modulus: float = 1100  # abaqus material property option
+    poissons_ratio: float = 0.4  # abaqus material property option
+    density: float = 1  # abaqus material property option
+    MaxRF22: float = 0.01  # fitness value evaluation option
+    penalty_coefficient: float = 0.1  # fitness value evaluation option
+    sigma: float = 1  # filtering option
+    threshold: float = 0.5  # filtering option
+    n_cpus: int = 16  # abaqus option
+    n_gpus: int = 0  # abaqus option
+    timeout: float = 0.5  # validation process option
 
-    def post_initialize(self):
+    def post_initialize(self):  # This function is only used in main.py, setting initial values to real value to be used
         self.lx *= self.divide_number
         self.ly *= self.divide_number
         self.lz *= self.divide_number  # number of voxels after increasing resolution
@@ -55,10 +56,11 @@ class Parameters:
         self.MaxRF22 *= unit_lx_total * unit_lz_total * self.material_modulus  # 0.01 is strain
 
 
+# Define parameters for gui
 PARAMETER_FILE_NAME = '_PARAMETERS_'
-padx = 5
-pady = 5
-left_width = 1400  # original: 400
+padx = 5  # Padding width
+pady = 5  # Padding height
+left_width = 1400  # default width: 400
 right_width = 400
 height = 750
 button_width = 15
@@ -66,16 +68,18 @@ parameters = Parameters()
 parameters_dict = asdict(parameters)
 
 
-class App:
+class App:  # GUI class
     def __init__(self, conn=None):
+        # Root configuration
         self.conn = conn
         self.ready_to_run = False
         self.root = tk.Tk()
-        self.root.protocol("WM_DELETE_WINDOW", self.callback)
+        self.root.protocol("WM_DELETE_WINDOW", self.callback_quit)
         self.root.title('Abaqus-Python Unified Control Interface')
         self.root.config(background='#FFFFFF')
         self.root.resizable(False, False)
 
+        # Frames
         self.up_frame = tk.Frame(self.root, width=left_width + right_width + 2 * padx, height=100)
         self.up_frame.config(background='#FFFFFF')
         self.up_frame.grid(row=0, column=0, padx=padx, pady=pady / 2)
@@ -85,6 +89,7 @@ class App:
         self.left_frame = tk.Frame(self.down_frame, width=left_width, height=height, padx=padx, pady=pady)
         self.right_frame = tk.Frame(self.down_frame, width=right_width, height=height, padx=padx, pady=pady)
 
+        # Elements
         self.set_path_title = tk.Label(self.up_frame,
                                        text='Choose the folder containing the Abaqus script and CSV files.')
         self.set_path_title.config(background='#FFFFFF')
@@ -104,16 +109,17 @@ class App:
         self.bar = FigureCanvasTkAgg(self.figure, self.left_frame)
         self.bar.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
 
+        # Show main
         self.set_path_title.pack()
         self.set_path_display.pack()
         self.set_path_btn.pack()
-
         self.root.mainloop()
 
-    def callback(self):
+    def callback_quit(self):
         self.root.quit()
 
     def show_canvas(self):
+        # Show graphs to be plotted
         self.ax[0].set(title='Pareto Fronts', xlabel='Objective function 1', ylabel='Objective function 2')
         self.ax[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
         self.ax[0].grid(True)
@@ -122,29 +128,29 @@ class App:
         if self.conn is not None:
             self.update_canvas()
 
-    def update_canvas(self, polling_rate=1):
-        if self.conn.poll():
+    def update_canvas(self, polling_rate: float = 10.0):
+        if self.conn.poll():  # Checking if any received data from main.py for every 1/polling_rate second
             try:
-                print('[GUI] Trying to receive plot data...')
-                x1, y1, x2y2 = self.conn.recv()
-                x2, y2 = zip(*x2y2.items())
-                print('[GUI] I received something!', x1, y1, x2, y2)
+                _x1, _y1, _x2y2 = self.conn.recv()
+                _x2, _y2 = zip(*_x2y2.items())
+                print('[GUI] Received: ', _x1, _y1, _x2, _y2)
+
                 # Randomize plotting options to make data more noticeable
-                color_1, color_2 = np.random.rand(3, ), np.random.rand(3, )
-                plot_options = {
+                _color_1, _color_2 = np.random.rand(3, ), np.random.rand(3, )
+                _plot_options = {
                     'marker': np.random.choice(
                         ('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')),
-                    'color': color_1,
-                    'markeredgecolor': color_1,
-                    'markerfacecolor': color_2,
+                    'color': _color_1,
+                    'markeredgecolor': _color_1,
+                    'markerfacecolor': _color_2,
                     'markersize': 8,
                     'markeredgewidth': 2}
-                self.ax[0].plot(x1, y1, **plot_options)
+                self.ax[0].plot(_x1, _y1, **_plot_options)
                 self.ax[1].clear()
-                for generation, hv, line in zip(x2, y2, self.ax[0].lines):
-                    self.ax[1].scatter(generation, hv, marker=line.get_marker(), c=[line.get_markerfacecolor()],
-                                       edgecolors=line.get_markeredgecolor(), s=line.get_markersize() ** 2,
-                                       linewidth=line.get_markeredgewidth())
+                for _generation, _hv, _line in zip(_x2, _y2, self.ax[0].lines):
+                    self.ax[1].scatter(_generation, _hv, marker=_line.get_marker(), c=[_line.get_markerfacecolor()],
+                                       edgecolors=_line.get_markeredgecolor(), s=_line.get_markersize() ** 2,
+                                       linewidth=_line.get_markeredgewidth())
                 self.ax[0].grid(True)
                 self.ax[1].grid(True)
                 self.bar.draw()
@@ -154,15 +160,15 @@ class App:
 
     def onclick_set_path_button(self):
         try:
-            folder_path = askdirectory(initialdir="./")
-            if folder_path:
+            _folder_path = askdirectory(initialdir="./")
+            if _folder_path:
                 self.set_path_display.delete(0, "end")
-                self.set_path_display.insert(0, folder_path)
+                self.set_path_display.insert(0, _folder_path)
             self.setPath.set(self.set_path_display.get(0))
             os.chdir(self.setPath.get())
 
-            params_main_already_exists = True if os.path.isfile(PARAMETER_FILE_NAME) else False
-            if params_main_already_exists:
+            _params_already_exists = True if os.path.isfile(PARAMETER_FILE_NAME) else False
+            if _params_already_exists:
                 with open(PARAMETER_FILE_NAME, mode='rb') as f_params:
                     self.set_path_display.config(background='#00FF00')
                     self.set_path_title.config(text='Preset parameter value found.')
@@ -171,39 +177,39 @@ class App:
             else:
                 self.set_path_display.config(background='#FF0000')
                 self.set_path_title.config(text='Parameter not found. Please set below.')
-                self.show_parameters(loaded=False)
+                self.show_parameters(loaded=None)
                 self.ready_to_run = False
 
         except Exception as error_message:
             messagebox.showerror("Error", f"An error occurred:\n{error_message}")
 
     def onclick_set_default_btn(self):
-        for idx, value in enumerate(parameters_dict.values()):
-            self.string_vars[idx].set(value)
+        for _idx, _value in enumerate(parameters_dict.values()):
+            self.string_vars[_idx].set(_value)
 
-    def return_radiobutton_frame_instead_of_entry(self, key, i, d):  # right_Frame
-        radiobutton_frame = tk.Frame(self.right_frame, width=left_width - 2 * padx,
-                                     height=height / len(parameters_dict) - pady)
-        if len(d[key]) == 2:
-            lb_width = 25
-            rb_width = 9
-        elif len(d[key]) == 3:
-            lb_width = 24
-            rb_width = 5
+    def return_radiobutton_frame_instead_of_entry(self, key: str, str_var_idx: int, name_dict: dict):  # right_Frame
+        _radiobutton_frame = tk.Frame(self.right_frame, width=left_width - 2 * padx,
+                                      height=height / len(parameters_dict) - pady)
+        if len(name_dict[key]) == 2:
+            _label_width = 25
+            _radio_button_width = 9
+        elif len(name_dict[key]) == 3:
+            _label_width = 24
+            _radio_button_width = 5
         else:
             raise ValueError('Please make sure the number of checkboxes is less than 3.')
-        lb = tk.Label(radiobutton_frame, width=lb_width, text=translator(s=key, translate=True), anchor='w')
-        lb.grid(row=0, column=0)
+        _label = tk.Label(_radiobutton_frame, width=_label_width, text=translator(s=key, flip=False), anchor='w')
+        _label.grid(row=0, column=0)
 
-        for menu_idx, menu in enumerate(d[key]):
-            rb = tk.Radiobutton(radiobutton_frame, text=menu, variable=self.string_vars[i],
-                                width=rb_width, value=menu, tristatevalue=menu)
-            rb.grid(row=0, column=menu_idx + 1)
-        return radiobutton_frame
+        for menu_idx, menu in enumerate(name_dict[key]):
+            _radio_button = tk.Radiobutton(_radiobutton_frame, text=menu, variable=self.string_vars[str_var_idx],
+                                           width=_radio_button_width, value=menu, tristatevalue=menu)
+            _radio_button.grid(row=0, column=menu_idx + 1)
+        return _radiobutton_frame
 
     def onclick_submit_btn(self):
         for params_idx, key in enumerate(parameters_dict.keys()):
-            parameters_dict[key] = string_to_int_or_float_or_string(self.string_vars[params_idx].get())
+            parameters_dict[key] = atoi(self.string_vars[params_idx].get())
         if self.ready_to_run and self.conn is not None:
             self.conn.send((self.setPath.get(), Parameters(**parameters_dict)))
             self.submit_btn.config(background='#0000FF', foreground='#FFFFFF', text='Running...')
@@ -220,7 +226,7 @@ class App:
         print('[GUI] Closing GUI...')
         self.root.quit()
 
-    def show_parameters(self, loaded):
+    def show_parameters(self, loaded: None | dict) -> None:
         radiobutton_name_dict = {
             'abaqus_execution_mode': ('noGUI', 'script'),
             'mode': ('GA', 'random'),
@@ -232,20 +238,21 @@ class App:
         self.left_frame.grid_propagate(False)
         self.right_frame.grid(row=1, column=1, padx=padx, pady=pady / 2)
         self.right_frame.grid_propagate(False)
-        for i, key in enumerate(asdict(Parameters()).keys()):
+        for row_idx, key in enumerate(asdict(Parameters()).keys()):
             if key in radiobutton_name_dict.keys():
-                rbf = self.return_radiobutton_frame_instead_of_entry(key=key, i=i, d=radiobutton_name_dict)
-                rbf.grid(row=i, column=0)
+                _radio_button_frame = self.return_radiobutton_frame_instead_of_entry(key=key, str_var_idx=row_idx,
+                                                                                     name_dict=radiobutton_name_dict)
+                _radio_button_frame.grid(row=row_idx, column=0)
 
             else:
-                ef = tk.Frame(self.right_frame, width=left_width - 2 * padx,
-                              height=height / len(asdict(Parameters()).keys()) - pady)
-                lb = tk.Label(ef, width=25, text=translator(s=key, translate=True), anchor='w')
-                ee = tk.Entry(ef, width=25, textvariable=self.string_vars[i])
-                ef.grid(row=i, column=0)
-                lb.grid(row=0, column=0)
-                ee.grid(row=0, column=1)
-            self.string_vars[i].set('')
+                _entry_frame = tk.Frame(self.right_frame, width=left_width - 2 * padx,
+                                        height=height / len(asdict(Parameters()).keys()) - pady)
+                _label = tk.Label(_entry_frame, width=25, text=translator(s=key, flip=False), anchor='w')
+                _entry = tk.Entry(_entry_frame, width=25, textvariable=self.string_vars[row_idx])
+                _entry_frame.grid(row=row_idx, column=0)
+                _label.grid(row=0, column=0)
+                _entry.grid(row=0, column=1)
+            self.string_vars[row_idx].set('')
 
         empty_label = tk.Label(self.right_frame)
         empty_label.grid(row=len(asdict(Parameters()).keys()))
@@ -259,7 +266,7 @@ class App:
         self.show_canvas()
 
 
-def string_to_int_or_float_or_string(s):
+def atoi(s: str) -> str | int | float:
     try:
         float(s)
         # s is integer or float type
@@ -275,7 +282,7 @@ def string_to_int_or_float_or_string(s):
         return s
 
 
-def translator(s: str, translate: bool) -> str:
+def translator(s: str, flip: bool) -> str:
     dictionary = {'abaqus_script_name': 'Filename of ABAQUS script',
                   'abaqus_execution_mode': 'ABAQUS execution mode',
                   'mode': 'GA Mode',
@@ -303,7 +310,7 @@ def translator(s: str, translate: bool) -> str:
                   'n_cpus': 'CPU cores for abaqus',
                   'n_gpus': 'GPU cores for abaqus',
                   'timeout': 'Timeout of validation process(s)'}
-    return dictionary.get(s) if translate else {v: k for k, v in dictionary.items()}.get(s)
+    return {v: k for k, v in dictionary.items()}.get(s) if flip else dictionary.get(s)
 
 
 class Visualizer:
@@ -320,7 +327,8 @@ class Visualizer:
             self.axes[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
             self.axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    def plot(self, gen_num, pareto_1_sorted, pareto_2_sorted, use_manual_rp, ref_x=0.0, ref_y=0.0):
+    def plot(self, gen_num: int, pareto_1_sorted: np.ndarray, pareto_2_sorted: np.ndarray,
+             use_manual_rp: bool = False, ref_x: float = 0.0, ref_y: float = 0.0) -> None:
         if use_manual_rp:
             self.ref_x, self.ref_y = ref_x, ref_y
         elif (self.ref_x is None) or (self.ref_y is None):
@@ -331,25 +339,25 @@ class Visualizer:
                 self.ref_x = pareto_1_sorted[-1]
             if pareto_2_sorted[0] > self.ref_y:
                 self.ref_y = pareto_2_sorted[0]
-        datum_hv = get_datum_hv(pareto_1_sorted, pareto_2_sorted)
-        lower_bounds = [pareto_1_sorted[0], pareto_2_sorted[-1]]
-        self.all_datum_hv.update({gen_num: datum_hv})
-        self.all_lower_bounds.update({gen_num: lower_bounds})
-        all_hv = {key: get_hv_from_datum_hv(self.all_datum_hv[key], self.all_lower_bounds[key],
-                                            ref_x=self.ref_x, ref_y=self.ref_y) for key in self.all_datum_hv.keys()}
-        generations, hvs = zip(*all_hv.items())
-        file_name = '_plotting_data_'
-        if os.path.isfile(file_name):
-            with open(file_name, mode='rb') as f_read:
-                read_data = pickle.load(f_read)
-            with open(file_name, mode='wb') as f_write:
-                read_data.update({gen_num: (pareto_1_sorted, pareto_2_sorted)})
-                pickle.dump(read_data, f_write)
+        _datum_hv = get_datum_hv(pareto_1_sorted, pareto_2_sorted)
+        _lower_bounds = [pareto_1_sorted[0], pareto_2_sorted[-1]]
+        self.all_datum_hv.update({gen_num: _datum_hv})
+        self.all_lower_bounds.update({gen_num: _lower_bounds})
+        _all_hv = {key: get_hv_from_datum_hv(self.all_datum_hv[key], self.all_lower_bounds[key],
+                                             ref_x=self.ref_x, ref_y=self.ref_y) for key in self.all_datum_hv.keys()}
+        _generations, _hvs = zip(*_all_hv.items())
+        _file_name = '_plotting_data_'
+        if os.path.isfile(_file_name):
+            with open(_file_name, mode='rb') as f_read:
+                _read_data = pickle.load(f_read)
+            with open(_file_name, mode='wb') as f_write:
+                _read_data.update({gen_num: (pareto_1_sorted, pareto_2_sorted)})
+                pickle.dump(_read_data, f_write)
         else:
-            with open(file_name, mode='wb') as f_write:
+            with open(_file_name, mode='wb') as f_write:
                 pickle.dump({gen_num: (pareto_1_sorted, pareto_2_sorted)}, f_write)
         if self.conn_to_gui is not None:
-            self.conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, all_hv))
+            self.conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, _all_hv))
         else:
             color_1 = np.random.rand(3, )
             color_2 = np.random.rand(3, )
@@ -365,7 +373,7 @@ class Visualizer:
             print(f'> Objective function 2:{pareto_2_sorted}\n')
             self.axes[0].plot(pareto_1_sorted, pareto_2_sorted, **plot_options)
             self.axes[1].clear()
-            for generation, hv, line in zip(generations, hvs, self.axes[0].lines):
+            for generation, hv, line in zip(_generations, _hvs, self.axes[0].lines):
                 self.axes[1].scatter(generation, hv, marker=line.get_marker(), c=[line.get_markerfacecolor()],
                                      edgecolors=line.get_markeredgecolor(), s=line.get_markersize() ** 2,
                                      linewidth=line.get_markeredgewidth())
@@ -373,7 +381,7 @@ class Visualizer:
             self.axes[1].grid(True)
 
     def visualize(self, params, w, use_manual_rp, ref_x=0.0, ref_y=0.0):
-        topo_next_parent, result_next_parent = parent_import(w+1)
+        topo_next_parent, result_next_parent = parent_import(w + 1)
         fitness_values_next_parent = evaluate_fitness_values(topo=topo_next_parent, result=result_next_parent,
                                                              params=params)
         fitness_pareto_next_parent = find_pareto_front_points(costs=fitness_values_next_parent, return_index=False)
@@ -383,18 +391,14 @@ class Visualizer:
 
 
 if __name__ == '__main__':
-    from main import make_and_start_process
-
-    gui_process, parent_conn, child_conn = make_and_start_process(target=App)
-    set_path, parameters = parent_conn.recv()
+    end_gen = 39
+    set_path = r'F:\shshsh\data-23-1-4'
+    parameters = Parameters()
     parameters.post_initialize()
     os.chdir(set_path)
-    visualizer = Visualizer(conn_to_gui=parent_conn)
+    visualizer = Visualizer(conn_to_gui=None)
 
-    with open('Plot_data', 'rb') as f:
-        plot_data = pickle.load(f)
-    for gen_idx in range(len(plot_data)):
-        pareto_sort_1, pareto_sort_2 = plot_data[gen_idx + 1][0], plot_data[gen_idx + 1][1]
-        visualizer.plot(gen_num=gen_idx + 1, pareto_1_sorted=pareto_sort_1, pareto_2_sorted=pareto_sort_2,
-                        use_manual_rp=False)
+    for gen_idx in range(-1, end_gen):
+        visualizer.visualize(params=parameters, w=gen_idx + 1, use_manual_rp=False)
+    plt.show()
     input('Press enter to exit')

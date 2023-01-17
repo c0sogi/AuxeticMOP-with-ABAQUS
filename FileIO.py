@@ -1,10 +1,5 @@
 import numpy as np
-import pandas as pd
 import os
-
-
-def read_numpy_from_csv(file_name, gen_num, from_type, to_type):
-    return pd.read_csv(f'./{file_name}_{gen_num}.csv', header=None, dtype=from_type).to_numpy(dtype=to_type)
 
 
 def array_to_csv(path, arr, dtype, mode, save_as_int=False):

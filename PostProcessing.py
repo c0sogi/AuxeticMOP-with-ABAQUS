@@ -1,10 +1,8 @@
-from typing import Tuple
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 
 
-def get_datum_hv(pareto_1_sorted, pareto_2_sorted):
+def get_datum_hv(pareto_1_sorted: np.ndarray, pareto_2_sorted: np.ndarray) -> float:
     datum_point_x, datum_point_y = pareto_1_sorted[-1], pareto_2_sorted[0]
     xrs = pareto_1_sorted - datum_point_x
     yrs = pareto_2_sorted - datum_point_y
@@ -13,16 +11,16 @@ def get_datum_hv(pareto_1_sorted, pareto_2_sorted):
         if point_idx == len(xrs) - 1:
             break
         datum_hv += abs((xrs[point_idx + 1] - xr) * (yrs[point_idx + 1] + yr) * 0.5)
-    datum_hv -= abs((pareto_1_sorted[-1]-pareto_1_sorted[0])*(pareto_2_sorted[0]-pareto_2_sorted[-1]))
+    datum_hv -= abs((pareto_1_sorted[-1] - pareto_1_sorted[0]) * (pareto_2_sorted[0] - pareto_2_sorted[-1]))
     return datum_hv
 
 
-def get_hv_from_datum_hv(datum_hv, lower_bounds, ref_x, ref_y):
+def get_hv_from_datum_hv(datum_hv: float, lower_bounds: list, ref_x: float, ref_y: float):
     return datum_hv + (ref_x - lower_bounds[0]) * (ref_y - lower_bounds[1])
 
 
 def evaluate_fitness_values(topo: np.ndarray, result: np.ndarray, params) -> np.ndarray:
-    fitness_values = np.empty_like(result)
+    fitness_values = np.empty((len(topo), 2), dtype=float)
     max_rf22 = params.MaxRF22
     lx, ly, lz = params.lx, params.ly, params.lz
     k = params.penalty_coefficient
@@ -60,72 +58,6 @@ def evaluate_fitness_values(topo: np.ndarray, result: np.ndarray, params) -> np.
     return fitness_values
 
 
-# def get_fitness_value_limits(w, lx, ly, lz, evaluation_version, penalty_coefficient, max_rf22):
-#     fit_min, fit_max = 0, 0
-#     for i in range(1, w + 1):
-#         topo, result = parent_import(w=i)
-#         fitness_values = evaluate_one_topology(topo=topo, result=result, lx=lx, ly=ly, lz=lz,
-#                                                evaluation_version=evaluation_version,
-#                                                max_rf22=max_rf22, penalty_coefficient=penalty_coefficient)
-#         if i == 1:
-#             fit_max = np.max(fitness_values, axis=0)
-#             fit_min = np.min(fitness_values, axis=0)
-#         else:
-#             fit_max1 = np.max(fitness_values, axis=0)
-#             fit_min1 = np.min(fitness_values, axis=0)
-#             for j in range(2):
-#                 if fit_max1[j] > fit_max[j]:
-#                     fit_max[j] = fit_max1[j]
-#                 if fit_min1[j] < fit_min[j]:
-#                     fit_min[j] = fit_min1[j]
-#     return fit_max, fit_min
-
-
-# def fitval_sort(fv):
-#     fv_sp = np.split(fv, 2, axis=1)
-#     fv1 = fv_sp[0]
-#     fv2 = fv_sp[1]
-#     fv1 = np.squeeze(fv1)
-#     fv2 = np.squeeze(fv2)
-#     sort = fv1.argsort()
-#     fv1_sort = fv1[sort]
-#     fv2_sort = fv2[sort]
-#     return fv1_sort, fv2_sort, sort
-
-
-# def pareto_front_finding(fitness_values, pop_index):
-#     pop_size = len(fitness_values)
-#     pareto_front = np.ones(pop_size, dtype=bool)  # initially assume all solutions are in pareto front by using "1"
-#
-#     for i in range(pop_size):
-#         for j in range(pop_size):
-#             if np.less_equal(fitness_values[j], fitness_values[i]).all() and np.less(fitness_values[j],
-#                                                                                      fitness_values[i]).any():
-#                 pareto_front[i] = 0  # i is not in pareto front because j dominates i
-#                 break  # no more comparision is needed to find out which one is dominated
-#
-#     return pop_index[pareto_front]
-
-
-# def visualize_old(w, lx, ly, lz, penalty_coefficient, evaluation_version, max_rf22, parent_conn,
-#               file_io=True):
-# print('\n')
-# print("iteration: %d" % w)
-# print("_________________")
-# print("Optimal solutions:")
-# print("       x1               x2                 x3")
-# print(index)  # show optimal solutions
-# print("______________")
-# print("Fitness values:")
-# # print("  objective 1    objective 2")
-# print("          Model              objective 1      objective 2      Job")
-# print("            |                     |                |            |")
-# for q in range(len(index)):
-#     gen_num, pop_num = find_model_output(w=w+1, q=sort[q], directory=directory, end_pop=end_pop)
-#     print("%dth generation %dth pop   [%E   %E]   Job-%d-%d" % (
-#         w + 1, q + 1, fitness_values[q, 0], fitness_values[q, 1], gen_num, pop_num))
-# print(fitness_values)
-
 def find_pareto_front_points(costs: np.ndarray, return_index: bool = False) -> np.ndarray:
     """
     A function calculating indices of pareto fronts or values of pareto points. The returned value is sorted by the
@@ -153,31 +85,32 @@ def find_pareto_front_points(costs: np.ndarray, return_index: bool = False) -> n
         return sorted_pareto_points
 
 
-def crowding_calculation(fitness_values):
-    pop_size = len(fitness_values[:, 0])
-    fitness_value_number = len(fitness_values[0, :])
-    matrix_for_crowding = np.zeros((pop_size, fitness_value_number))
-    normalize_fitness_values = (fitness_values - fitness_values.min(0)) / fitness_values.ptp(0)
+def crowding_calculation(fitness_values: np.ndarray):
+    print('fitval: ', fitness_values)
+    population_size, number_of_fitness_values = fitness_values.shape[0], fitness_values.shape[1]
+    matrix_for_crowding = np.zeros((population_size, number_of_fitness_values))
+    normalize_fitness_values = (fitness_values - np.min(fitness_values, axis=0)) / np.ptp(fitness_values, axis=0)
 
     # normalize the fitness values
-    for i in range(fitness_value_number):
-        crowding_results = np.zeros(pop_size)
+    for i in range(number_of_fitness_values):
+        crowding_results = np.zeros(population_size)
         crowding_results[0] = 1  # extreme point has the max crowding distance
-        crowding_results[pop_size - 1] = 1  # extreme point has the max crowding distance
+        crowding_results[population_size - 1] = 1  # extreme point has the max crowding distance
         sorting_normalize_fitness_values = np.sort(normalize_fitness_values[:, i])
         sorting_normalized_values_index = np.argsort(normalize_fitness_values[:, i])
 
         # crowding distance calculation
-        crowding_results[1:pop_size - 1] = (
-                sorting_normalize_fitness_values[2:pop_size] - sorting_normalize_fitness_values[0:pop_size - 2])
+        crowding_results[1:population_size - 1] = (
+                sorting_normalize_fitness_values[2:population_size] - sorting_normalize_fitness_values[0:population_size - 2])
         re_sorting = np.argsort(sorting_normalized_values_index)  # re_sorting to the original order
         matrix_for_crowding[:, i] = crowding_results[re_sorting]
 
     crowding_distance = np.sum(matrix_for_crowding, axis=1)  # crowding distance of each solution
+    print('crowding distance: ', crowding_distance)
     return crowding_distance
 
 
-def remove_using_crowding(fitness_values, number_solutions_needed):
+def remove_using_crowding(fitness_values: np.ndarray, number_solutions_needed: int) -> np.ndarray:
     rn = np.random  # addition
     pop_index = np.arange(fitness_values.shape[0])
     crowding_distance = crowding_calculation(fitness_values)
@@ -211,10 +144,9 @@ def remove_using_crowding(fitness_values, number_solutions_needed):
 
 
 def selection(all_topologies: np.ndarray, all_fitness_values: np.ndarray,
-              population_size: int) -> Tuple[np.ndarray, list]:
-    total_pop_idx = set(np.arange(len(all_topologies)))
+              population_size: int) -> tuple[np.ndarray, np.ndarray]:
     remaining_population_idx = np.arange(len(all_topologies))
-    total_pareto_front_idx = set()
+    total_pareto_front_idx = np.empty((0,), dtype=int)
     while len(total_pareto_front_idx) < population_size:
         new_pareto_front_idx = find_pareto_front_points(costs=all_fitness_values[remaining_population_idx],
                                                         return_index=True)
@@ -227,11 +159,10 @@ def selection(all_topologies: np.ndarray, all_fitness_values: np.ndarray,
             selected_solutions = remove_using_crowding(all_fitness_values[new_pareto_front_idx],
                                                        number_solutions_needed)
             new_pareto_front_idx = new_pareto_front_idx[selected_solutions]
-
-        total_pareto_front_idx = total_pareto_front_idx.union(remaining_population_idx[new_pareto_front_idx])
-        remaining_population_idx = np.array(list(total_pop_idx - total_pareto_front_idx))
-    selected_populations = all_topologies[list(total_pareto_front_idx)]
-    return selected_populations, list(total_pareto_front_idx)
+        total_pareto_front_idx = np.hstack((total_pareto_front_idx, remaining_population_idx[new_pareto_front_idx]))
+        remaining_population_idx = np.setdiff1d(remaining_population_idx, total_pareto_front_idx)
+    selected_populations = all_topologies[total_pareto_front_idx]
+    return selected_populations, total_pareto_front_idx
 
 
 def array_divide(topo, lx, ly, lz, divide_number, ini_pop, end_pop):
@@ -295,8 +226,48 @@ def visualize_n_cubes(arr_4d, full=False):
     plt.show()
 
 
+def show_pareto_fronts(gen, directory, params):
+    def find_job_location_from_offspring(g, tp):
+        for current_gen in range(g, 0, -1):
+            topos_offspring = np.genfromtxt(f'topo_offspring_{current_gen}.csv', dtype=int, delimiter=',')
+            for offspring_idx, topo_offspring in enumerate(topos_offspring):
+                if np.array_equal(tp, topo_offspring):
+                    return current_gen, offspring_idx + 1
+        topos_parent_1 = np.genfromtxt(f'topo_parent_1.csv', dtype=int, delimiter=',')
+        for offspring_idx, topo_parent_1 in enumerate(topos_parent_1):
+            if np.array_equal(tp, topo_parent_1):
+                return 0, offspring_idx + 1
+
+    from os import chdir
+    chdir(directory)
+    topos_next_parent = np.genfromtxt(f'topo_parent_{gen + 1}.csv', dtype=int, delimiter=',')
+    results_next_parent = np.genfromtxt(f'Output_parent_{gen + 1}.csv', dtype=float, delimiter=',')
+
+    fitness_values = evaluate_fitness_values(topo=topos_next_parent, result=results_next_parent, params=params)
+    pareto_indices = find_pareto_front_points(costs=fitness_values, return_index=True)
+    print('=' * 66)
+    for pareto_idx in pareto_indices:
+        topo_pareto = topos_next_parent[pareto_idx]
+        job_first, job_second = find_job_location_from_offspring(g=gen, tp=topo_pareto)
+        print(f'[Gen {gen}]', f'Parent {gen+1}-{pareto_idx+1}:',
+              f'{fitness_values[pareto_idx, 0]:.10f} |',
+              f'{fitness_values[pareto_idx, 1]:.10f} |',
+              f'Job{job_first}-{job_second}.odb')
+    return pareto_indices
+
+
 if __name__ == '__main__':
-    path = r'F:\shshsh\data-23-1-4\topo_parent_35.csv'
-    arr_4d = np.genfromtxt(path, dtype=int, delimiter=',').reshape((100, 10, 10, 10))
-    for arr_3d in arr_4d:
-        visualize_one_cube(arr_3d, True)
+    from GraphicUserInterface import Parameters
+    import matplotlib.pyplot as plt
+
+    set_path = r'f:\shshsh\temp'
+    pareto_gen = 1
+
+    parameters = Parameters()
+    parameters.post_initialize()
+    indices = show_pareto_fronts(gen=pareto_gen, directory=set_path, params=parameters)
+    print()
+    # arr_4d = np.genfromtxt(f'topo_parent_{gen + 1}.csv', dtype=int, delimiter=',').reshape((100, 10, 10, 10))[idxs]
+    # for idx, arr_3d in zip(idxs, arr_4d):
+    #     print(f'> Visualizing Parent {gen + 1}-{idx + 1}')
+    #     visualize_one_cube(arr_3d, False)

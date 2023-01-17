@@ -4,14 +4,16 @@ import numpy as np
 from time import sleep
 from datetime import datetime
 import multiprocessing as mp
-import multiprocessing.connection as connection
+from typing import TYPE_CHECKING
 from dataclasses import asdict
-from typing import Tuple
-
+from multiprocessing import connection
 from GeneticAlgorithm import generate_offspring, random_parent_generation
 from GraphicUserInterface import App, Visualizer, Parameters
 from PostProcessing import evaluate_fitness_values, selection
 from FileIO import parent_import, parent_export, offspring_import
+
+if TYPE_CHECKING:
+    import multiprocessing.connection as connection
 
 ABAQUS_ARGUMENTS_FILENAME = 'args'
 ABAQUS_PROCESS_END_FILENAME = 'args_end'
@@ -19,7 +21,7 @@ ABAQUS_PARAMETER_FILENAME = 'PARAMS'
 PLOTTING_DATA_FILENAME = '_plotting_data_'
 
 
-def make_and_start_process(target: any, duplex: bool = True, daemon: bool = True) -> Tuple[mp.Process,
+def make_and_start_process(target: any, duplex: bool = True, daemon: bool = True) -> tuple[mp.Process,
                                                                                            connection.Connection,
                                                                                            connection.Connection]:
     """
@@ -120,7 +122,7 @@ def one_generation(gen: int, restart: bool, params: Parameters, visualizer: Visu
     wait_for_abaqus_until_complete(check_exit_time=1, restart=restart, w=gen, offspring=topo_offspring)
 
     # Import parent outputs of current generation from abaqus
-    _, result_offspring = offspring_import(gen_num=gen)
+    topo_offspring, result_offspring = offspring_import(gen_num=gen)
     fitness_values_parent = evaluate_fitness_values(topo=topo_parent, result=result_parent, params=params)
     fitness_values_offspring = evaluate_fitness_values(topo=topo_offspring, result=result_offspring, params=params)
     fitness_values_parent_and_offspring = np.vstack((fitness_values_parent, fitness_values_offspring))
