@@ -263,48 +263,64 @@ def show_pareto_fronts(gen: int, params, directory: str = None, show: bool = Fal
     return pareto_indices
 
 
-def get_whole_topologies(params):
+def print_origin_of_paretos(params) -> None:
+    """
+    Print original location of pareto topologies from whole csv files.
+    :param params: Parameter dataclass
+    :return: None
+    """
     from os import listdir
     from re import compile
     from threading import Thread
 
-    def get_numbers(p):
+    def _get_numbers(p):
         return sorted([int(compile(r'\d+').search(s).group()) for s in [f for f in listdir() if compile(p).match(f)]])
 
-    def load_whole_files(header, nd, ad):
+    def _load_whole_files(header, nd, ad):
         if 'topo' in header:
             dtype = int
         else:
             dtype = float
-        nd.update({header: get_numbers(rf'{header}_\d+\.csv')})
-        ad.update({header: np.expand_dims(np.genfromtxt(f'{header}_{nd[header].pop(0)}.csv',
+        nd.update({header: _get_numbers(rf'{header}_\d+\.csv')})
+        ad.update({header: np.expand_dims(np.genfromtxt(f'{header}_{nd[header][0]}.csv',
                                                         dtype=dtype, delimiter=','), axis=0)})
-        for num in nd[header]:
+        for file_idx, num in enumerate(nd[header]):
+            if file_idx == 0:
+                continue
             ad[header] = np.vstack((ad[header],
                                     np.expand_dims(np.genfromtxt(f'{header}_{num}.csv',
                                                                  dtype=dtype, delimiter=','), axis=0)))
         return ad
 
-    def find_job_location_from_offspring(tpp, tpo):
-        print(pareto_idx, np.where(np.all(tpo == tpp[:, None, None, None, :], axis=(0, 1, 2))))
+    def _find_job_location_from_offspring(gen, pareto_idx, tpp, tpo, tpfp, nd):
+        # tpp: topo_pareto, tpo: topo_offspring, tpfp: topo_first_parent, nd: num_dict
+        arg = np.argwhere(np.all(tpo == tpp, axis=(2,)))
+
+        if len(arg) == 0:
+            arg = np.argwhere(np.all(tpfp == tpp, axis=(1,)))
+            print(f'Pareto topo in parent {gen} - {pareto_idx + 1} is in parent ', 1, '-', arg[0, 0] + 1)
+        else:
+            print(f'Pareto topo in parent {gen} - {pareto_idx + 1} is in offspring ', nd['topo_offspring'][arg[0, 0]],
+                  '-', arg[0, 1] + 1)
 
     filename_headers = ('topo_parent', 'topo_offspring', 'Output_parent', 'Output_offspring')
     num_dict, arr_dict = dict(), dict()
-    threads = [Thread(target=load_whole_files, args=(header, num_dict, arr_dict), daemon=True)
+    threads = [Thread(target=_load_whole_files, args=(header, num_dict, arr_dict), daemon=True)
                for header in filename_headers]
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
-
+    del threads
     for arr_idx, gen in enumerate(num_dict['Output_parent']):
         fitness_values = evaluate_fitness_values(topo=arr_dict['topo_parent'][arr_idx],
                                                  result=arr_dict['Output_parent'][arr_idx], params=params)
         pareto_indices = find_pareto_front_points(costs=fitness_values, return_index=True)
-        print('=' * 66)
+        print('=' * 30, f'Parent {gen}', '=' * 30)
         for pareto_idx in pareto_indices:
-            topo_pareto = arr_dict['topo_parent'][pareto_idx]
-            find_job_location_from_offspring(tpp=topo_pareto, tpo=arr_dict['topo_offspring'])
+            topo_pareto = arr_dict['topo_parent'][arr_idx, pareto_idx]
+            _find_job_location_from_offspring(gen=gen, pareto_idx=pareto_idx, tpp=topo_pareto, nd=num_dict,
+                                              tpo=arr_dict['topo_offspring'], tpfp=arr_dict['topo_parent'][0])
 
 
 def open_history_output(gen, path=None):
@@ -329,5 +345,4 @@ if __name__ == '__main__':
     chdir(set_path)
     parameters = Parameters()
     parameters.post_initialize()
-
-    get_whole_topologies(params=parameters)
+    print_origin_of_paretos(params=parameters)
