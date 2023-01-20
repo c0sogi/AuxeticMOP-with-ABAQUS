@@ -4,16 +4,12 @@ import numpy as np
 from time import sleep
 from datetime import datetime
 import multiprocessing as mp
-from typing import TYPE_CHECKING
-from dataclasses import asdict
 from multiprocessing import connection
+from dataclasses import asdict
 from GeneticAlgorithm import generate_offspring, random_parent_generation
 from GraphicUserInterface import App, Visualizer, Parameters
 from PostProcessing import evaluate_fitness_values, selection
 from FileIO import parent_import, parent_export, offspring_import
-
-if TYPE_CHECKING:
-    import multiprocessing.connection as connection
 
 ABAQUS_ARGUMENTS_FILENAME = 'args'
 ABAQUS_PROCESS_END_FILENAME = 'args_end'
@@ -21,9 +17,8 @@ ABAQUS_PARAMETER_FILENAME = 'PARAMS'
 PLOTTING_DATA_FILENAME = '_plotting_data_'
 
 
-def make_and_start_process(target: any, duplex: bool = True, daemon: bool = True) -> tuple[mp.Process,
-                                                                                           connection.Connection,
-                                                                                           connection.Connection]:
+def make_and_start_process(target: any, duplex: bool = True,
+                           daemon: bool = True) -> tuple[mp.Process, connection.Connection, connection.Connection]:
     """
     Make GUI process and return a process and two Pipe connections between main process and GUI process.
     :param target: The GUI class to run as another process.
@@ -111,15 +106,15 @@ def one_generation(gen: int, restart: bool, params: Parameters, visualizer: Visu
 
     # Make offspring topologies
     if restart:
-        topo_offspring = np.genfromtxt('topo_offspring_' + str(gen) + '.csv', delimiter=',', dtype=int)
-        topo_offspring = topo_offspring.reshape((params.end_pop, params.lx, params.ly, params.lz))
+        _topo_offspring = np.genfromtxt('topo_offspring_' + str(gen) + '.csv', delimiter=',', dtype=int)
+        _topo_offspring = _topo_offspring.reshape((params.end_pop, params.lx, params.ly, params.lz))
     else:
-        topo_offspring = generate_offspring(topo_parent=topo_parent, gen=gen, end_pop=params.end_pop,
-                                            timeout=params.timeout, mutation_rate=params.mutation_rate,
-                                            lx=params.lx, ly=params.ly, lz=params.lz)
+        _topo_offspring = generate_offspring(topo_parent=topo_parent, gen=gen, end_pop=params.end_pop,
+                                             timeout=params.timeout, mutation_rate=params.mutation_rate,
+                                             lx=params.lx, ly=params.ly, lz=params.lz)
 
     # Make abaqus work
-    wait_for_abaqus_until_complete(check_exit_time=1, restart=restart, w=gen, offspring=topo_offspring)
+    wait_for_abaqus_until_complete(check_exit_time=1, restart=restart, w=gen, offspring=_topo_offspring)
 
     # Import parent outputs of current generation from abaqus
     topo_offspring, result_offspring = offspring_import(gen_num=gen)
@@ -172,9 +167,9 @@ if __name__ == '__main__':
     set_path, parameters = parent_conn.recv()
     parameters.post_initialize()
     os.chdir(set_path)
+    remove_file(file_name=ABAQUS_ARGUMENTS_FILENAME)
 
     # load previous plotting data
-    remove_file(file_name=ABAQUS_ARGUMENTS_FILENAME)
     v = Visualizer(conn_to_gui=parent_conn)
     plot_previous_data(visualizer=v, use_manual_rp=False)
 
@@ -212,3 +207,4 @@ if __name__ == '__main__':
         abaqus_process.kill()
         parent_conn.close()
         child_conn.close()
+        raise KeyboardInterrupt

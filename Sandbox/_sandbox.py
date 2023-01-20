@@ -5,7 +5,8 @@ from FileIO import offspring_import, parent_import
 from PostProcessing import evaluate_fitness_values, selection
 from GeneticAlgorithm import generate_offspring
 
-if __name__ == '__main__':
+
+def test_main():
     path = r'f:\shshsh\temp'
     gen = 1
     params = Parameters()
@@ -25,3 +26,13 @@ if __name__ == '__main__':
                                     all_fitness_values=fitness_values_parent_and_offspring,
                                     population_size=params.end_pop)
     print(len(next_generations))
+
+
+def test_history(gen, path=None):
+    from PostProcessing import open_history_output
+    open_history_output(gen=gen, path=path)
+
+
+if __name__ == '__main__':
+    for i in range(10, 47):
+        test_history(gen=i, path=r'F:\shshsh\data-23-1-4')

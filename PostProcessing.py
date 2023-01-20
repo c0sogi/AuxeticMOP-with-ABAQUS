@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 
 
@@ -100,8 +101,8 @@ def crowding_calculation(fitness_values: np.ndarray):
         sorting_normalized_values_index = np.argsort(normalize_fitness_values[:, i])
 
         # crowding distance calculation
-        crowding_results[1:population_size - 1] = (
-                sorting_normalize_fitness_values[2:population_size] - sorting_normalize_fitness_values[0:population_size - 2])
+        crowding_results[1:population_size - 1] = (sorting_normalize_fitness_values[2:population_size]
+                                                   - sorting_normalize_fitness_values[0:population_size - 2])
         re_sorting = np.argsort(sorting_normalized_values_index)  # re_sorting to the original order
         matrix_for_crowding[:, i] = crowding_results[re_sorting]
 
@@ -226,7 +227,7 @@ def visualize_n_cubes(arr_4d, full=False):
     plt.show()
 
 
-def show_pareto_fronts(gen, directory, params):
+def show_pareto_fronts(gen: int, params, directory: str = None, show: bool = False) -> np.ndarray:
     def find_job_location_from_offspring(g, tp):
         for current_gen in range(g, 0, -1):
             topos_offspring = np.genfromtxt(f'topo_offspring_{current_gen}.csv', dtype=int, delimiter=',')
@@ -238,8 +239,9 @@ def show_pareto_fronts(gen, directory, params):
             if np.array_equal(tp, topo_parent_1):
                 return 0, offspring_idx + 1
 
-    from os import chdir
-    chdir(directory)
+    if directory is not None:
+        from os import chdir
+        chdir(directory)
     topos_next_parent = np.genfromtxt(f'topo_parent_{gen + 1}.csv', dtype=int, delimiter=',')
     results_next_parent = np.genfromtxt(f'Output_parent_{gen + 1}.csv', dtype=float, delimiter=',')
 
@@ -249,25 +251,83 @@ def show_pareto_fronts(gen, directory, params):
     for pareto_idx in pareto_indices:
         topo_pareto = topos_next_parent[pareto_idx]
         job_first, job_second = find_job_location_from_offspring(g=gen, tp=topo_pareto)
-        print(f'[Gen {gen}]', f'Parent {gen+1}-{pareto_idx+1}:',
+        print(f'[Gen {gen}]', f'Parent {gen + 1}-{pareto_idx + 1}:',
               f'{fitness_values[pareto_idx, 0]:.10f} |',
               f'{fitness_values[pareto_idx, 1]:.10f} |',
               f'Job{job_first}-{job_second}.odb')
+    if show:
+        pareto_topologies = topos_next_parent[pareto_indices].reshape(len(pareto_indices),
+                                                                      params.lx, params.ly, params.lz)
+        for pareto_topology in pareto_topologies:
+            visualize_one_cube(cube_3d_array=pareto_topology, full=True)
     return pareto_indices
+
+
+def get_whole_topologies(params):
+    from os import listdir
+    from re import compile
+    from threading import Thread
+
+    def get_numbers(p):
+        return sorted([int(compile(r'\d+').search(s).group()) for s in [f for f in listdir() if compile(p).match(f)]])
+
+    def load_whole_files(header, nd, ad):
+        if 'topo' in header:
+            dtype = int
+        else:
+            dtype = float
+        nd.update({header: get_numbers(rf'{header}_\d+\.csv')})
+        ad.update({header: np.expand_dims(np.genfromtxt(f'{header}_{nd[header].pop(0)}.csv',
+                                                        dtype=dtype, delimiter=','), axis=0)})
+        for num in nd[header]:
+            ad[header] = np.vstack((ad[header],
+                                    np.expand_dims(np.genfromtxt(f'{header}_{num}.csv',
+                                                                 dtype=dtype, delimiter=','), axis=0)))
+        return ad
+
+    def find_job_location_from_offspring(tpp, tpo):
+        print(pareto_idx, np.where(np.all(tpo == tpp[:, None, None, None, :], axis=(0, 1, 2))))
+
+    filename_headers = ('topo_parent', 'topo_offspring', 'Output_parent', 'Output_offspring')
+    num_dict, arr_dict = dict(), dict()
+    threads = [Thread(target=load_whole_files, args=(header, num_dict, arr_dict), daemon=True)
+               for header in filename_headers]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    for arr_idx, gen in enumerate(num_dict['Output_parent']):
+        fitness_values = evaluate_fitness_values(topo=arr_dict['topo_parent'][arr_idx],
+                                                 result=arr_dict['Output_parent'][arr_idx], params=params)
+        pareto_indices = find_pareto_front_points(costs=fitness_values, return_index=True)
+        print('=' * 66)
+        for pareto_idx in pareto_indices:
+            topo_pareto = arr_dict['topo_parent'][pareto_idx]
+            find_job_location_from_offspring(tpp=topo_pareto, tpo=arr_dict['topo_offspring'])
+
+
+def open_history_output(gen, path=None):
+    if path is not None:
+        from os import chdir
+        chdir(path)
+    from pickle import load
+    file_names = ('U1_HistoryOutput', 'U2_HistoryOutput', 'U3_HistoryOutput',
+                  'RF1_HistoryOutput', 'RF2_HistoryOutput', 'RF3_HistoryOutput')
+    for file_name in file_names:
+        pickle_file_name = file_name + f'_{gen}'
+        with open(pickle_file_name, 'rb') as f:
+            loaded_file = load(f, encoding='bytes')
+            print(f'Gen{gen}-{pickle_file_name}: {loaded_file}')
 
 
 if __name__ == '__main__':
     from GraphicUserInterface import Parameters
-    import matplotlib.pyplot as plt
+    from os import chdir
 
-    set_path = r'f:\shshsh\temp'
-    pareto_gen = 1
-
+    set_path = r'f:\shshsh\data-23-1-4'
+    chdir(set_path)
     parameters = Parameters()
     parameters.post_initialize()
-    indices = show_pareto_fronts(gen=pareto_gen, directory=set_path, params=parameters)
-    print()
-    # arr_4d = np.genfromtxt(f'topo_parent_{gen + 1}.csv', dtype=int, delimiter=',').reshape((100, 10, 10, 10))[idxs]
-    # for idx, arr_3d in zip(idxs, arr_4d):
-    #     print(f'> Visualizing Parent {gen + 1}-{idx + 1}')
-    #     visualize_one_cube(arr_3d, False)
+
+    get_whole_topologies(params=parameters)

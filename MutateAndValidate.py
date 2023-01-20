@@ -107,7 +107,7 @@ def make_voxels_surface_contact(topologies: np.ndarray, lx: int, ly: int, lz: in
 
 def make_3d_print_without_support(arr_3d: np.ndarray, max_distance: int = 1) -> tuple[np.ndarray, bool, int]:
     arr_3d_result = arr_3d.copy()
-    x_size, y_size, z_size = arr_3d_result.shape[0], arr_3d_result.shape[1], arr_3d_result.shape[2]
+    x_size, y_size, z_size = arr_3d_result.shape
     total_changed_voxels = 0
     y_search_range = range(1, y_size - 1)
     y_search_range_reversed = range(y_size - 2, 0, -1)
@@ -140,16 +140,17 @@ def make_3d_print_without_support(arr_3d: np.ndarray, max_distance: int = 1) -> 
 @njit
 def dead_and_survived_islands(y_idx: int, y_direction: int, x_size: int, z_size: int, max_island_idx: int,
                               labeled_arr: np.ndarray, arr_3d_result: np.ndarray) -> tuple[set, set]:
-    survived_islands, dead_islands = set(), set()
+    survived_islands = set()
+    dead_islands = set()
     # Determining which ones are the dead islands
     for x_idx in range(x_size):
         for z_idx in range(z_size):
-            island_idx = labeled_arr[x_idx, z_idx]
-            if island_idx and arr_3d_result[x_idx, y_idx - y_direction, z_idx]:
-                survived_islands.add(island_idx)
-    for i in range(1, max_island_idx + 1):
-        if i not in survived_islands:
-            dead_islands.add(i)
+            island_label_num = labeled_arr[x_idx, z_idx]
+            if island_label_num and arr_3d_result[x_idx, y_idx - y_direction, z_idx]:
+                survived_islands.add(island_label_num)
+    for island_label_num in range(1, max_island_idx + 1):
+        if island_label_num not in survived_islands:
+            dead_islands.add(island_label_num)
     return dead_islands, survived_islands
 
 

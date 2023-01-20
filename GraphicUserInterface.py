@@ -145,14 +145,18 @@ class App:  # GUI class
                     'markerfacecolor': _color_2,
                     'markersize': 8,
                     'markeredgewidth': 2}
-                self.ax[0].plot(_x1, _y1, **_plot_options)
+                # Delete all plotted hyper volumes
                 self.ax[1].clear()
+                self.ax[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
+                self.ax[1].grid(True)
+                self.ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
+
+                # Plot and scatter received data
+                self.ax[0].plot(_x1, _y1, **_plot_options)
                 for _generation, _hv, _line in zip(_x2, _y2, self.ax[0].lines):
                     self.ax[1].scatter(_generation, _hv, marker=_line.get_marker(), c=[_line.get_markerfacecolor()],
                                        edgecolors=_line.get_markeredgecolor(), s=_line.get_markersize() ** 2,
                                        linewidth=_line.get_markeredgewidth())
-                self.ax[0].grid(True)
-                self.ax[1].grid(True)
                 self.bar.draw()
             except Exception as error_message:
                 print('[GUI] An plotting error occurred:', error_message)
@@ -282,7 +286,7 @@ def atoi(s: str) -> str | int | float:
         return s
 
 
-def translator(s: str, flip: bool) -> str:
+def translator(s: str, flip: bool = False) -> str:
     dictionary = {'abaqus_script_name': 'Filename of ABAQUS script',
                   'abaqus_execution_mode': 'ABAQUS execution mode',
                   'mode': 'GA Mode',
@@ -329,6 +333,7 @@ class Visualizer:
 
     def plot(self, gen_num: int, pareto_1_sorted: np.ndarray, pareto_2_sorted: np.ndarray,
              use_manual_rp: bool = False, ref_x: float = 0.0, ref_y: float = 0.0) -> None:
+        # Determining reference point
         if use_manual_rp:
             self.ref_x, self.ref_y = ref_x, ref_y
         elif (self.ref_x is None) or (self.ref_y is None):
@@ -339,6 +344,8 @@ class Visualizer:
                 self.ref_x = pareto_1_sorted[-1]
             if pareto_2_sorted[0] > self.ref_y:
                 self.ref_y = pareto_2_sorted[0]
+
+        # Calculating hyper volume
         _datum_hv = get_datum_hv(pareto_1_sorted, pareto_2_sorted)
         _lower_bounds = [pareto_1_sorted[0], pareto_2_sorted[-1]]
         self.all_datum_hv.update({gen_num: _datum_hv})
@@ -346,6 +353,8 @@ class Visualizer:
         _all_hv = {key: get_hv_from_datum_hv(self.all_datum_hv[key], self.all_lower_bounds[key],
                                              ref_x=self.ref_x, ref_y=self.ref_y) for key in self.all_datum_hv.keys()}
         _generations, _hvs = zip(*_all_hv.items())
+
+        # Saving plotting data
         _file_name = '_plotting_data_'
         if os.path.isfile(_file_name):
             with open(_file_name, mode='rb') as f_read:
@@ -356,6 +365,8 @@ class Visualizer:
         else:
             with open(_file_name, mode='wb') as f_write:
                 pickle.dump({gen_num: (pareto_1_sorted, pareto_2_sorted)}, f_write)
+
+        # Plot data onto GUI
         if self.conn_to_gui is not None:
             self.conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, _all_hv))
         else:
@@ -391,14 +402,12 @@ class Visualizer:
 
 
 if __name__ == '__main__':
-    end_gen = 39
-    set_path = r'F:\shshsh\data-23-1-4'
-    parameters = Parameters()
+    from main import make_and_start_process, plot_previous_data
+    gui_process, parent_conn, child_conn = make_and_start_process(target=App, duplex=True, daemon=True)
+    set_path, parameters = parent_conn.recv()
     parameters.post_initialize()
     os.chdir(set_path)
-    visualizer = Visualizer(conn_to_gui=None)
 
-    for gen_idx in range(-1, end_gen):
-        visualizer.visualize(params=parameters, w=gen_idx + 1, use_manual_rp=False)
-    plt.show()
+    v = Visualizer(conn_to_gui=parent_conn)
+    plot_previous_data(visualizer=v, use_manual_rp=False)
     input('Press enter to exit')
