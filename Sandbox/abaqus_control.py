@@ -3,6 +3,7 @@ from abaqus import *
 from abaqusConstants import *
 from driverUtils import executeOnCaeStartup
 import numpy as np
+
 executeOnCaeStartup()
 
 
@@ -75,7 +76,11 @@ class MyModel:
         self.model.parts[part_name].Set(name=set_name,
                                         nodes=self.model.parts[part_name].nodes.getByBoundingBox(**bound_definition))
 
-    def set_encastre_of_assembly(self, bc_name, set_name, step_name):
+    def create_set_by_bounding_box(self, instance_name, set_name, bound_definition):
+        self.root_assembly.Set(name=set_name, nodes=self.root_assembly.instances[instance_name].nodes.getByBoundingBox(
+                                   **bound_definition))
+
+    def set_encastre(self, bc_name, set_name, step_name):
         self.model.EncastreBC(name=bc_name, createStepName=step_name,
                               localCsys=None, region=self.root_assembly.sets[set_name])
 
@@ -84,18 +89,58 @@ class MyModel:
                                   amplitude=UNSET, distributionType=UNIFORM, fieldName='', localCsys=None,
                                   region=self.root_assembly.sets[set_name], **displacement)
 
+    def set_boundary_condition(self, symmetry_direction, set_name):
+        if symmetry_direction == 'x':
+            self.model.XsymmBC(createStepName='Initial', localCsys=None, name='x_sym',
+                               region=self.root_assembly.sets[set_name])
+        elif symmetry_direction == 'y':
+            self.model.YsymmBC(createStepName='Initial', localCsys=None, name='y_sym',
+                               region=self.root_assembly.sets[set_name])
+        elif symmetry_direction == 'z':
+            self.model.ZsymmBC(createStepName='Initial', localCsys=None, name='z_sym',
+                               region=self.root_assembly.sets[set_name])
+        else:
+            raise ValueError
+
     def create_step(self, step_name, previous_step, step_type):
         if step_type == 'modal':
             self.model.FrequencyStep(name=step_name, previous=previous_step,
                                      limitSavedEigenvectorRegion=None, numEigen=12)
-        else:
+        elif step_type == 'compression':
             self.model.StaticStep(initialInc=0.001, maxInc=0.1, maxNumInc=10000, minInc=1e-12,
                                   name=step_name, previous=previous_step)
+        else:
+            raise ValueError
 
-    def create_reference_point_and_set(self, part_name, rp_name, rp_coordinate):
-        rp_id = self.model.parts[part_name].ReferencePoint(point=rp_coordinate).id
-        self.model.parts[part_name].Set(name=rp_name,
-                                        referencePoints=(self.model.parts[part_name].referencePoints[rp_id],))
+    def create_output_requests(self, step_name, history_output_name, set_name,
+                               field_outputs, history_outputs):
+        self.model.fieldOutputRequests['F-Output-1'].setValues(variables=field_outputs)
+        self.model.HistoryOutputRequest(createStepName=step_name, name=history_output_name, rebar=EXCLUDE,
+                                        region=self.root_assembly.sets[set_name], sectionPoints=DEFAULT,
+                                        variables=history_outputs)
+
+    def create_reference_point_and_set(self, rp_name, rp_coordinate):
+        rp_id = self.root_assembly.ReferencePoint(point=rp_coordinate).id
+        self.root_assembly.Set(name=rp_name, referencePoints=(self.root_assembly.referencePoints[rp_id],))
+        return rp_id
+
+    def create_coupling(self, rp_set_name, surface_set_name, constraint_name):
+        self.model.Coupling(alpha=0.0, controlPoint=self.root_assembly.sets[rp_set_name], couplingType=KINEMATIC,
+                            influenceRadius=WHOLE_SURFACE, localCsys=None, name=constraint_name,
+                            surface=self.root_assembly.sets[surface_set_name],
+                            u1=ON, u2=ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
+
+    def allow_self_contact(self, instance_name, whole_bound, step_name):
+        elements = self.root_assembly.instances[instance_name].elements.getByBoundingBox(**whole_bound)
+        surface = self.root_assembly.Surface(name='surface',
+                                             face1Elements=elements, face2Elements=elements, face3Elements=elements,
+                                             face4Elements=elements, face5Elements=elements, face6Elements=elements)
+        self.model.ContactProperty('IntProp-1')
+        self.model.interactionProperties['IntProp-1'].NormalBehavior(
+            allowSeparation=ON, constraintEnforcementMethod=DEFAULT, pressureOverclosure=HARD)
+        self.model.SelfContactStd(contactTracking=ONE_CONFIG,
+                                  createStepName=step_name, interactionProperty='IntProp-1', name='Int-1',
+                                  surface=surface, thickness=ON)
 
     def create_job(self, job_name, num_cpus, num_gpus, run):
         mdb.Job(name=job_name, model=self.model.name, description='',
@@ -134,6 +179,24 @@ def quaver_to_full(quaver):
     return np.swapaxes(full, axis1=0, axis2=2)
 
 
+def bound_setter(whole_bound, option):
+    """
+    Create dictionary of bound limits used for bounding box
+    :param whole_bound: whole bound dictionary for bounding box, six keys in dictionary
+    :param option: This can be either 'xMin', 'yMin', 'zMin', 'xMax', 'yMax', 'zMax'. If 'xMin',
+     bound for x=0 will be returned.
+    :return: a dictionary for bounding box
+    """
+    bound = whole_bound.copy()
+    if 'Min' in option:
+        bound[option[0] + 'Max'] = bound[option[0] + 'Min']
+    elif 'Max' in option:
+        bound[option[0] + 'Min'] = bound[option[0] + 'Max']
+    else:
+        pass
+    return bound
+
+
 def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
                  analysis_mode, material_properties, full):
     topo_arr = quaver_to_full(topo_arr) if full else topo_arr.copy()
@@ -141,6 +204,11 @@ def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
     cube_x_size = voxel_unit_length * cube_x_voxels
     cube_y_size = voxel_unit_length * cube_y_voxels
     cube_z_size = voxel_unit_length * cube_z_voxels
+    whole_bound = {'xMin': 0., 'yMin': 0., 'zMin': 0., 'xMax': cube_x_size, 'yMax': cube_y_size, 'zMax': cube_z_size}
+    bounds = {option: bound_setter(whole_bound=whole_bound, option=option) for option in whole_bound.keys()}
+    rp_coordinates = {'RP-x': (1.05 * cube_x_size, cube_y_size / 2, cube_z_size / 2),
+                      'RP-y': (cube_x_size / 2, 1.05 * cube_y_size, cube_z_size / 2),
+                      'RP-z': (cube_x_size / 2, cube_y_size / 2, 1.05 * cube_z_size)}
 
     with MyModel(model_name='Model-{}'.format(model_name), params=parameters) as mm:
         material_name = material_properties['material_name']
@@ -148,27 +216,46 @@ def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
         mm.create_mesh_of_part(part_name=voxel_name)
         mm.create_cube_part(voxel_name=voxel_name, cube_name=cube_name, topo_arr=topo_arr)
         mm.create_material(**material_properties)
-        mm.assign_section_to_elements_of_part_by_bounding_box(
-            part_name=cube_name, material_name=material_name, section_name=material_name + '-section',
-            bound_definition={
-                'xMin': 0., 'yMin': 0., 'zMin': 0.,
-                'xMax': cube_x_size, 'yMax': cube_y_size, 'zMax': cube_z_size})
+        for option, bound in bounds.items():
+            mm.create_set_of_part_by_bounding_box(part_name=cube_name, set_name=option, bound_definition=bound)
+        rp_id_dict = {rpn: mm.create_reference_point_and_set(rp_name=rpn, rp_coordinate=rpc)
+                      for rpn, rpc in rp_coordinates.items()}
+        mm.create_coupling(rp_set_name='RP-y', surface_set_name='{}-1.{}'.format(cube_name, 'yMax'),
+                           constraint_name='coupling')
+
+        for symmetry_diction, mirror_set_name in (('x', 'xMin'), ('y', 'yMin'), ('z', 'zMin')):
+            mm.set_boundary_condition(symmetry_direction=symmetry_diction,
+                                      set_name='{}-1.{}'.format(cube_name, mirror_set_name))
+        mm.assign_section_to_elements_of_part_by_bounding_box(part_name=cube_name, material_name=material_name,
+                                                              section_name=material_name + '-section',
+                                                              bound_definition=whole_bound)
         if analysis_mode == 'modal':
-            mm.create_set_of_part_by_bounding_box(part_name=cube_name, set_name='bottom', bound_definition={
-                'xMin': 0., 'yMin': 0., 'zMin': 0.,
-                'xMax': cube_x_size, 'yMax': 0., 'zMax': cube_z_size})
-            mm.create_reference_point_and_set(part_name=cube_name, rp_name='RP-1', rp_coordinate=(0., 0.5, 0.))
-            mm.set_encastre_of_assembly(bc_name='encastre_bottom', set_name='{}-1.{}'.format(cube_name, 'bottom'),
-                                        step_name='Initial')
-            mm.create_step(step_name='ModalStep', previous_step='Initial', step_type='modal')
+            mm.create_step(step_name=analysis_mode + '-step', previous_step='Initial', step_type=analysis_mode)
+            mm.set_encastre(bc_name='encastre_bottom', set_name='{}-1.{}'.format(cube_name, 'yMin'),
+                            step_name='Initial')
+        elif analysis_mode == 'compression':
+            analysis_step_name = analysis_mode + '-step'
+            mm.create_step(step_name=analysis_step_name, previous_step='Initial', step_type=analysis_mode)
+            mm.set_displacement(bc_name='displacement',
+                                set_name='{}-1.{}'.format(cube_name, 'yMax'),
+                                step_name=analysis_step_name, displacement={'u1': 0, 'u2': -0.5, 'u3': 0,
+                                                                            'ur1': 0, 'ur2': 0, 'ur3': 0})
+            mm.set_displacement(bc_name='fix_x',
+                                set_name='{}-1.{}'.format(cube_name, 'xMin'),
+                                step_name=analysis_step_name, displacement={'u1': 0})
+            mm.set_displacement(bc_name='fix_y',
+                                set_name='{}-1.{}'.format(cube_name, 'yMin'),
+                                step_name=analysis_step_name, displacement={'u2': 0})
+            mm.set_displacement(bc_name='fix_z',
+                                set_name='{}-1.{}'.format(cube_name, 'zMin'),
+                                step_name=analysis_step_name, displacement={'u3': 0})
+            # mm.allow_self_contact(instance_name=cube_name + '-1', whole_bound=whole_bound, step_name=analysis_step_name)
+            mm.create_output_requests(step_name=analysis_step_name, history_output_name='H-Output',
+                                      set_name='RP-y',
+                                      field_outputs=('S', 'U', 'RF', 'IVOL', 'MISESMAX'),
+                                      history_outputs=('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3', 'ALLIE'))
         else:
-            mm.create_set_of_part_by_bounding_box(part_name=cube_name, set_name='bottom', bound_definition={
-                'xMin': 0., 'yMin': 0., 'zMin': 0.,
-                'xMax': cube_x_size, 'yMax': 0., 'zMax': cube_z_size})
-            mm.create_reference_point_and_set(part_name=cube_name, rp_name='RP-1', rp_coordinate=(0., 0.5, 0.))
-            mm.set_encastre_of_assembly(bc_name='encastre_bottom', set_name='{}-1.{}'.format(cube_name, 'bottom'),
-                                        step_name='Initial')
-            mm.create_step(step_name='ModalStep', previous_step='Initial', step_type='modal')
+            raise ValueError
 
         # mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=1, num_gpus=0, run=True)
 
