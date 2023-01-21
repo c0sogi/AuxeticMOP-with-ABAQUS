@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GraphicUserInterface import Parameters
 
 
 def get_datum_hv(pareto_1_sorted: np.ndarray, pareto_2_sorted: np.ndarray) -> float:
@@ -227,7 +231,7 @@ def visualize_n_cubes(arr_4d, full=False):
     plt.show()
 
 
-def show_pareto_fronts(gen: int, params, directory: str = None, show: bool = False) -> np.ndarray:
+def show_pareto_fronts(gen: int, params: Parameters, directory: str = None, show: bool = False) -> np.ndarray:
     def find_job_location_from_offspring(g, tp):
         for current_gen in range(g, 0, -1):
             topos_offspring = np.genfromtxt(f'topo_offspring_{current_gen}.csv', dtype=int, delimiter=',')

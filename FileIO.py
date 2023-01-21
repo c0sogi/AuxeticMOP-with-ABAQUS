@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from GeneticAlgorithm import random_parent_generation
 
 
 def array_to_csv(path, arr, dtype, mode, save_as_int=False):
@@ -16,9 +17,15 @@ def offspring_import(gen_num):
     return topo_offspring, result_offspring
 
 
-def parent_import(gen_num):
-    topo_parent = np.genfromtxt('topo_parent_' + str(gen_num) + '.csv', delimiter=',', dtype=int)
-    result_parent = np.genfromtxt('Output_parent_' + str(gen_num) + '.csv', delimiter=',', dtype=float)
+def parent_import(gen_num, **kwargs):
+    try:
+        topo_parent = np.genfromtxt('topo_parent_' + str(gen_num) + '.csv', delimiter=',', dtype=int)
+    except FileNotFoundError:
+        topo_parent = random_parent_generation(density=0.5, params=kwargs['params'], show_parent=False)
+    try:
+        result_parent = np.genfromtxt('Output_parent_' + str(gen_num) + '.csv', delimiter=',', dtype=float)
+    except FileNotFoundError:
+        result_parent = None
     return topo_parent, result_parent
 
 

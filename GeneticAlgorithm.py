@@ -5,6 +5,10 @@ import os
 from functools import reduce
 from MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
 from FileIO import array_to_csv
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GraphicUserInterface import Parameters
 
 
 def inspect_clone_in_all_parents(w, topology_flattened, all_parent_topologies):
@@ -133,7 +137,7 @@ def random_array(shape, probability):
         shape)
 
 
-def random_parent_generation(density: float, params, show_parent: bool = False) -> np.ndarray:
+def random_parent_generation(density: float, params: Parameters, show_parent: bool = False) -> np.ndarray:
     parent_name = f'topo_parent_{params.ini_gen}.csv'
     parents = np.empty((params.end_pop, params.lx * params.ly * params.lz))
     total_parent_generation_count = 0
@@ -144,13 +148,13 @@ def random_parent_generation(density: float, params, show_parent: bool = False) 
                                               timeout=params.timeout)
         if parent is None:
             continue
-        total_parent_generation_count += 1
         print(f'<<<<< Parent {total_parent_generation_count + 1} >>>>>')
 
         volume_frac = np.count_nonzero(parent) / (params.lx * params.ly * params.lz / 100)
         total_volume_frac += volume_frac
         print(f'Volume fraction: {volume_frac:.1f} %\n')
         parents[total_parent_generation_count] = parent.flatten()
+        total_parent_generation_count += 1
     print(f'Average volume fraction: {total_volume_frac / params.end_pop:.1f} %')
     array_to_csv(path=parent_name, arr=parents, dtype=int, mode='w', save_as_int=True)
     if show_parent:

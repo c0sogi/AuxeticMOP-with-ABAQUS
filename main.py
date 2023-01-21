@@ -103,6 +103,8 @@ def one_generation(gen: int, restart: bool, params: Parameters, visualizer: Visu
     """
     # Import parent topologies and outputs of current generation
     topo_parent, result_parent = parent_import(gen_num=gen)
+    if result_parent is None:
+        wait_for_abaqus_until_complete(check_exit_time=1.0, restart=False)
 
     # Make offspring topologies
     if restart:
@@ -114,7 +116,7 @@ def one_generation(gen: int, restart: bool, params: Parameters, visualizer: Visu
                                              lx=params.lx, ly=params.ly, lz=params.lz)
 
     # Make abaqus work
-    wait_for_abaqus_until_complete(check_exit_time=1, restart=restart, w=gen, offspring=_topo_offspring)
+    wait_for_abaqus_until_complete(check_exit_time=1.0, restart=restart, w=gen, offspring=_topo_offspring)
 
     # Import parent outputs of current generation from abaqus
     topo_offspring, result_offspring = offspring_import(gen_num=gen)
@@ -178,10 +180,6 @@ if __name__ == '__main__':
                                  abaqus_execution_mode=parameters.abaqus_execution_mode, directory=set_path)
 
     # Start GA
-    if not os.path.isfile(f'topo_parent_{parameters.ini_gen}.csv'):
-        random_parent_generation(params=parameters, density=0.3, show_parent=False)
-    if not os.path.isfile(f'Output_parent_{parameters.ini_gen}.csv'):
-        one_generation(gen=parameters.ini_gen, restart=False, params=parameters, visualizer=v)
     try:
         if parameters.mode == 'GA':
             if parameters.restart_pop == 0:
