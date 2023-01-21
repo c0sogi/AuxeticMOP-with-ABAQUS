@@ -2,6 +2,7 @@ import regionToolset
 from abaqus import *
 from abaqusConstants import *
 from driverUtils import executeOnCaeStartup
+from odbAccess import openOdb
 import numpy as np
 
 executeOnCaeStartup()
@@ -78,7 +79,7 @@ class MyModel:
 
     def create_set_by_bounding_box(self, instance_name, set_name, bound_definition):
         self.root_assembly.Set(name=set_name, nodes=self.root_assembly.instances[instance_name].nodes.getByBoundingBox(
-                                   **bound_definition))
+            **bound_definition))
 
     def set_encastre(self, bc_name, set_name, step_name):
         self.model.EncastreBC(name=bc_name, createStepName=step_name,
@@ -130,11 +131,9 @@ class MyModel:
                             surface=self.root_assembly.sets[surface_set_name],
                             u1=ON, u2=ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
 
-    def allow_self_contact(self, instance_name, whole_bound, step_name):
-        elements = self.root_assembly.instances[instance_name].elements.getByBoundingBox(**whole_bound)
-        surface = self.root_assembly.Surface(name='surface',
-                                             face1Elements=elements, face2Elements=elements, face3Elements=elements,
-                                             face4Elements=elements, face5Elements=elements, face6Elements=elements)
+    def allow_self_contact(self, instance_name, step_name):
+        elements = self.root_assembly.instances[instance_name].elements.getExteriorFaces()
+        surface = self.root_assembly.Surface(name='Surf-1', side1Elements=elements)
         self.model.ContactProperty('IntProp-1')
         self.model.interactionProperties['IntProp-1'].NormalBehavior(
             allowSeparation=ON, constraintEnforcementMethod=DEFAULT, pressureOverclosure=HARD)
@@ -158,18 +157,6 @@ def random_array(shape, probability):
     from functools import reduce
     return np.random.choice([1, 0], size=reduce(lambda x, y: x * y, shape),
                             p=[probability, 1 - probability]).reshape(shape)
-
-
-# def make_333(merged_part_name):
-#     for ix in range(3):
-#         for iy in range(3):
-#             for iz in range(3):
-#                 instance_name = '{}-{}-{}-{}'.format(CUBE_NAME, ix, iy, iz)
-#                 ins = root_assembly.Instance(name=instance_name, part=root_model.parts[CUBE_NAME], dependent=ON)
-#                 ins.translate(vector=(ix * CUBE_X_SIZE, iy * CUBE_Y_SIZE, iz * CUBE_Z_SIZE))
-#     root_assembly.InstanceFromBooleanMerge(name=merged_part_name, instances=root_assembly.instances.values(),
-#                                            originalInstances=DELETE, mergeNodes=BOUNDARY_ONLY,
-#                                            nodeMergingTolerance=1e-06, domain=MESH)
 
 
 def quaver_to_full(quaver):
@@ -197,9 +184,18 @@ def bound_setter(whole_bound, option):
     return bound
 
 
+def export_outputs(model_name, step_name):
+    odb = openOdb('Job-{}.odb'.format(model_name))
+    print(odb)
+    field_outputs = odb.steps[step_name].frames[-1].fieldOutputs
+    history_outputs = odb.steps[step_name].historyRegions
+    return field_outputs, history_outputs
+
+
 def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
                  analysis_mode, material_properties, full):
     topo_arr = quaver_to_full(topo_arr) if full else topo_arr.copy()
+    # free_surface(topo_arr=topo_arr)
     cube_x_voxels, cube_y_voxels, cube_z_voxels = topo_arr.shape
     cube_x_size = voxel_unit_length * cube_x_voxels
     cube_y_size = voxel_unit_length * cube_y_voxels
@@ -237,27 +233,18 @@ def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
             analysis_step_name = analysis_mode + '-step'
             mm.create_step(step_name=analysis_step_name, previous_step='Initial', step_type=analysis_mode)
             mm.set_displacement(bc_name='displacement',
-                                set_name='{}-1.{}'.format(cube_name, 'yMax'),
+                                set_name='RP-y',
                                 step_name=analysis_step_name, displacement={'u1': 0, 'u2': -0.5, 'u3': 0,
                                                                             'ur1': 0, 'ur2': 0, 'ur3': 0})
-            mm.set_displacement(bc_name='fix_x',
-                                set_name='{}-1.{}'.format(cube_name, 'xMin'),
-                                step_name=analysis_step_name, displacement={'u1': 0})
-            mm.set_displacement(bc_name='fix_y',
-                                set_name='{}-1.{}'.format(cube_name, 'yMin'),
-                                step_name=analysis_step_name, displacement={'u2': 0})
-            mm.set_displacement(bc_name='fix_z',
-                                set_name='{}-1.{}'.format(cube_name, 'zMin'),
-                                step_name=analysis_step_name, displacement={'u3': 0})
-            # mm.allow_self_contact(instance_name=cube_name + '-1', whole_bound=whole_bound, step_name=analysis_step_name)
+            mm.allow_self_contact(instance_name=cube_name + '-1', step_name=analysis_step_name)
             mm.create_output_requests(step_name=analysis_step_name, history_output_name='H-Output',
-                                      set_name='RP-y',
+                                      set_name='{}-1.{}'.format(cube_name, 'yMax'),
                                       field_outputs=('S', 'U', 'RF', 'IVOL', 'MISESMAX'),
                                       history_outputs=('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3', 'ALLIE'))
         else:
             raise ValueError
-
-        # mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=1, num_gpus=0, run=True)
+        mm.root_assembly.regenerate()
+        mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=1, num_gpus=0, run=True)
 
 
 if __name__ == '__main__':
