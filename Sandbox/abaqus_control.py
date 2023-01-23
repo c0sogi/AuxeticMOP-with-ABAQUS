@@ -22,7 +22,7 @@ class MyModel:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if len(mdb.models.keys()) == 1:
             mdb.Model(name='empty_model', modelType=STANDARD_EXPLICIT)
-        # del mdb.models[self.model.name]
+        del mdb.models[self.model.name]
         del self
 
     def create_voxel_part(self, voxel_name):
@@ -151,6 +151,7 @@ class MyModel:
                 multiprocessingMode=DEFAULT, numCpus=num_cpus, numGPUs=num_gpus)
         if run:
             mdb.jobs[job_name].submit(consistencyChecking=OFF)
+            mdb.jobs[job_name].waitForCompletion()
 
 
 def random_array(shape, probability):
@@ -184,18 +185,26 @@ def bound_setter(whole_bound, option):
     return bound
 
 
-def export_outputs(model_name, step_name):
+def export_outputs(model_name, cube_name, step_name):
     odb = openOdb('Job-{}.odb'.format(model_name))
-    print(odb)
-    field_outputs = odb.steps[step_name].frames[-1].fieldOutputs
+    field_outputs = {
+        'displacement': odb.steps[step_name].frames[-1].fieldOutputs['U'],
+        'rotation': odb.steps[step_name].frames[-1].fieldOutputs['UR'],
+        'reaction_force': odb.steps[step_name].frames[-1].fieldOutputs['RF'],
+        'stress': odb.steps[step_name].frames[-1].fieldOutputs['S']
+    }
+    print(odb.rootAssembly.nodeSets.keys())
+    displacement_of_node_sets = {
+        face: field_outputs['displacement'].getSubset(region=odb.rootAssembly.nodeSets[face])
+        for face in ('xMax', 'yMax', 'zMax')
+    }
+    reaction_force_of_reference_point = field_outputs['reaction_force'].getSubset(region=odb.rootAssembly.nodeSets['RP-Y'])
     history_outputs = odb.steps[step_name].historyRegions
-    return field_outputs, history_outputs
 
 
 def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
                  analysis_mode, material_properties, full):
     topo_arr = quaver_to_full(topo_arr) if full else topo_arr.copy()
-    # free_surface(topo_arr=topo_arr)
     cube_x_voxels, cube_y_voxels, cube_z_voxels = topo_arr.shape
     cube_x_size = voxel_unit_length * cube_x_voxels
     cube_y_size = voxel_unit_length * cube_y_voxels
@@ -212,39 +221,35 @@ def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
         mm.create_mesh_of_part(part_name=voxel_name)
         mm.create_cube_part(voxel_name=voxel_name, cube_name=cube_name, topo_arr=topo_arr)
         mm.create_material(**material_properties)
-        for option, bound in bounds.items():
-            mm.create_set_of_part_by_bounding_box(part_name=cube_name, set_name=option, bound_definition=bound)
-        rp_id_dict = {rpn: mm.create_reference_point_and_set(rp_name=rpn, rp_coordinate=rpc)
-                      for rpn, rpc in rp_coordinates.items()}
-        mm.create_coupling(rp_set_name='RP-y', surface_set_name='{}-1.{}'.format(cube_name, 'yMax'),
-                           constraint_name='coupling')
-
-        for symmetry_diction, mirror_set_name in (('x', 'xMin'), ('y', 'yMin'), ('z', 'zMin')):
-            mm.set_boundary_condition(symmetry_direction=symmetry_diction,
-                                      set_name='{}-1.{}'.format(cube_name, mirror_set_name))
         mm.assign_section_to_elements_of_part_by_bounding_box(part_name=cube_name, material_name=material_name,
                                                               section_name=material_name + '-section',
                                                               bound_definition=whole_bound)
+        for option, bound in bounds.items():
+            mm.create_set_by_bounding_box(instance_name=cube_name + '-1', set_name=option, bound_definition=bound)
+        for rp_name, rp_coordinate in rp_coordinates.items():
+            mm.create_reference_point_and_set(rp_name=rp_name, rp_coordinate=rp_coordinate)
+        for symmetry_diction, boundary_set_name in (('x', 'xMin'), ('y', 'yMin'), ('z', 'zMin')):
+            mm.set_boundary_condition(symmetry_direction=symmetry_diction, set_name=boundary_set_name)
         if analysis_mode == 'modal':
             mm.create_step(step_name=analysis_mode + '-step', previous_step='Initial', step_type=analysis_mode)
-            mm.set_encastre(bc_name='encastre_bottom', set_name='{}-1.{}'.format(cube_name, 'yMin'),
-                            step_name='Initial')
+            mm.set_encastre(bc_name='encastre_bottom', set_name='yMin', step_name='Initial')
         elif analysis_mode == 'compression':
             analysis_step_name = analysis_mode + '-step'
             mm.create_step(step_name=analysis_step_name, previous_step='Initial', step_type=analysis_mode)
+            mm.allow_self_contact(instance_name=cube_name + '-1', step_name=analysis_step_name)
+            mm.create_coupling(rp_set_name='RP-y', surface_set_name='yMax', constraint_name='coupling')
             mm.set_displacement(bc_name='displacement',
                                 set_name='RP-y',
                                 step_name=analysis_step_name, displacement={'u1': 0, 'u2': -0.5, 'u3': 0,
                                                                             'ur1': 0, 'ur2': 0, 'ur3': 0})
-            mm.allow_self_contact(instance_name=cube_name + '-1', step_name=analysis_step_name)
-            mm.create_output_requests(step_name=analysis_step_name, history_output_name='H-Output',
-                                      set_name='{}-1.{}'.format(cube_name, 'yMax'),
+            mm.create_output_requests(step_name=analysis_step_name, history_output_name='H-Output', set_name='yMax',
                                       field_outputs=('S', 'U', 'RF', 'IVOL', 'MISESMAX'),
                                       history_outputs=('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3', 'ALLIE'))
         else:
             raise ValueError
         mm.root_assembly.regenerate()
         mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=1, num_gpus=0, run=True)
+        export_outputs(model_name=model_name, cube_name=cube_name, step_name=analysis_step_name)
 
 
 if __name__ == '__main__':
