@@ -22,6 +22,14 @@ except ImportError:
     from queue import Queue
 executeOnCaeStartup()
 
+material = {
+    'material_name': 'resin',
+    'density': 1.2e-09,
+    'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
+}
+host = 'localhost'
+port = 12345
+
 
 class Client:
     def __init__(self, host, port, option, connect):
@@ -427,12 +435,9 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
 
 
 if __name__ == '__main__':
-    material = {
-        'material_name': 'resin',
-        'density': 1.2e-09,
-        'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
-    }
-    client = Client(host='localhost', port=12345, option='json', connect=True)
+    client = Client(host=host, port=port, option='json', connect=True)
+    frame = open_job_log()
+    save_log('connected to {}:{}'.format(port, host), job_log_frame=frame)
     while True:
         while True:
             parameters = client.recv()
@@ -440,7 +445,7 @@ if __name__ == '__main__':
                 break
         print('Received: ', parameters)
         if parameters['exit_abaqus']:
-            exit()
+            break
         restart = parameters['restart']
         topologies_file_name = parameters['topologies_file_name']
         topologies_key = parameters['topologies_key']
@@ -451,4 +456,5 @@ if __name__ == '__main__':
                          topo_arr=topology, voxel_unit_length=parameters['unit_l'], full=False, params=parameters,
                          material_properties=material, voxel_name='voxel', cube_name='cube',
                          displacement={'u1': 0, 'u2': parameters['dis_y'], 'u3': 0, 'ur1': 0, 'ur2': 0, 'ur3': 0})
+            save_log('Created Job{}-{}.odb'.format(gen_num, entity_num), job_log_frame=frame)
         client.send('[{}] Generation {} finished!'.format(datetime.now(), gen_num))

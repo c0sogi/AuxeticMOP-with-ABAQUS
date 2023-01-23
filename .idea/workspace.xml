@@ -4,119 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Improving abaqus script">
-      <change afterPath="$PROJECT_DIR$/__forTesting__/ansys_control.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/__forTesting__/cad.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/__forTesting__/output.step" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/__forTesting__/test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQ2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.12032.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.1752.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.2352.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.26844.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.28496.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.32828.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.34352.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.35488.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.35572.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.35824.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.36720.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeG.00.4012.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.11188.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.1164.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.13676.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.15968.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.23320.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.24096.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.28060.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.30772.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.3364.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.34064.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.34584.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/ABQcaeK.00.35728.exception" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/HistoryOutput_offspring_1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.com" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.inp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.ipm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.msg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.odb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.prt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-1.sta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.com" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.inp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.ipm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.msg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.odb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.prt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-2.sta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.com" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.inp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.ipm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.msg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.odb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.prt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-3.sta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.com" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.inp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.ipm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.msg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.odb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.prt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-4.sta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.com" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.inp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.ipm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.msg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.odb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.prt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Job-1-5.sta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/abaqus1.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/abaqus2.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/abaqus3.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/abaqus4.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/abaqus5.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/abaqus6.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/save_abaqus1.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/save_abaqus2.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/save_abaqus3.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/save_abaqus4.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/abaqus data/save_abaqus5.rec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/ClassDefinitions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/FileIO.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/Network.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/__init__.py" afterDir="false" />
+    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="New abaqus script with server">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FileIO.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GeneticAlgorithm.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphicUserInterface.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MutateAndValidate.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Network.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PostProcessing.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/_sandbox.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/abaqus_control.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/ABQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/ABQ.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/_PARAMETERS_" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/_PARAMETERS_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/abaqus_acis.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/topo_parent_1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/abaqus data/ABQ2.py" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/ABQ2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -181,6 +71,9 @@
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/auxeticmop" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -468,7 +361,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674443930371</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Improving abaqus script">
+      <created>1674480088928</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1674480088928</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -514,6 +414,7 @@
     <MESSAGE value="Auxetic MOP Genetic Algorithm with ABAQUS" />
     <MESSAGE value="Modifying hyper calculation in progress..." />
     <MESSAGE value="Improving abaqus script" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improving abaqus script" />
+    <MESSAGE value="New abaqus script with server" />
+    <option name="LAST_COMMIT_MESSAGE" value="New abaqus script with server" />
   </component>
 </project>

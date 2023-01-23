@@ -5,7 +5,6 @@ from time import sleep
 from datetime import datetime
 import multiprocessing as mp
 from multiprocessing import connection
-from itertools import islice
 from dataclasses import asdict
 from auxeticmop import generate_offspring, random_parent_generation
 from auxeticmop import App, Visualizer, Parameters
