@@ -6,8 +6,10 @@ from time import sleep
 import pickle
 import struct
 from sys import version_info
-from queue import Queue
-
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 
 class Server:
     def __init__(self, host, port, option, run_nonblocking):
@@ -48,7 +50,8 @@ class Server:
         if self.option == 'pickle':
             serialized_data = pickle.dumps(data, protocol=2)
         else:
-            serialized_data = b''
+            serialized_data = json.dumps(data).encode()
+        print('Sending packets: ', serialized_data)
         client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
         client_socket.sendall(serialized_data)
         print('[{}] A data sent'.format(datetime.now()))
@@ -116,7 +119,7 @@ class Client:
         if self.option == 'pickle':
             serialized_data = pickle.dumps(data, protocol=2)
         else:
-            serialized_data = b''
+            serialized_data = json.dumps(data).encode()
         while True:
             try:
                 self.client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
@@ -163,25 +166,20 @@ class Client:
 
 
 if __name__ == '__main__':
-    open_server = True
+    open_server = False
     if open_server:  # Creating server
-        server = Server(host='', port=9999, option='pickle', run_nonblocking=True)
+        server = Server(host='', port=12345, option='json', run_nonblocking=True)
         print('server created')
+        while len(server.connected_clients) == 0:
+            sleep(1)
         while True:
-            datum = server.recv()
-            print(f'- A data from queue: {datum}\n')
+            data = {'a': 1, 'b': 2.0, 'c': 'hello'}
+            json_data = json.dumps(data)
+            server.send(client_socket=server.connected_clients[-1], data=data)
+            print('sending: ', json_data)
+            sleep(5)
 
     else:  # Creating client
-        import numpy as np
-        print('client created')
-        gateway = '115.145.177.1'
-        external_ip_address = '115.145.177.126'
-        client = Client(host=external_ip_address, port=9999, option='pickle', connect=True)
-        msg_sent_count = 0
-        while msg_sent_count < 100000000000000000:
-            client.send(f'Random number: {np.random.random(3)}')
-            sleep(0.5)
-            msg_sent_count += 1
-        client.client_socket.close()
-    print('sleeping...')
-    sleep(1000)
+        client = Client(host='localhost', port=12345, option='json', connect=True)
+        while True:
+            print('Received: ', client.recv())

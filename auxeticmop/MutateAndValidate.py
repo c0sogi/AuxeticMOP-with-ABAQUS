@@ -3,7 +3,7 @@ from scipy.ndimage import label
 from numba import njit
 import numpy as np
 import random
-from PostProcessing import visualize_one_cube, visualize_n_cubes
+from .PostProcessing import visualize_one_cube
 
 
 @njit

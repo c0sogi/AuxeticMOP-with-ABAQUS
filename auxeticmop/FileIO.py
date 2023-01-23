@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from GeneticAlgorithm import random_parent_generation
+import pickle
 
 
 def array_to_csv(path, arr, dtype, mode, save_as_int=False):
@@ -17,11 +17,11 @@ def offspring_import(gen_num):
     return topo_offspring, result_offspring
 
 
-def parent_import(gen_num, **kwargs):
+def parent_import(gen_num):
     try:
         topo_parent = np.genfromtxt('topo_parent_' + str(gen_num) + '.csv', delimiter=',', dtype=int)
     except FileNotFoundError:
-        topo_parent = random_parent_generation(density=0.5, params=kwargs['params'], show_parent=False)
+        topo_parent = None
     try:
         result_parent = np.genfromtxt('Output_parent_' + str(gen_num) + '.csv', delimiter=',', dtype=float)
     except FileNotFoundError:
@@ -33,6 +33,8 @@ def parent_export(gen_num, next_generations, population_size,
                   result_parent, result_offspring, topo_parent, topo_offspring):
     for i in next_generations:
         if i < population_size:
+            dump_pickled_dict_data(f'Topologies_{gen_num + 1}', key='parent', to_dump=result_parent[i], mode='a')
+            dump_pickled_dict_data(f'FieldOutput_{gen_num + 1}', key='parent', to_dump=result_parent[i], mode='a')
             array_to_csv(f'Output_parent_{gen_num + 1}.csv', result_parent[i], dtype=float, mode='a')
             array_to_csv(f'topo_parent_{gen_num + 1}.csv', topo_parent[i],
                          dtype=int, mode='a', save_as_int=True)
@@ -42,3 +44,20 @@ def parent_export(gen_num, next_generations, population_size,
                          mode='a')
             array_to_csv(f'topo_parent_{gen_num + 1}.csv', topo_offspring[i - population_size],
                          dtype=int, mode='a', save_as_int=True)
+
+
+def dump_pickled_dict_data(file_name, key, to_dump, mode):
+    if mode == 'a' and os.path.isfile(file_name):
+        with open(file_name, mode='rb') as f:
+            dict_data = pickle.load(f, encoding='latin1')
+        dict_data.update({key: to_dump})
+    else:
+        dict_data = {key: to_dump}
+    with open(file_name, mode='wb') as f:
+        pickle.dump(dict_data, f, protocol=2)
+
+
+def load_pickled_dict_data(file_name):
+    with open(file_name, mode='rb') as f:
+        dict_data = pickle.load(f, encoding='latin1')
+    return dict_data

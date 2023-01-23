@@ -3,57 +3,14 @@ from tkinter.filedialog import askdirectory
 from tkinter import messagebox
 import os
 import pickle
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
-from PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_fitness_values
-from FileIO import parent_import
-
-
-@dataclass  # Use @dataclass(kw_only=True) for Python version >= 3.10
-class Parameters:
-    abaqus_script_name: str = 'ABQ.py'  # abaqus python script filename e.g., ABQ.py
-    abaqus_execution_mode: str = 'script'  # noGUI: without abaqus gui, script: with abaqus gui
-    mode: str = 'GA'  # GA mode
-    evaluation_version: str = 'ver3'  # fitness value evaluation mode
-    restart_pop: int = 0  # 0 for no-restart, 1~ for initial restarting population
-    ini_pop: int = 1  # First population number, default: 1
-    end_pop: int = 100  # Last population number
-    ini_gen: int = 1  # First generation number, default: 1
-    end_gen: int = 50  # Last generation number
-    mutation_rate: float = 0.1  # mutation process option
-    unit_l: float = 3  # Voxel length
-    lx: int = 10  # Number of voxels in x-direction
-    ly: int = 10  # Number of voxels in y-direction
-    lz: int = 10  # Number of voxels in z-direction
-    divide_number: int = 1  # up-scaling factor
-    mesh_size: float = 0.25  # abaqus meshing option
-    dis_y: float = -0.005  # abaqus boundary condition option
-    material_modulus: float = 1100  # abaqus material property option
-    poissons_ratio: float = 0.4  # abaqus material property option
-    density: float = 1  # abaqus material property option
-    MaxRF22: float = 0.01  # fitness value evaluation option
-    penalty_coefficient: float = 0.1  # fitness value evaluation option
-    sigma: float = 1  # filtering option
-    threshold: float = 0.5  # filtering option
-    n_cpus: int = 16  # abaqus option
-    n_gpus: int = 0  # abaqus option
-    timeout: float = 0.5  # validation process option
-
-    def post_initialize(self):  # This function is only used in main.py, setting initial values to real value to be used
-        self.lx *= self.divide_number
-        self.ly *= self.divide_number
-        self.lz *= self.divide_number  # number of voxels after increasing resolution
-        self.unit_l /= self.divide_number
-        unit_lx_total = self.lx * self.unit_l
-        unit_ly_total = self.ly * self.unit_l
-        unit_lz_total = self.lz * self.unit_l
-        self.mesh_size *= self.unit_l
-        self.dis_y *= unit_ly_total  # boundary condition (displacement)
-        self.MaxRF22 *= unit_lx_total * unit_lz_total * self.material_modulus  # 0.01 is strain
-
+from .PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_fitness_values
+from .FileIO import load_pickled_dict_data
+from .ClassDefinitions import Parameters
 
 # Define parameters for gui
 PARAMETER_FILE_NAME = '_PARAMETERS_'
@@ -128,7 +85,7 @@ class App:  # GUI class
             self.update_canvas()
 
     def update_canvas(self, polling_rate: float = 10.0):
-        if self.conn.poll():  # Checking if any received data from main.py for every 1/polling_rate second
+        if self.conn.poll():  # Checking if any received data available for every 1/polling_rate second
             try:
                 _x1, _y1, _x2y2 = self.conn.recv()
                 _x2, _y2 = zip(*_x2y2.items())
@@ -231,7 +188,7 @@ class App:  # GUI class
 
     def show_parameters(self, loaded: None | dict) -> None:
         radiobutton_name_dict = {
-            'abaqus_execution_mode': ('noGUI', 'script'),
+            'abaqus_mode': ('noGUI', 'script'),
             'mode': ('GA', 'random'),
             'evaluation_version': ('ver1', 'ver2', 'ver3')
         }
@@ -267,53 +224,6 @@ class App:  # GUI class
             for params_idx, (key, value) in enumerate(loaded.items()):
                 self.string_vars[params_idx].set(value)
         self.show_canvas()
-
-
-def atoi(s: str) -> str | int | float:
-    try:
-        float(s)
-        # s is integer or float type
-        try:
-            int(s)
-            # s is int type
-            return int(s)
-        except ValueError:
-            # s is float type
-            return float(s)
-    except ValueError:
-        # s is not number, just string
-        return s
-
-
-def translator(s: str, flip: bool = False) -> str:
-    dictionary = {'abaqus_script_name': 'Filename of ABAQUS script',
-                  'abaqus_execution_mode': 'ABAQUS execution mode',
-                  'mode': 'GA Mode',
-                  'evaluation_version': 'GA evaluation version',
-                  'restart_pop': '[P] Restart from population',
-                  'ini_pop': '[P] First Population',
-                  'end_pop': '[P] Last Population',
-                  'ini_gen': '[G] First Generation',
-                  'end_gen': '[G] Last Generation',
-                  'mutation_rate': 'Mutation rate(0~1)',
-                  'unit_l': 'Voxel unit length(mm)',
-                  'lx': 'Voxel number in X-direction',
-                  'ly': 'Voxel number in Y-direction',
-                  'lz': 'Voxel number in Z-direction',
-                  'divide_number': 'Upscale multiplier(1~)',
-                  'mesh_size': 'Mesh size/Voxel size(0~1)',
-                  'dis_y': 'Y Compression ratio(-1~1)',
-                  'material_modulus': "Young's modulus(MPa)",
-                  'poissons_ratio': "Poisson's ratio(0~1)",
-                  'density': 'Material density(ton/mm3)',
-                  'MaxRF22': 'Maximum RF22(N)',
-                  'penalty_coefficient': 'Penalty coefficient',
-                  'sigma': 'Sigma for filtering',
-                  'threshold': 'Threshold for filtering',
-                  'n_cpus': 'CPU cores for abaqus',
-                  'n_gpus': 'GPU cores for abaqus',
-                  'timeout': 'Timeout of validation process(s)'}
-    return {v: k for k, v in dictionary.items()}.get(s) if flip else dictionary.get(s)
 
 
 class Visualizer:
@@ -391,7 +301,8 @@ class Visualizer:
             self.axes[1].grid(True)
 
     def visualize(self, params, w, use_manual_rp, ref_x=0.0, ref_y=0.0):
-        topo_next_parent, result_next_parent = parent_import(w + 1)
+        topo_next_parent = load_pickled_dict_data(f'Topologies_{w+1}')['parent']
+        result_next_parent = load_pickled_dict_data(f'FieldOutput_{w+1}')
         fitness_values_next_parent = evaluate_fitness_values(topo=topo_next_parent, result=result_next_parent,
                                                              params=params)
         fitness_pareto_next_parent = find_pareto_front_points(costs=fitness_values_next_parent, return_index=False)
@@ -400,13 +311,52 @@ class Visualizer:
                   use_manual_rp=use_manual_rp, ref_x=ref_x, ref_y=ref_y)
 
 
-if __name__ == '__main__':
-    from main import make_and_start_process, plot_previous_data
-    gui_process, parent_conn, child_conn = make_and_start_process(target=App, duplex=True, daemon=True)
-    set_path, parameters = parent_conn.recv()
-    parameters.post_initialize()
-    os.chdir(set_path)
+def atoi(s: str) -> str | int | float:
+    try:
+        float(s)
+        # s is integer or float type
+        try:
+            int(s)
+            # s is int type
+            return int(s)
+        except ValueError:
+            # s is float type
+            return float(s)
+    except ValueError:
+        # s is not number, just string
+        return s
 
-    v = Visualizer(conn_to_gui=parent_conn)
-    plot_previous_data(visualizer=v, use_manual_rp=False)
-    input('Press enter to exit')
+
+def translator(s: str, flip: bool = False) -> str:
+    dictionary = {'abaqus_script': 'Filename of ABAQUS script',
+                  'abaqus_mode': 'ABAQUS execution mode',
+                  'mode': 'GA Mode',
+                  'evaluation_version': 'GA evaluation version',
+                  'restart_pop': '[P] Restart from population',
+                  'ini_pop': '[P] First Population',
+                  'end_pop': '[P] Last Population',
+                  'ini_gen': '[G] First Generation',
+                  'end_gen': '[G] Last Generation',
+                  'mutation_rate': 'Mutation rate(0~1)',
+                  'unit_l': 'Voxel unit length(mm)',
+                  'lx': 'Voxel number in X-direction',
+                  'ly': 'Voxel number in Y-direction',
+                  'lz': 'Voxel number in Z-direction',
+                  'divide_number': 'Upscale multiplier(1~)',
+                  'mesh_size': 'Mesh size/Voxel size(0~1)',
+                  'dis_y': 'Y Compression ratio(-1~1)',
+                  'material_modulus': "Young's modulus(MPa)",
+                  'poisson_ratio': "Poisson's ratio(0~1)",
+                  'density': 'Material density(ton/mm3)',
+                  'MaxRF22': 'Maximum RF22(N)',
+                  'penalty_coefficient': 'Penalty coefficient',
+                  'sigma': 'Sigma for filtering',
+                  'threshold': 'Threshold for filtering',
+                  'n_cpus': 'CPU cores for abaqus',
+                  'n_gpus': 'GPU cores for abaqus',
+                  'timeout': 'Timeout of validation process(s)'}
+    return {value: key for key, value in dictionary.items()}.get(s) if flip else dictionary.get(s)
+
+
+if __name__ == '__main__':
+    pass

@@ -3,12 +3,9 @@ import numpy as np
 import itertools
 import os
 from functools import reduce
-from MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
-from FileIO import array_to_csv
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from GraphicUserInterface import Parameters
+from .MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
+from .FileIO import dump_pickled_dict_data, load_pickled_dict_data
+from .ClassDefinitions import Parameters
 
 
 def inspect_clone_in_all_parents(w, topology_flattened, all_parent_topologies):
@@ -28,7 +25,8 @@ def inspect_clone_in_current_offsprings(topology, offspring):  # inspect topolog
 
 
 def cutting_function(topologies):
-    cuttings = np.arange(0, topologies.shape[1], step=1, dtype=int)
+    _topologies = topologies.reshape((len(topologies), -1))
+    cuttings = np.arange(0, _topologies.shape[1], step=1, dtype=int)
     np.random.shuffle(cuttings)
     cutting, candidate = None, None
     candidate_found_flag = False
@@ -36,8 +34,8 @@ def cutting_function(topologies):
         candidate = list()
         cutting = cuttings[-1]
         cuttings = np.delete(cuttings, obj=-1, axis=0)
-        for parent_idx in range(len(topologies)):
-            if topologies[parent_idx, cutting] == 1:
+        for parent_idx in range(len(_topologies)):
+            if _topologies[parent_idx, cutting] == 1:
                 candidate.append(parent_idx)
             if len(candidate) == 2:
                 candidate_found_flag = True
@@ -54,23 +52,24 @@ def candidates(candidate_list):
 
 
 def crossover(chromosome_1, chromosome_2, cutting_section):  # Crossover process
-    offspring1 = np.zeros_like(chromosome_1)
-    offspring2 = np.zeros_like(chromosome_2)
-    offspring1[0:cutting_section] = chromosome_1[0:cutting_section]
-    offspring1[cutting_section:] = chromosome_2[cutting_section:]
-    offspring2[0:cutting_section] = chromosome_2[0:cutting_section]
-    offspring2[cutting_section:] = chromosome_1[cutting_section:]
-    offspring = np.vstack([offspring1, offspring2])
-    return offspring
+    chromosome_1_flattened = chromosome_1.flatten()
+    chromosome_2_flattened = chromosome_2.flatten()
+    cross_overed_chromosome_1 = np.empty_like(chromosome_1_flattened)
+    cross_overed_chromosome_2 = np.empty_like(chromosome_2_flattened)
+    cross_overed_chromosome_1[0:cutting_section] = chromosome_1_flattened[0:cutting_section]
+    cross_overed_chromosome_1[cutting_section:] = chromosome_2_flattened[cutting_section:]
+    cross_overed_chromosome_2[0:cutting_section] = chromosome_2_flattened[0:cutting_section]
+    cross_overed_chromosome_2[cutting_section:] = chromosome_1_flattened[cutting_section:]
+    return cross_overed_chromosome_1.reshape(chromosome_1.shape), cross_overed_chromosome_2.reshape(chromosome_2.shape)
 
 
 def generate_offspring(topo_parent: np.ndarray, gen: int, lx: int, ly: int, lz: int,
                        end_pop: int, mutation_rate: float, timeout: float) -> np.ndarray:
     """
-    Generating offspring from parents. Crossover & Mutation & Validating processes will be held.
+    Generating topo_offspring from parents. Crossover & Mutation & Validating processes will be held.
     Validating processes contain, checking 3d-print-ability without support, one voxel tree contacting six faces
     in a cube
-    :param topo_parent: Topology array of parent, shape: (end_pop, lx * ly * lz)
+    :param topo_parent: Topology array of parent, shape: (end_pop, lx, ly, lz)
     :param gen: Current generation
     :param lx: Total Voxels in x direction of a cube
     :param ly: Total Voxels in y direction of a cube
@@ -81,55 +80,53 @@ def generate_offspring(topo_parent: np.ndarray, gen: int, lx: int, ly: int, lz: 
     The more timeout, the longer time will be allowed for the function "mutate_and_validate_topology".
     :return:
     """
-    offspring = np.empty((0, lx * ly * lz), int)
+    topo_offspring = np.empty((0, lx, ly, lz), int)
     trial = 1
     validation_count = 0
-    all_parents_topologies = np.empty((0, end_pop, lx * ly * lz), int)
+    all_parents_topologies = np.empty((0, end_pop, lx, ly, lz), int)
     for generation_idx in range(gen):
-        parent_topologies = np.genfromtxt('topo_parent_' + str(generation_idx + 1) + '.csv', delimiter=',',
-                                          dtype=int).reshape((1, end_pop, lx * ly * lz))
-        all_parents_topologies = np.vstack((all_parents_topologies, parent_topologies))
+        parent_topologies = load_pickled_dict_data(f'Topologies_{generation_idx + 1}')['parent']
+        all_parents_topologies = np.vstack((all_parents_topologies, np.expand_dims(parent_topologies, axis=0)))
     while True:
-        print('[Generate offspring] Trial: ', trial)
+        print('[Generate topo_offspring] Trial: ', trial)
         trial += 1
         cutting_section, candidate_list = cutting_function(topologies=topo_parent)
-        print('[Generate offspring] Candidate list: ', candidate_list)
+        print('[Generate topo_offspring] Candidate list: ', candidate_list)
         candidate_pairs_list = candidates(candidate_list=candidate_list)
         for pair_idx in range(len(candidate_pairs_list)):
             chromosome_1_idx = candidate_pairs_list[pair_idx][0]
             chromosome_2_idx = candidate_pairs_list[pair_idx][1]
-            cross_overed_pairs = crossover(chromosome_1=topo_parent[chromosome_1_idx],
-                                           chromosome_2=topo_parent[chromosome_2_idx],
-                                           cutting_section=cutting_section)
-            cross_overed_chromosome_1 = cross_overed_pairs[0].reshape((lx, ly, lz))
-            cross_overed_chromosome_2 = cross_overed_pairs[1].reshape((lx, ly, lz))
+            cross_overed_chromosome_1, cross_overed_chromosome_2 = crossover(chromosome_1=topo_parent[chromosome_1_idx],
+                                                                             chromosome_2=topo_parent[chromosome_2_idx],
+                                                                             cutting_section=cutting_section)
             validated_chromosome_1 = mutate_and_validate_topology(cross_overed_chromosome_1,
                                                                   mutation_probability=mutation_rate, timeout=timeout)
             validated_chromosome_2 = mutate_and_validate_topology(cross_overed_chromosome_2,
                                                                   mutation_probability=mutation_rate, timeout=timeout)
             for validated_chromosome in (validated_chromosome_1, validated_chromosome_2):
                 if validated_chromosome is None:
-                    print('[Generate offspring] <!> Non-connected tree detected')
+                    print('[Generate topo_offspring] <!> Non-connected tree detected')
                     continue
                 else:
                     is_any_clone_in_all_parents = inspect_clone_in_all_parents(
                         w=gen, topology_flattened=validated_chromosome, all_parent_topologies=all_parents_topologies)
                     is_any_clone_in_current_offsprings = inspect_clone_in_current_offsprings(
-                        topology=validated_chromosome, offspring=offspring)
+                        topology=validated_chromosome, offspring=topo_offspring)
                     if is_any_clone_in_all_parents:
-                        print('[Generate offspring] Clone structure found in parents!')
+                        print('[Generate topo_offspring] Clone structure found in parents!')
                         continue
                     elif is_any_clone_in_current_offsprings:
-                        print('[Generate offspring] Clone structure found in current offsprings!')
+                        print('[Generate topo_offspring] Clone structure found in current offsprings!')
                         continue
                     else:
-                        offspring = np.vstack((offspring, validated_chromosome.flatten()))
+                        topo_offspring = np.vstack((topo_offspring, np.expand_dims(validated_chromosome, axis=0)))
                         validation_count += 1
-                        print(f'[Generate offspring] Validation of chromosome {validation_count} complete!')
-                        if len(offspring) == end_pop:
-                            print('[Generate offspring] Generating offspring complete')
-                            array_to_csv(f'topo_offspring_{gen}.csv', offspring, dtype=int, mode='w', save_as_int=True)
-                            return offspring.reshape((end_pop, lx, ly, lz))
+                        print(f'[Generate topo_offspring] Validation of chromosome {validation_count} complete!')
+                        if len(topo_offspring) == end_pop:
+                            print('[Generate topo_offspring] Generating topo_offspring complete')
+                            dump_pickled_dict_data(f'Topologies_{gen}', key='offspring',
+                                                   to_dump=topo_offspring, mode='a')
+                            return topo_offspring
 
 
 def random_array(shape, probability):
@@ -137,9 +134,8 @@ def random_array(shape, probability):
         shape)
 
 
-def random_parent_generation(density: float, params: Parameters, show_parent: bool = False) -> np.ndarray:
-    parent_name = f'topo_parent_{params.ini_gen}.csv'
-    parents = np.empty((params.end_pop, params.lx * params.ly * params.lz))
+def random_parent_generation(gen: int, density: float, params: Parameters, show_parent: bool = False) -> np.ndarray:
+    parents = np.empty((params.end_pop, params.lx, params.ly, params.lz))
     total_parent_generation_count = 0
     total_volume_frac = 0
     while total_parent_generation_count < params.end_pop:
@@ -149,17 +145,16 @@ def random_parent_generation(density: float, params: Parameters, show_parent: bo
         if parent is None:
             continue
         print(f'<<<<< Parent {total_parent_generation_count + 1} >>>>>')
-
         volume_frac = np.count_nonzero(parent) / (params.lx * params.ly * params.lz / 100)
         total_volume_frac += volume_frac
         print(f'Volume fraction: {volume_frac:.1f} %\n')
-        parents[total_parent_generation_count] = parent.flatten()
+        parents[total_parent_generation_count] = parent
         total_parent_generation_count += 1
     print(f'Average volume fraction: {total_volume_frac / params.end_pop:.1f} %')
-    array_to_csv(path=parent_name, arr=parents, dtype=int, mode='w', save_as_int=True)
+    dump_pickled_dict_data(file_name=f'Topologies_{gen}', key='parent', to_dump=parents, mode='w')
     if show_parent:
         for parent in parents:
-            visualize_one_cube(parent.reshape((params.lx, params.ly, params.lz)), full=False)
+            visualize_one_cube(parent, full=False)
     return parents
 
 

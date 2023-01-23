@@ -4,8 +4,107 @@ from abaqusConstants import *
 from driverUtils import executeOnCaeStartup
 from odbAccess import openOdb
 import numpy as np
-
+import pickle
+import os
+from datetime import datetime
+import threading
+import socket
+import struct
+import json
+from sys import version_info
+try:
+    import Tkinter as tk
+except ImportError:
+    import tkinter as tk
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 executeOnCaeStartup()
+
+
+class Client:
+    def __init__(self, host, port, option, connect):
+        self.host = host
+        self.port = port
+        self.option = option
+        self.q = Queue()
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.is_alive = True
+        self._default_packet_size = 1024
+        self._header_format = '>I'
+        self._header_bytes = 4
+        if connect:
+            self.connect()
+
+    def connect(self):
+        if version_info.major >= 3:
+            new_th = threading.Thread(target=self._thread_recv, args=(self.client_socket, self.option), daemon=True)
+        else:
+            new_th = threading.Thread(target=self._thread_recv, args=(self.client_socket, self.option))
+            new_th.setDaemon(True)
+        self.client_socket.connect((self.host, self.port))
+        print('[{}] Connected to {}:{}'.format(datetime.now(), self.host, self.port))
+        new_th.start()
+
+    def send(self, data):
+        if self.option == 'pickle':
+            serialized_data = pickle.dumps(data, protocol=2)
+        else:
+            serialized_data = json.dumps(data).encode()
+        while True:
+            try:
+                self.client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
+                self.client_socket.sendall(serialized_data)
+                print('[{}] A data sent'.format(datetime.now()))
+                break
+            except Exception as send_error:
+                print('Sending data failed, trying to reconnect to server: ', send_error)
+                self.connect()
+
+    def recv(self):
+        return self.q.get()
+
+    def close(self):
+        self.client_socket.close()
+
+    def _thread_recv(self, client_socket, option):
+        while True:
+            try:  # Trying to receive a data and decode it
+                data_size = struct.unpack(self._header_format, client_socket.recv(self._header_bytes))[0]
+                remaining_payload_size = data_size
+                packets = b''
+                while remaining_payload_size != 0:
+                    packets += client_socket.recv(remaining_payload_size)
+                    remaining_payload_size = data_size - len(packets)
+                try:  # Trying to decode received data
+                    if option == 'json':
+                        received_data = json.loads(packets.decode())
+                    else:
+                        if version_info.major >= 3:
+                            received_data = pickle.loads(packets, encoding='bytes')
+                        else:
+                            received_data = pickle.loads(packets)
+                    print('[{}] Received data: {}'.format(datetime.now(), received_data))
+                    self.q.put(received_data)
+                except Exception as e2:  # Decoding is failed
+                    print('[{}] Loading received data failure: {}'.format(datetime.now(), e2))
+                    continue
+            except Exception as e1:  # Connection is lost
+                print('[{}] Error: {}'.format(datetime.now(), e1))
+                break
+        self.is_alive = False
+        print('<!> Connection dead')
+
+
+class JobLogFrame(tk.Frame):
+    def __init__(self, *args, **kwargs):
+        tk.Frame.__init__(self, *args, **kwargs)
+        self.text = tk.Text(self, height=50, width=100)
+        self.vsb = tk.Scrollbar(self, orient="vertical", command=self.text.yview)
+        self.text.configure(yscrollcommand=self.vsb.set)
+        self.vsb.pack(side="right", fill="y")
+        self.text.pack(side="left", fill="both", expand=True)
 
 
 class MyModel:
@@ -133,13 +232,14 @@ class MyModel:
 
     def allow_self_contact(self, instance_name, step_name):
         elements = self.root_assembly.instances[instance_name].elements.getExteriorFaces()
-        surface = self.root_assembly.Surface(name='Surf-1', side1Elements=elements)
-        self.model.ContactProperty('IntProp-1')
-        self.model.interactionProperties['IntProp-1'].NormalBehavior(
+        _surface = self.root_assembly.Surface(name='ExteriorSurface', side1Elements=elements)
+        _interaction_property_name = 'SelfContactProp'
+        _interaction_name = 'SelfContact'
+        self.model.ContactProperty(_interaction_property_name)
+        self.model.interactionProperties[_interaction_property_name].NormalBehavior(
             allowSeparation=ON, constraintEnforcementMethod=DEFAULT, pressureOverclosure=HARD)
-        self.model.SelfContactStd(contactTracking=ONE_CONFIG,
-                                  createStepName=step_name, interactionProperty='IntProp-1', name='Int-1',
-                                  surface=surface, thickness=ON)
+        self.model.SelfContactStd(name=_interaction_name, contactTracking=ONE_CONFIG, createStepName=step_name,
+                                  interactionProperty=_interaction_property_name, surface=_surface, thickness=ON)
 
     def create_job(self, job_name, num_cpus, num_gpus, run):
         mdb.Job(name=job_name, model=self.model.name, description='',
@@ -152,6 +252,44 @@ class MyModel:
         if run:
             mdb.jobs[job_name].submit(consistencyChecking=OFF)
             mdb.jobs[job_name].waitForCompletion()
+
+
+def open_job_log():
+    _root = tk.Tk()
+    _root.title('Abaqus control log')
+    _frame = JobLogFrame(_root)
+    _frame.pack(fill="both", expand=True)
+    _new_thread = threading.Thread(target=_root.mainloop)
+    _new_thread.setDaemon(True)
+    _new_thread.start()
+    return _frame
+
+
+def save_log(message, job_log_frame):
+    _now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    _message = '[{}]{}\n'.format(_now, message)
+    print(_message)
+    with open('log.txt', mode='a') as f_log:
+        f_log.write(_message)
+    job_log_frame.text.insert('end', _message)
+    job_log_frame.text.see('end')
+
+
+def dump_pickled_dict_data(file_name, key, to_dump, mode):
+    if mode == 'a' and os.path.isfile(file_name):
+        with open(file_name, mode='rb') as f:
+            dict_data = pickle.load(f)
+        dict_data.update({key: to_dump})
+    else:
+        dict_data = {key: to_dump}
+    with open(file_name, mode='wb') as f:
+        pickle.dump(dict_data, f)
+
+
+def load_pickled_dict_data(file_name):
+    with open(file_name, mode='rb') as f:
+        dict_data = pickle.load(f)
+    return dict_data
 
 
 def random_array(shape, probability):
@@ -185,25 +323,62 @@ def bound_setter(whole_bound, option):
     return bound
 
 
-def export_outputs(model_name, cube_name, step_name):
-    odb = openOdb('Job-{}.odb'.format(model_name))
-    field_outputs = {
-        'displacement': odb.steps[step_name].frames[-1].fieldOutputs['U'],
-        'rotation': odb.steps[step_name].frames[-1].fieldOutputs['UR'],
-        'reaction_force': odb.steps[step_name].frames[-1].fieldOutputs['RF'],
-        'stress': odb.steps[step_name].frames[-1].fieldOutputs['S']
+def export_outputs(model_name, step_name, rp_name):
+    gen, entity = map(int, model_name.split('-'))
+    history_output_file_header = 'HistoryOutput_offspring'
+    field_output_file_header = 'FieldOutput_offspring'
+    exported_field_outputs = {
+        'displacement': {'xMax': np.ndarray, 'yMax': np.ndarray, 'zMax': np.ndarray},
+        'rotation': np.ndarray,
+        'reaction_force': np.ndarray,
+        'mises_stress': {'max': float, 'min': float, 'average': float}
     }
-    print(odb.rootAssembly.nodeSets.keys())
-    displacement_of_node_sets = {
-        face: field_outputs['displacement'].getSubset(region=odb.rootAssembly.nodeSets[face])
-        for face in ('xMax', 'yMax', 'zMax')
-    }
-    reaction_force_of_reference_point = field_outputs['reaction_force'].getSubset(region=odb.rootAssembly.nodeSets['RP-Y'])
-    history_outputs = odb.steps[step_name].historyRegions
+    exported_history_output_properties = ('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3')
+    try:
+        odb = openOdb('Job-{}.odb'.format(model_name))
+        try:
+            # Field outputs
+            field_outputs = {
+                'displacement': odb.steps[step_name].frames[-1].fieldOutputs['U'],
+                'rotation': odb.steps[step_name].frames[-1].fieldOutputs['UR'],
+                'reaction_force': odb.steps[step_name].frames[-1].fieldOutputs['RF'],
+                'stress': odb.steps[step_name].frames[-1].fieldOutputs['S']
+            }
+            displacement_of_node_sets = {
+                face: field_outputs['displacement'].getSubset(region=odb.rootAssembly.nodeSets[face.upper()]).values
+                for face in ('xMax', 'yMax', 'zMax')
+            }
+            for face, displacement_of_node_set in displacement_of_node_sets.items():
+                exported_field_outputs['displacement'][face] = np.average(
+                    np.array([data.data for data in displacement_of_node_set]), axis=0)
+            exported_field_outputs['reaction_force'] = field_outputs['reaction_force'].getSubset(
+                region=odb.rootAssembly.nodeSets[rp_name.upper()]).values[0].data
+            exported_field_outputs['rotation'] = field_outputs['rotation'].getSubset(
+                region=odb.rootAssembly.nodeSets[rp_name.upper()]).values[0].data
+            _values = [stress.mises for stress in field_outputs['stress'].values]
+            exported_field_outputs['mises_stress']['max'] = max(_values)
+            exported_field_outputs['mises_stress']['min'] = min(_values)
+            exported_field_outputs['mises_stress']['average'] = np.average(_values)
+            dump_pickled_dict_data(file_name='{}_{}'.format(field_output_file_header, str(gen)),
+                                   key=entity, to_dump=exported_field_outputs, mode='a')
+
+            # History outputs
+            history_outputs = odb.steps[step_name].historyRegions['Node ASSEMBLY.1'].historyOutputs
+            exported_history_outputs = {prop: np.array(history_outputs[prop].data)
+                                        for prop in exported_history_output_properties}
+            dump_pickled_dict_data(file_name='{}_{}'.format(history_output_file_header, str(gen)),
+                                   key=entity, to_dump=exported_history_outputs, mode='a')
+
+        except Exception as e2:
+            print('ODB output reading failed: ', e2)
+        finally:
+            odb.close()
+    except Exception as e1:
+        print('There is no ODB file: ', e1)
 
 
-def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
-                 analysis_mode, material_properties, full):
+def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
+                 analysis_mode, material_properties, full, displacement=None):
     topo_arr = quaver_to_full(topo_arr) if full else topo_arr.copy()
     cube_x_voxels, cube_y_voxels, cube_z_voxels = topo_arr.shape
     cube_x_size = voxel_unit_length * cube_x_voxels
@@ -215,7 +390,7 @@ def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
                       'RP-y': (cube_x_size / 2, 1.05 * cube_y_size, cube_z_size / 2),
                       'RP-z': (cube_x_size / 2, cube_y_size / 2, 1.05 * cube_z_size)}
 
-    with MyModel(model_name='Model-{}'.format(model_name), params=parameters) as mm:
+    with MyModel(model_name='Model-{}'.format(model_name), params=params) as mm:
         material_name = material_properties['material_name']
         mm.create_voxel_part(voxel_name=voxel_name)
         mm.create_mesh_of_part(part_name=voxel_name)
@@ -240,37 +415,40 @@ def run_analysis(model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
             mm.create_coupling(rp_set_name='RP-y', surface_set_name='yMax', constraint_name='coupling')
             mm.set_displacement(bc_name='displacement',
                                 set_name='RP-y',
-                                step_name=analysis_step_name, displacement={'u1': 0, 'u2': -0.5, 'u3': 0,
-                                                                            'ur1': 0, 'ur2': 0, 'ur3': 0})
-            mm.create_output_requests(step_name=analysis_step_name, history_output_name='H-Output', set_name='yMax',
+                                step_name=analysis_step_name, displacement=displacement)
+            mm.create_output_requests(step_name=analysis_step_name, history_output_name='H-Output', set_name='RP-y',
                                       field_outputs=('S', 'U', 'RF', 'IVOL', 'MISESMAX'),
                                       history_outputs=('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3', 'ALLIE'))
         else:
             raise ValueError
         mm.root_assembly.regenerate()
         mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=1, num_gpus=0, run=True)
-        export_outputs(model_name=model_name, cube_name=cube_name, step_name=analysis_step_name)
+        export_outputs(model_name=model_name, step_name=analysis_step_name, rp_name='RP-y')
 
 
 if __name__ == '__main__':
-    path = r'C:\pythoncode\AuxeticMOP\abaqus data\topo_parent_1.csv'
     material = {
         'material_name': 'resin',
         'density': 1.2e-09,
         'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
     }
-    parameters = {
-        'end_pop': 100,
-        'lx': 5,
-        'ly': 5,
-        'lz': 5,
-        'unit_l': 3.0,
-        'mesh_size': 1.5
-    }
-    topos_from_csv = np.swapaxes(np.genfromtxt(path, delimiter=',', dtype=int).reshape((
-        parameters['end_pop'], parameters['lx'], parameters['ly'], parameters['lz'])), axis1=1, axis2=3)
-    for model_num, topo in enumerate(topos_from_csv, start=1):
-        run_analysis(model_name='1-{}'.format(model_num), analysis_mode='compression',
-                     topo_arr=topo, voxel_unit_length=parameters['unit_l'], full=False,
-                     material_properties=material, voxel_name='voxel', cube_name='cube')
-        break
+    client = Client(host='localhost', port=12345, option='json', connect=True)
+    while True:
+        while True:
+            parameters = client.recv()
+            if parameters is not None:
+                break
+        print('Received: ', parameters)
+        if parameters['exit_abaqus']:
+            exit()
+        restart = parameters['restart']
+        topologies_file_name = parameters['topologies_file_name']
+        topologies_key = parameters['topologies_key']
+        topologies = load_pickled_dict_data(topologies_file_name)[topologies_key]
+        gen_num = topologies_file_name.split('_')[-1]
+        for entity_num, topology in enumerate(topologies, start=1):
+            run_analysis(model_name='{}-{}'.format(gen_num, entity_num), analysis_mode='compression',
+                         topo_arr=topology, voxel_unit_length=parameters['unit_l'], full=False, params=parameters,
+                         material_properties=material, voxel_name='voxel', cube_name='cube',
+                         displacement={'u1': 0, 'u2': parameters['dis_y'], 'u3': 0, 'ur1': 0, 'ur2': 0, 'ur3': 0})
+        client.send('[{}] Generation {} finished!'.format(datetime.now(), gen_num))

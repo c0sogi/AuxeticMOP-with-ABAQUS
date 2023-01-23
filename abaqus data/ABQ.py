@@ -74,7 +74,7 @@ class LogFrame(tk.Frame):
 
 
 def open_log_window():
-    root =tk.Tk()
+    root = tk.Tk()
     root.title('Abaqus control log')
     fr = LogFrame(root)
     fr.pack(fill="both", expand=True)
