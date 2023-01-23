@@ -14,11 +14,11 @@ class Parameters:
     end_gen: int = 50  # Last generation number
     mutation_rate: float = 0.1  # mutation process option
     unit_l: float = 3  # Voxel length
-    lx: int = 10  # Number of voxels in x-direction
-    ly: int = 10  # Number of voxels in y-direction
-    lz: int = 10  # Number of voxels in z-direction
+    lx: int = 5  # Number of voxels in x-direction
+    ly: int = 5  # Number of voxels in y-direction
+    lz: int = 5  # Number of voxels in z-direction
     divide_number: int = 1  # up-scaling factor
-    mesh_size: float = 0.25  # abaqus meshing option
+    mesh_size: float = 0.5  # abaqus meshing option
     dis_y: float = -0.005  # abaqus boundary condition option
     material_modulus: float = 1100  # abaqus material property option
     poisson_ratio: float = 0.4  # abaqus material property option
@@ -27,7 +27,7 @@ class Parameters:
     penalty_coefficient: float = 0.1  # fitness value evaluation option
     sigma: float = 1  # filtering option
     threshold: float = 0.5  # filtering option
-    n_cpus: int = 16  # abaqus option
+    n_cpus: int = 1  # abaqus option
     n_gpus: int = 0  # abaqus option
     timeout: float = 0.5  # validation process option
 

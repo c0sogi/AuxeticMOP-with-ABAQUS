@@ -1,69 +1,111 @@
+import regionToolset
 from abaqus import *
 from abaqusConstants import *
-from load import *
-from mesh import *
-from optimization import *
-from job import *
-from sketch import *
-from visualization import *
-from connectorBehavior import *
-from part import *
-from material import *
-from section import *
-from assembly import *
-from step import *
-from interaction import *
-from odbAccess import *
-
-import os
+from driverUtils import executeOnCaeStartup
+from odbAccess import openOdb
 import numpy as np
 import pickle
+import os
 from datetime import datetime
-from time import sleep
 import threading
+import socket
+import struct
+import json
+from sys import version_info
 try:
     import Tkinter as tk
-except:
+except ImportError:
     import tkinter as tk
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
+executeOnCaeStartup()
 
-# Load parameter dictionary from PARAMS
-with open('./PARAMS', mode='rb') as f_params:
-    PARAMS = pickle.load(f_params)
-os.remove('./PARAMS')
-
-# Unused variables
-model = 'original'
-
-# Load variables from PARAMS
-setPath = PARAMS['setPath']
-os.chdir(setPath)
-mode = PARAMS['mode']
-restart_pop = PARAMS['restart_pop']
-ini_pop = PARAMS['ini_pop']
-end_pop = PARAMS['end_pop']
-divide_number = PARAMS['divide_number']
-unit_l = PARAMS['unit_l']
-lx = PARAMS['lx']
-ly = PARAMS['ly']
-lz = PARAMS['lz']
-mesh_size = PARAMS['mesh_size']
-dis_y = PARAMS['dis_y']
-density = PARAMS['density']
-material_modulus = PARAMS['material_modulus']
-poissons_ratio = PARAMS['poissons_ratio']
-MAXRF22 = PARAMS['MaxRF22']
-penalty_coefficient = PARAMS['penalty_coefficient']
-n_cpus = PARAMS['n_cpus']
-n_gpus = PARAMS['n_gpus']
-
-# Define another parameters from PARAMS
-unit_l_half = unit_l * 0.5
-unit_lx_total = lx * unit_l
-unit_ly_total = ly * unit_l
-unit_lz_total = lz * unit_l
+material = {
+    'material_name': 'resin',
+    'density': 1.2e-09,
+    'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
+}
+host = 'localhost'
+port = 12345
 
 
-class LogFrame(tk.Frame):
+class Client:
+    def __init__(self, host, port, option, connect):
+        self.host = host
+        self.port = port
+        self.option = option
+        self.q = Queue()
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.is_alive = True
+        self._default_packet_size = 1024
+        self._header_format = '>I'
+        self._header_bytes = 4
+        if connect:
+            self.connect()
+
+    def connect(self):
+        if version_info.major >= 3:
+            new_th = threading.Thread(target=self._thread_recv, args=(self.client_socket, self.option), daemon=True)
+        else:
+            new_th = threading.Thread(target=self._thread_recv, args=(self.client_socket, self.option))
+            new_th.setDaemon(True)
+        self.client_socket.connect((self.host, self.port))
+        print('[{}] Connected to {}:{}'.format(datetime.now(), self.host, self.port))
+        new_th.start()
+
+    def send(self, data):
+        if self.option == 'pickle':
+            serialized_data = pickle.dumps(data, protocol=2)
+        else:
+            serialized_data = json.dumps(data).encode()
+        while True:
+            try:
+                self.client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
+                self.client_socket.sendall(serialized_data)
+                print('[{}] A data sent'.format(datetime.now()))
+                break
+            except Exception as send_error:
+                print('Sending data failed, trying to reconnect to server: ', send_error)
+                self.connect()
+
+    def recv(self):
+        return self.q.get()
+
+    def close(self):
+        self.client_socket.close()
+
+    def _thread_recv(self, client_socket, option):
+        while True:
+            try:  # Trying to receive a data and decode it
+                data_size = struct.unpack(self._header_format, client_socket.recv(self._header_bytes))[0]
+                remaining_payload_size = data_size
+                packets = b''
+                while remaining_payload_size != 0:
+                    packets += client_socket.recv(remaining_payload_size)
+                    remaining_payload_size = data_size - len(packets)
+                try:  # Trying to decode received data
+                    if option == 'json':
+                        received_data = json.loads(packets.decode())
+                    else:
+                        if version_info.major >= 3:
+                            received_data = pickle.loads(packets, encoding='bytes')
+                        else:
+                            received_data = pickle.loads(packets)
+                    print('[{}] Received data: {}'.format(datetime.now(), received_data))
+                    self.q.put(received_data)
+                except Exception as e2:  # Decoding is failed
+                    print('[{}] Loading received data failure: {}'.format(datetime.now(), e2))
+                    continue
+            except Exception as e1:  # Connection is lost
+                print('[{}] Error: {}'.format(datetime.now(), e1))
+                break
+        self.is_alive = False
+        print('<!> Connection dead')
+
+
+class JobLogFrame(tk.Frame):
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
         self.text = tk.Text(self, height=50, width=100)
@@ -73,1040 +115,346 @@ class LogFrame(tk.Frame):
         self.text.pack(side="left", fill="both", expand=True)
 
 
-def open_log_window():
-    root = tk.Tk()
-    root.title('Abaqus control log')
-    fr = LogFrame(root)
-    fr.pack(fill="both", expand=True)
-    th_log = threading.Thread(target=root.mainloop)
-    th_log.start()
-    sleep(1)
-    return fr
+class MyModel:
+    def __init__(self, model_name, params):
+        session.journalOptions.setValues(replayGeometry=COORDINATE, recoverGeometry=COORDINATE)
+        self.model = mdb.Model(name=model_name, modelType=STANDARD_EXPLICIT)
+        self.root_assembly = self.model.rootAssembly
+        self.root_assembly.DatumCsysByDefault(CARTESIAN)
+        self.params = params
 
+    def __enter__(self):
+        return self
 
-def now_s():
-    return datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if len(mdb.models.keys()) == 1:
+            mdb.Model(name='empty_model', modelType=STANDARD_EXPLICIT)
+        del mdb.models[self.model.name]
+        del self
 
+    def create_voxel_part(self, voxel_name):
+        _voxel_part = self.model.Part(name=voxel_name, dimensionality=THREE_D, type=DEFORMABLE_BODY)
+        _s = self.model.ConstrainedSketch(name='__profile__', sheetSize=2 * self.params['unit_l'])
+        _s.rectangle(point1=(0.0, 0.0), point2=(self.params['unit_l'], self.params['unit_l']))
+        _voxel_part.BaseSolidExtrude(sketch=_s, depth=self.params['unit_l'])
 
-def array_to_csv(path, arr, dtype, mode, save_as_int=False):
-    if mode == 'a' and os.path.isfile(path):
-        previous_arr = csv_to_array(path, dtype=dtype)
-        print('[array_to_csv] append shape: ', previous_arr.shape, arr.shape)
-        arr = np.vstack((previous_arr, arr))
-    fmt = '%i' if save_as_int else '%.18e'
-    np.savetxt(path, arr, delimiter=',', fmt=fmt)
+    def create_cube_part(self, voxel_name, cube_name, topo_arr):
+        for ix in range(topo_arr.shape[0]):
+            for iy in range(topo_arr.shape[1]):
+                for iz in range(topo_arr.shape[2]):
+                    if topo_arr[ix, iy, iz]:
+                        _instance_name = '{}-{}-{}-{}'.format(cube_name, ix, iy, iz)
+                        self.root_assembly.Instance(name=_instance_name, part=self.model.parts[voxel_name],
+                                                    dependent=ON)
+                        self.root_assembly.translate(instanceList=(_instance_name,),
+                                                     vector=(ix * self.params['unit_l'],
+                                                             iy * self.params['unit_l'],
+                                                             iz * self.params['unit_l']))
+        self.merge_mesh_of_instances(part_name_of_merged_assembly=cube_name)
 
+    def create_mesh_of_part(self, part_name):
+        self.model.parts[part_name].seedPart(size=self.params['mesh_size'], minSizeFactor=0.9, deviationFactor=0.1)
+        self.model.parts[part_name].generateMesh()
 
-def csv_to_array(path, dtype):
-    return np.genfromtxt(path, delimiter=',', dtype=dtype)
+    def merge_mesh_of_instances(self, part_name_of_merged_assembly):
+        _instances = self.root_assembly.instances.values()
+        self.root_assembly.InstanceFromBooleanMerge(name=part_name_of_merged_assembly, instances=_instances,
+                                                    originalInstances=DELETE, mergeNodes=BOUNDARY_ONLY,
+                                                    nodeMergingTolerance=1e-06, domain=MESH)
 
+    def create_material(self, material_name, density, engineering_constants):
 
-def save_log(log_message, frame):
-    print(log_message)
-    with open('./log.txt', mode='a') as f_log:
-        f_log.write(log_message + '\n')
-    frame.text.insert('end', log_message + '\n')
-    frame.text.see('end')
+        self.model.Material(name=material_name)
+        self.model.materials[material_name].Density(table=((density,),))
+        self.model.materials[material_name].Elastic(type=ENGINEERING_CONSTANTS, table=(engineering_constants,))
 
+    def assign_section_to_elements_of_part_by_bounding_box(self, part_name, material_name, section_name,
+                                                           bound_definition):
+        bounded_elements = self.model.parts[part_name].elements.getByBoundingBox(**bound_definition)
+        bounded_region = regionToolset.Region(elements=bounded_elements)
+        self.model.HomogeneousSolidSection(material=material_name, name=section_name, thickness=None)
+        self.model.parts[part_name].SectionAssignment(region=bounded_region, sectionName=section_name,
+                                                      offset=0.0, offsetType=MIDDLE_SURFACE, offsetField='',
+                                                      thicknessAssignment=FROM_SECTION)
+        self.model.parts[part_name].MaterialOrientation(additionalRotationType=ROTATION_NONE, axis=AXIS_1,
+                                                        fieldName='', localCsys=None, orientationType=GLOBAL,
+                                                        region=bounded_region, stackDirection=STACK_3)
 
-def abaqus_cad(offspring, m, rt, q):  # offspring == 4dimensional numpy array
-    m.ConstrainedSketch(name='__profile__', sheetSize=200.0)
-    m.sketches['__profile__'].rectangle(point1=(0.0, 0.0),
-                                        point2=(unit_l, unit_l))
+    def create_set_of_part_by_bounding_box(self, part_name, set_name, bound_definition):
+        self.model.parts[part_name].Set(name=set_name,
+                                        nodes=self.model.parts[part_name].nodes.getByBoundingBox(**bound_definition))
 
-    m.Part(dimensionality=THREE_D, name='Part-1', type=DEFORMABLE_BODY)
-    m.parts['Part-1'].BaseSolidExtrude(depth=unit_l, sketch=m.sketches['__profile__'])
-    del m.sketches['__profile__']
+    def create_set_by_bounding_box(self, instance_name, set_name, bound_definition):
+        self.root_assembly.Set(name=set_name, nodes=self.root_assembly.instances[instance_name].nodes.getByBoundingBox(
+            **bound_definition))
 
-    voxelnum = np.sum(offspring[q - 1])
-    voxelnum = int(voxelnum)
-    rt.DatumCsysByDefault(CARTESIAN)
-    rt.Instance(dependent=ON, name='Part-1', part=m.parts['Part-1'])
-    rt.LinearInstancePattern(direction1=(1.0, 0.0, 0.0), direction2=(0.0, 1.0, 0.0),
-                             instanceList=('Part-1',),
-                             number1=int(voxelnum),
-                             number2=1, spacing1=0.0, spacing2=0.0)
+    def set_encastre(self, bc_name, set_name, step_name):
+        self.model.EncastreBC(name=bc_name, createStepName=step_name,
+                              localCsys=None, region=self.root_assembly.sets[set_name])
 
-    n = 0
-    for i in range(lx):
-        for j in range(ly):
-            for k in range(lz):
-                if offspring[q - 1][k][j][i] == 1:
-                    if n == 0:
-                        rt.translate(instanceList=('Part-1',), vector=(unit_l * i, unit_l * j, unit_l * k))
-                    else:
-                        rt.translate(instanceList=('Part-1-lin-%d-1' % (n + 1),),
-                                     vector=(i * unit_l, j * unit_l, k * unit_l))
-                    n = n + 1
+    def set_displacement(self, bc_name, set_name, step_name, displacement):
+        self.model.DisplacementBC(name=bc_name, createStepName=step_name,
+                                  amplitude=UNSET, distributionType=UNIFORM, fieldName='', localCsys=None,
+                                  region=self.root_assembly.sets[set_name], **displacement)
 
-
-def abaqus_cad_ones(topologys, m, rt):  # topologys == 3dimensional numpy array
-
-    a = unit_l / divide_number
-
-    m.ConstrainedSketch(name='__profile__', sheetSize=200.0)
-
-    m.sketches['__profile__'].rectangle(point1=(0.0, 0.0),
-
-                                        point2=(a, a))
-
-    m.Part(dimensionality=THREE_D, name='Part-1', type=DEFORMABLE_BODY)
-
-    m.parts['Part-1'].BaseSolidExtrude(depth=a, sketch=m.sketches['__profile__'])
-
-    del m.sketches['__profile__']
-
-    voxelnum = np.sum(topologys)
-
-    voxelnum = int(voxelnum)
-
-    rt.DatumCsysByDefault(CARTESIAN)
-
-    rt.Instance(dependent=ON, name='Part-1', part=m.parts['Part-1'])
-
-    rt.LinearInstancePattern(direction1=(1.0, 0.0, 0.0), direction2=(0.0, 1.0, 0.0),
-
-                             instanceList=('Part-1',),
-
-                             number1=int(voxelnum),
-
-                             number2=1, spacing1=0.0, spacing2=0.0)
-
-    n = 0
-
-    for i in range(lx):
-
-        for j in range(ly):
-
-            for k in range(lz):
-
-                if topologys[k][j][i] == 1:
-
-                    if n == 0:
-
-                        rt.translate(instanceList=('Part-1',), vector=(unit_l * i, unit_l * j, unit_l * k))
-
-                    else:
-
-                        rt.translate(instanceList=('Part-1-lin-%d-1' % (n + 1),),
-                                     vector=(i * unit_l, j * unit_l, k * unit_l))
-
-                    n = n + 1
-
-
-def abaqus_merge3(m, rt):
-    SingleInstances_List = rt.instances.keys()
-
-    c = [0 for i in range(len(SingleInstances_List))]
-
-    c[0] = rt.instances['Part-1']
-
-    for i in range(1, len(SingleInstances_List)):
-        c[i] = rt.instances['Part-1-lin-%d-1' % (i + 1)]
-
-    rt.InstanceFromBooleanMerge(name='Merge-1', instances=c, keepIntersections=ON,
-
-                                domain=GEOMETRY, originalInstances=SUPPRESS)
-
-    del m.parts['Part-1']
-
-
-def abaqus_merge4(split, m, rt):
-    SingleInstances_List = rt.instances.keys()
-    SingleInstances_Num = len(SingleInstances_List)
-    one_ten = int(SingleInstances_Num // split)
-
-    for j in range(split):
-
-        if j == 0:
-            c = [0 for i in range(one_ten)]
-            c[-1] = rt.instances['Part-1']
-            for i in range(one_ten - 1):
-                c[i] = rt.instances['Part-1-lin-%d-1' % (i + 2)]
-            rt.InstanceFromBooleanMerge(name='Merge-%d' % (j + 2), instances=c, keepIntersections=ON, domain=GEOMETRY,
-                                        originalInstances=SUPPRESS)
-
-        elif 0 < j < split - 1:
-            c = [0 for i in range(one_ten + 1)]
-            c[-1] = rt.instances['Merge-%d-1' % (j + 1)]
-            for i in range(one_ten):
-                c[i] = rt.instances['Part-1-lin-%d-1' % ((j * one_ten) + i + 1)]
-            rt.InstanceFromBooleanMerge(name='Merge-%d' % (j + 2), instances=c, keepIntersections=ON, domain=GEOMETRY,
-                                        originalInstances=SUPPRESS)
-            del m.parts['Merge-%d' % (j + 1)]
-
+    def set_boundary_condition(self, symmetry_direction, set_name):
+        if symmetry_direction == 'x':
+            self.model.XsymmBC(createStepName='Initial', localCsys=None, name='x_sym',
+                               region=self.root_assembly.sets[set_name])
+        elif symmetry_direction == 'y':
+            self.model.YsymmBC(createStepName='Initial', localCsys=None, name='y_sym',
+                               region=self.root_assembly.sets[set_name])
+        elif symmetry_direction == 'z':
+            self.model.ZsymmBC(createStepName='Initial', localCsys=None, name='z_sym',
+                               region=self.root_assembly.sets[set_name])
         else:
-
-            if SingleInstances_Num % split == 0:
-
-                c = [0 for i in range(one_ten + 1)]
-
-                c[-1] = rt.instances['Merge-%d-1' % (j + 1)]
-
-                for i in range(one_ten):
-                    c[i] = rt.instances['Part-1-lin-%d-1' % ((j * one_ten) + i + 1)]
-
-                rt.InstanceFromBooleanMerge(name='Merge-1', instances=c, keepIntersections=ON,
-
-                                            domain=GEOMETRY, originalInstances=SUPPRESS)
-
-                del m.parts['Merge-%d' % (j + 1)]
-
-            else:
-
-                c = [0 for i in range(one_ten + 1 + (SingleInstances_Num % split))]
-
-                c[-1] = rt.instances['Merge-%d-1' % (j + 1)]
-
-                for i in range(one_ten + (SingleInstances_Num % split)):
-                    c[i] = rt.instances['Part-1-lin-%d-1' % ((j * one_ten) + i + 1)]
-
-                rt.InstanceFromBooleanMerge(name='Merge-1', instances=c, keepIntersections=ON,
-
-                                            domain=GEOMETRY, originalInstances=SUPPRESS)
-
-                del m.parts['Merge-%d' % (j + 1)]
-
-            # def abaqus_merge():
-
-
-def abaqus_mesh(m):
-    m.parts['Merge-1'].seedPart(deviationFactor=0.1, minSizeFactor=0.90, size=mesh_size)
-    m.parts['Merge-1'].generateMesh()
-
-
-def abaqus_step(m, rt):
-    ## step generation
-
-    rt.regenerate()
-
-    m.StaticStep(initialInc=0.001, maxInc=0.1, maxNumInc=10000, minInc=1e-12, name='Step-1', previous='Initial')
-
-    ## Define Reference point
-
-    r = rt.referencePoints
-
-    RP2id = rt.ReferencePoint(point=(0.5 * unit_lx_total, 1.1 * unit_ly_total, 0.5 * unit_lz_total)).id
-
-    RP2 = (r[RP2id],)
-
-    rt.Set(name='RP2', referencePoints=RP2)
-
-    RP1id = rt.ReferencePoint(point=(1.1 * unit_lx_total, 0.5 * unit_ly_total, 0.5 * unit_lz_total)).id
-
-    RP1 = (r[RP1id],)
-
-    rt.Set(name='RP1', referencePoints=RP1)
-
-    RP3id = rt.ReferencePoint(point=(0.5 * unit_lx_total, 0.5 * unit_ly_total, 1.1 * unit_lz_total)).id
-
-    RP3 = (r[RP3id],)
-
-    rt.Set(name='RP3', referencePoints=RP3)
-
-    ## Output request
-
-    m.fieldOutputRequests['F-Output-1'].setValues(variables=('S', 'U', 'RF', 'IVOL', 'MISESMAX'))
-
-    m.HistoryOutputRequest(createStepName='Step-1', name='RP2_H-Output',
-
-                           rebar=EXCLUDE, region=rt.sets['RP2'],
-
-                           sectionPoints=DEFAULT, variables=('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3', 'ALLIE'))
-
-    ## Step and job setting
-
-    m.steps['Step-1'].setValues(initialInc=0.0001, timePeriod=1.0)
-
-
-def abaqus_jobsetting(w, q):
-    if mode == 'GA' or mode == 'Random' or mode == 'None':
-        mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF,
-
-                explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF,
-
-                memory=90, memoryUnits=PERCENTAGE, model='Model-%d' % (q), modelPrint=OFF,
-
-                multiprocessingMode=DEFAULT, name='Job-%d-%d' % (w, q), nodalOutputPrecision=SINGLE,
-
-                numCpus=n_cpus, numDomains=n_cpus, numGPUs=n_gpus, queue=None, resultsFormat=ODB,
-
-                scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
-
-    if mode == 'Gaussian':
-        if model == 'original':
-            mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF,
-
-                    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF,
-
-                    memory=90, memoryUnits=PERCENTAGE, model='Model-%d-%d_original' % (w, q), modelPrint=OFF,
-
-                    multiprocessingMode=DEFAULT, name='Job-%d-%d_original' % (w, q), nodalOutputPrecision=SINGLE,
-
-                    numCpus=n_cpus, numDomains=n_cpus, numGPUs=n_gpus, queue=None, resultsFormat=ODB,
-
-                    scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
-
-        if model == 'gaussian':
-            mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF,
-
-                    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF,
-
-                    memory=90, memoryUnits=PERCENTAGE, model='Model-%d-%d_gaussian' % (w, q), modelPrint=OFF,
-
-                    multiprocessingMode=DEFAULT, name='Job-%d-%d_gaussian' % (w, q), nodalOutputPrecision=SINGLE,
-
-                    numCpus=n_cpus, numDomains=n_cpus, numGPUs=n_gpus, queue=None, resultsFormat=ODB,
-
-                    scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
-
-
-def abaqus_material_elastic(modulus, poisson, m, q):
-    m.Material(name='Material-1')
-
-    m.materials['Material-1'].Elastic(table=((modulus, poisson),))
-
-    m.HomogeneousSolidSection(material='Material-1', name=
-
-    'Section-1', thickness=None)
-
-    ## Section assignment
-
-    for i in range(lx):
-
-        for j in range(ly):
-
-            for k in range(lz):
-
-                if offspring[q - 1][k][j][i] == 1:
-                    m.parts['Merge-1'].SectionAssignment(offset=0.0,
-
-                                                         offsetField='', offsetType=MIDDLE_SURFACE,
-
-                                                         region=Region(cells=m.parts[
-
-                                                             'Merge-1'].cells.findAt(((unit_l * i + unit_l_half,
-                                                                                       unit_l * j + unit_l_half,
-                                                                                       unit_l * k + unit_l_half),), ))
-
-                                                         , sectionName='Section-1', thicknessAssignment=FROM_SECTION)
-
-
-def abaqus_material_elastic2(modulus, poisson, m):
-    m.Material(name='Material-1')
-
-    m.materials['Material-1'].Elastic(table=((modulus, poisson),))
-
-    m.HomogeneousSolidSection(material='Material-1', name=
-
-    'Section-1', thickness=None)
-
-    ## Section assignment
-
-    m.parts['Merge-1'].SectionAssignment(offset=0.0,
-
-                                         offsetField='', offsetType=MIDDLE_SURFACE,
-
-                                         region=Region(cells=m.parts[
-
-                                             'Merge-1'].cells.getByBoundingBox(-0.5, -0.5, -0.5, unit_lx_total + 0.5,
-                                                                               unit_ly_total + 0.5,
-                                                                               unit_lz_total + 0.5))
-
-                                         , sectionName='Section-1', thicknessAssignment=FROM_SECTION)
-
-
-def abaqus_material_anisotropic(offspring, E11, E22, E33, v12, v13, v23, G12, G13, G23, m, q):
-    m.Material(name='Material-1')
-
-    m.materials['Material-1'].Elastic(table=((E11, E22, E33, v12, v13, v23, G12, G13, G23),),
-                                      type=ENGINEERING_CONSTANTS)
-
-    m.HomogeneousSolidSection(material='Material-1', name=
-
-    'Section-1', thickness=None)
-
-    ## Section assignment
-
-    for i in range(lx):
-
-        for j in range(ly):
-
-            for k in range(lz):
-
-                if offspring[q - 1][k][j][i] == 1:
-                    m.parts['Merge-1'].SectionAssignment(offset=0.0,
-
-                                                         offsetField='', offsetType=MIDDLE_SURFACE,
-
-                                                         region=Region(cells=m.parts[
-
-                                                             'Merge-1'].cells.findAt(((unit_l * i + unit_l_half,
-                                                                                       unit_l * j + unit_l_half,
-                                                                                       unit_l * k + unit_l_half),), ))
-
-                                                         , sectionName='Section-1', thicknessAssignment=FROM_SECTION)
-
-                    m.parts['Merge-1'].MaterialOrientation(additionalRotationType=ROTATION_NONE, axis=AXIS_1,
-                                                           fieldName='', localCsys=None, orientationType=GLOBAL,
-                                                           region=Region(
-
-                                                               cells=m.parts['Merge-1'].cells.findAt(((
-                                                                                                          unit_l * i + unit_l_half,
-                                                                                                          unit_l * j + unit_l_half,
-                                                                                                          unit_l * k + unit_l_half),), ))
-
-                                                           , stackDirection=STACK_3)
-
-
-def abaqus_material_elastic_ones(modulus, poisson, m, topo):
-    m.Material(name='Material-1')
-
-    m.materials['Material-1'].Elastic(table=((modulus, poisson),))
-
-    m.HomogeneousSolidSection(material='Material-1', name='Section-1', thickness=None)
-
-    ## Section assignment
-
-    for i in range(lx):
-
-        for j in range(ly):
-
-            for k in range(lz):
-
-                if topo[k][j][i] == 1:
-                    m.parts['Merge-1'].SectionAssignment(offset=0.0,
-
-                                                         offsetField='', offsetType=MIDDLE_SURFACE,
-
-                                                         region=Region(cells=m.parts[
-
-                                                             'Merge-1'].cells.findAt(((unit_l * i + unit_l_half,
-                                                                                       unit_l * j + unit_l_half,
-                                                                                       unit_l * k + unit_l_half),), ))
-
-                                                         , sectionName='Section-1', thicknessAssignment=FROM_SECTION)
-
-
-def abaqus_material_hyper(m, q):
-    m.Material(name='Material-1')
-
-    mdb.models['Model-1'].materials['Material-1'].Density(table=((density,),))
-
-    mdb.models['Model-1'].materials['Material-1'].Hyperelastic(materialType=ISOTROPIC, n=3,
-
-                                                               table=((-2562157.38, 2.69096262, 935416.629, 4.73668103,
-
-                                                                       3581854.08, -1.05562694, 0.0, 0.0, 0.0),),
-
-                                                               testData=OFF, type=OGDEN,
-                                                               volumetricResponse=VOLUMETRIC_DATA)
-
-    m.HomogeneousSolidSection(material='Material-1', name='Section-1', thickness=None)
-
-    ## Section assignment
-
-    for i in range(lx):
-
-        for j in range(ly):
-
-            for k in range(lz):
-
-                if offspring[q - 1][k][j][i] == 1:
-                    m.parts['Merge-1'].SectionAssignment(offset=0.0,
-
-                                                         offsetField='', offsetType=MIDDLE_SURFACE,
-
-                                                         region=Region(cells=m.parts[
-
-                                                             'Merge-1'].cells.findAt(((unit_l * i + unit_l_half,
-                                                                                       unit_l * j + unit_l_half,
-                                                                                       unit_l * k + unit_l_half),), ))
-
-                                                         , sectionName='Section-1', thicknessAssignment=FROM_SECTION)
-
-
-def abaqus_BC_ones(m, rt, topo):
-    ##self-contact behavior
-
-    m.ContactProperty('IntProp-1')
-
-    m.interactionProperties['IntProp-1'].NormalBehavior(
-
-        allowSeparation=ON, constraintEnforcementMethod=DEFAULT, pressureOverclosure=HARD)
-
-    rt.Surface(name='Surf-1', side1Faces=
-
-    rt.instances['Merge-1-1'].faces.getByBoundingBox(-0.5, -0.5, -0.5, unit_lx_total + 0.5, unit_ly_total + 0.5,
-                                                     unit_lz_total + 0.5))
-
-    m.SelfContactStd(contactTracking=ONE_CONFIG,
-
-                     createStepName='Step-1', interactionProperty='IntProp-1', name='Int-1',
-
-                     surface=rt.surfaces['Surf-1'], thickness=ON)
-
-    ##Boundary conditions
-
-    it = rt.instances['Merge-1-1']
-
-    FaceX0 = []
-
-    FaceX = []
-
-    FaceY0 = []
-
-    FaceY = []
-
-    FaceZ0 = []
-
-    FaceZ = []
-
-    ## select all Face
-
-    for i in range(lx):
-
-        for j in range(ly):
-
-            for k in range(lz):
-
-                if i == 0 and topo[k][j][i] == 1:
-                    FaceX0 = FaceX0 + [it.faces.findAt((0, unit_l * j + unit_l_half, unit_l * k + unit_l_half), )]
-
-                if i == lx - 1 and topo[k][j][i] == 1:  # correction: a,b,c >> lx,ly,lz
-
-                    FaceX = FaceX + [
-                        it.faces.findAt((unit_lx_total, unit_l * j + unit_l_half, unit_l * k + unit_l_half), )]
-
-                if j == 0 and topo[k][j][i] == 1:
-                    FaceY0 = FaceY0 + [it.faces.findAt((unit_l * i + unit_l_half, 0, unit_l * k + unit_l_half), )]
-
-                if j == ly - 1 and topo[k][j][i] == 1:
-                    FaceY = FaceY + [
-                        it.faces.findAt((unit_l * i + unit_l_half, unit_ly_total, unit_l * k + unit_l_half), )]
-
-                if k == 0 and topo[k][j][i] == 1:
-                    FaceZ0 = FaceZ0 + [it.faces.findAt((unit_l * i + unit_l_half, unit_l * j + unit_l_half, 0), )]
-
-                if k == lz - 1 and topo[k][j][i] == 1:
-                    FaceZ = FaceZ + [
-                        it.faces.findAt((unit_l * i + unit_l_half, unit_l * j + unit_l_half, unit_lz_total), )]
-
-    FX = []
-
-    FX0 = []
-
-    FY = []
-
-    FY0 = []
-
-    FZ = []
-
-    FZ0 = []
-
-    for i in range(0, len(FaceY)):  # AttributeError: 'NoneType' object has no attribute 'index'
-
-        FY = FY + [FaceY[i].index]
-
-    setFY = it.faces[FY[0]:FY[0] + 1]
-
-    for i in range(1, len(FY)):
-        setFY += it.faces[FY[i]:FY[i] + 1]
-
-    ## rt.Set(faces=setFX0, name='FX0')
-
-    rt.Surface(name='FY', side1Faces=setFY)
-
-    rt.Set(name='FY', faces=setFY)
-
-    for i in range(0, len(FaceX)):
-        FX = FX + [FaceX[i].index]
-
-    setFX = it.faces[FX[0]:FX[0] + 1]
-
-    for i in range(0, len(FX)):
-        setFX += it.faces[FX[i]:FX[i] + 1]
-
-    rt.Surface(name='FX', side1Faces=setFX)
-
-    rt.Set(name='FX', faces=setFX)
-
-    for i in range(0, len(FaceZ)):
-        FZ = FZ + [FaceZ[i].index]
-
-    setFZ = it.faces[FZ[0]:FZ[0] + 1]
-
-    for i in range(0, len(FZ)):
-        setFZ += it.faces[FZ[i]:FZ[i] + 1]
-
-    rt.Surface(name='FZ', side1Faces=setFZ)
-
-    rt.Set(name='FZ', faces=setFZ)
-
-    for i in range(0, len(FaceX0)):
-        FX0 = FX0 + [FaceX0[i].index]
-
-    setFX0 = it.faces[FX0[0]:FX0[0] + 1]
-
-    for i in range(0, len(FX0)):
-        setFX0 += it.faces[FX0[i]:FX0[i] + 1]
-
-    rt.Set(name='FX0', faces=setFX0)
-
-    for i in range(0, len(FaceY0)):
-        FY0 = FY0 + [FaceY0[i].index]
-
-    setFY0 = it.faces[FY0[0]:FY0[0] + 1]
-
-    for i in range(0, len(FY0)):
-        setFY0 += it.faces[FY0[i]:FY0[i] + 1]
-
-    rt.Set(name='FY0', faces=setFY0)
-
-    for i in range(0, len(FaceZ0)):
-        FZ0 = FZ0 + [FaceZ0[i].index]
-
-    setFZ0 = it.faces[FZ0[0]:FZ0[0] + 1]
-
-    for i in range(0, len(FZ0)):
-        setFZ0 += it.faces[FZ0[i]:FZ0[i] + 1]
-
-    rt.Set(name='FZ0', faces=setFZ0)
-
-    m.Coupling(controlPoint=
-
-               rt.sets['RP2'], couplingType=KINEMATIC,
-
-               influenceRadius=WHOLE_SURFACE, localCsys=None, name='Constraint-1',
-
-               surface=rt.surfaces['FY'], u1=ON, u2=
-
-               ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
-
-    m.YsymmBC(createStepName='Step-1', localCsys=None, name=
-
-    'BC-1', region=rt.sets['FY0'])
-
-    m.ZsymmBC(createStepName='Step-1', localCsys=None, name=
-
-    'BC-2', region=rt.sets['FZ0'])
-
-    m.XsymmBC(createStepName='Step-1', localCsys=None, name=
-
-    'BC-3', region=rt.sets['FX0'])
-
-    m.DisplacementBC(amplitude=UNSET, createStepName='Step-1',
-
-                     distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
-
-                     'BC-4', region=rt.sets['RP2'], u1=0,
-
-                     u2=dis_y, u3=0, ur1=0, ur2=0, ur3=0)
-
-
-def abaqus_BC(offspring, m, rt, q):
-    ##self-contact behavior
-    m.ContactProperty('IntProp-1')
-    m.interactionProperties['IntProp-1'].NormalBehavior(
-        allowSeparation=ON, constraintEnforcementMethod=DEFAULT, pressureOverclosure=HARD)
-    rt.Surface(name='Surf-1', side1Faces=
-    rt.instances['Merge-1-1'].faces.getByBoundingBox(-0.5, -0.5, -0.5, unit_lx_total + 0.5, unit_ly_total + 0.5,
-                                                     unit_lz_total + 0.5))
-    m.SelfContactStd(contactTracking=ONE_CONFIG,
-                     createStepName='Step-1', interactionProperty='IntProp-1', name='Int-1',
-                     surface=rt.surfaces['Surf-1'], thickness=ON)
-    ##Boundary conditions
-    it = rt.instances['Merge-1-1']
-    FaceX0 = []
-    print('facex0=', FaceX0)
-    FaceX = []
-    print('facex=', FaceX)
-    FaceY0 = []
-    print('facey0=', FaceY0)
-    FaceY = []
-    print('facey=', FaceY)
-    FaceZ0 = []
-    print('facez0=', FaceZ0)
-    FaceZ = []
-    print('facez=', FaceZ)
-
-    ## select all Face
-
-    frt_end = [0, lx - 1]
-    for i in frt_end:
-        for j in range(ly):
-            for k in range(lz):
-                if offspring[q - 1][k][j][i] == 1:
-                    if i == 0:
-                        FaceX0 = FaceX0 + [it.faces.findAt((0, unit_l * j + unit_l_half, unit_l * k + unit_l_half), )]
-                        print('facex0_added')
-                        print('coordinate', i, j, k)
-                    else:
-                        FaceX = FaceX + [
-                            it.faces.findAt((unit_lx_total, unit_l * j + unit_l_half, unit_l * k + unit_l_half), )]
-                        print('facex_added')
-                        print('coordinate', i, j, k)
-    for j in frt_end:
-        for i in range(lx):
-            for k in range(lz):
-                if offspring[q - 1][k][j][i] == 1:
-                    if j == 0:
-                        FaceY0 = FaceY0 + [it.faces.findAt((unit_l * i + unit_l_half, 0, unit_l * k + unit_l_half), )]
-                        print('facey0_added')
-                        print('coordinate', i, j, k)
-                    else:
-                        FaceY = FaceY + [
-                            it.faces.findAt((unit_l * i + unit_l_half, unit_ly_total, unit_l * k + unit_l_half), )]
-                        print('facey_added')
-                        print('coordinate', i, j, k)
-
-    for k in frt_end:
-        for i in range(lx):
-            for j in range(ly):
-                if offspring[q - 1][k][j][i] == 1:
-                    if k == 0:
-                        FaceZ0 = FaceZ0 + [it.faces.findAt((unit_l * i + unit_l_half, unit_l * j + unit_l_half, 0), )]
-                        print('facez0_added')
-                        print('coordinate', i, j, k)
-                    else:
-                        FaceZ = FaceZ + [
-                            it.faces.findAt((unit_l * i + unit_l_half, unit_l * j + unit_l_half, unit_lz_total), )]
-                        print('facez_added')
-                        print('coordinate', i, j, k)
-    print('facex=', FaceX)
-    print('facex0=', FaceX0)
-    print('facey=', FaceY)
-    print('facey0=', FaceY0)
-    print('facez=', FaceZ)
-    print('facez0=', FaceZ0)
-    FX = []
-    FX0 = []
-    FY = []
-    FY0 = []
-    FZ = []
-    FZ0 = []
-    for i in range(0, len(FaceY)):  # AttributeError: 'NoneType' object has no attribute 'index'
-        FY = FY + [FaceY[i].index]
-    setFY = it.faces[FY[0]:FY[0] + 1]
-
-    for i in range(1, len(FY)):
-        setFY += it.faces[FY[i]:FY[i] + 1]
-    rt.Surface(name='FY', side1Faces=setFY)
-    rt.Set(name='FY', faces=setFY)
-
-    for i in range(0, len(FaceX)):
-        FX = FX + [FaceX[i].index]
-    setFX = it.faces[FX[0]:FX[0] + 1]
-
-    for i in range(0, len(FX)):
-        setFX += it.faces[FX[i]:FX[i] + 1]
-
-    rt.Surface(name='FX', side1Faces=setFX)
-
-    rt.Set(name='FX', faces=setFX)
-
-    for i in range(0, len(FaceZ)):
-        FZ = FZ + [FaceZ[i].index]
-
-    setFZ = it.faces[FZ[0]:FZ[0] + 1]
-
-    for i in range(0, len(FZ)):
-        setFZ += it.faces[FZ[i]:FZ[i] + 1]
-
-    rt.Surface(name='FZ', side1Faces=setFZ)
-
-    rt.Set(name='FZ', faces=setFZ)
-
-    for i in range(0, len(FaceX0)):
-        FX0 = FX0 + [FaceX0[i].index]
-
-    setFX0 = it.faces[FX0[0]:FX0[0] + 1]
-
-    for i in range(0, len(FX0)):
-        setFX0 += it.faces[FX0[i]:FX0[i] + 1]
-
-    rt.Set(name='FX0', faces=setFX0)
-
-    for i in range(0, len(FaceY0)):
-        FY0 = FY0 + [FaceY0[i].index]
-
-    setFY0 = it.faces[FY0[0]:FY0[0] + 1]
-
-    for i in range(0, len(FY0)):
-        setFY0 += it.faces[FY0[i]:FY0[i] + 1]
-
-    rt.Set(name='FY0', faces=setFY0)
-
-    for i in range(0, len(FaceZ0)):
-        FZ0 = FZ0 + [FaceZ0[i].index]
-
-    setFZ0 = it.faces[FZ0[0]:FZ0[0] + 1]
-
-    for i in range(0, len(FZ0)):
-        setFZ0 += it.faces[FZ0[i]:FZ0[i] + 1]
-
-    rt.Set(name='FZ0', faces=setFZ0)
-
-    m.Coupling(controlPoint=
-
-               rt.sets['RP2'], couplingType=KINEMATIC,
-
-               influenceRadius=WHOLE_SURFACE, localCsys=None, name='Constraint-1',
-
-               surface=rt.surfaces['FY'], u1=ON, u2=
-
-               ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
-
-    m.YsymmBC(createStepName='Step-1', localCsys=None, name=
-
-    'BC-1', region=rt.sets['FY0'])
-
-    m.ZsymmBC(createStepName='Step-1', localCsys=None, name=
-
-    'BC-2', region=rt.sets['FZ0'])
-
-    m.XsymmBC(createStepName='Step-1', localCsys=None, name=
-
-    'BC-3', region=rt.sets['FX0'])
-
-    m.DisplacementBC(amplitude=UNSET, createStepName='Step-1',
-
-                     distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
-
-                     'BC-4', region=rt.sets['RP2'], u1=0,
-
-                     u2=dis_y, u3=0, ur1=0, ur2=0, ur3=0)
-
-
-def abaqus_historyOutput(w, q):
-    if mode == 'Gaussian':
-        if model == 'original':
-            f = openOdb(path='Job-{}-{}_original.odb'.format(w, q))
-        if model == 'gaussian':
-            f = openOdb(path='Job-{}-{}_gaussian.odb'.format(w, q))
-
-    else:
-        f = openOdb(path='Job-{}-{}.odb'.format(w, q))
-    region = f.steps['Step-1'].historyRegions['Node ASSEMBLY.1'].historyOutputs
-    u1 = np.array(region['U1'].data)  # type :tuple
-    u2 = np.array(region['U2'].data)
-    u3 = np.array(region['U3'].data)
-    rf1 = np.array(region['RF1'].data)
-    rf2 = np.array(region['RF2'].data)
-    rf3 = np.array(region['RF3'].data)
-
-    if mode == 'Random':
-        w = 0
-
-    file_names = ('U1_HistoryOutput', 'U2_HistoryOutput', 'U3_HistoryOutput',
-                  'RF1_HistoryOutput', 'RF2_HistoryOutput', 'RF3_HistoryOutput')
-    arrs = (u1, u2, u3, rf1, rf2, rf3)
-    for arr in arrs:
-        print(arr.shape)
-
-    for file_name, arr in zip(file_names, arrs):
-        file_name = '{}_{}'.format(file_name, w)
-        if os.path.isfile(file_name):
-            with open(file_name, mode='rb') as f_history_read:
-                history_output_read = pickle.load(f_history_read)
-            with open(file_name, mode='wb') as f_history_write:
-                history_output_read.update({q: arr.transpose()})
-                pickle.dump(history_output_read, f_history_write)
+            raise ValueError
+
+    def create_step(self, step_name, previous_step, step_type):
+        if step_type == 'modal':
+            self.model.FrequencyStep(name=step_name, previous=previous_step,
+                                     limitSavedEigenvectorRegion=None, numEigen=12)
+        elif step_type == 'compression':
+            self.model.StaticStep(initialInc=0.001, maxInc=0.1, maxNumInc=10000, minInc=1e-12,
+                                  name=step_name, previous=previous_step)
         else:
-            with open(file_name, mode='wb') as f_history_write:
-                pickle.dump({q: arr.transpose()}, f_history_write)
+            raise ValueError
+
+    def create_output_requests(self, step_name, history_output_name, set_name,
+                               field_outputs, history_outputs):
+        self.model.fieldOutputRequests['F-Output-1'].setValues(variables=field_outputs)
+        self.model.HistoryOutputRequest(createStepName=step_name, name=history_output_name, rebar=EXCLUDE,
+                                        region=self.root_assembly.sets[set_name], sectionPoints=DEFAULT,
+                                        variables=history_outputs)
+
+    def create_reference_point_and_set(self, rp_name, rp_coordinate):
+        rp_id = self.root_assembly.ReferencePoint(point=rp_coordinate).id
+        self.root_assembly.Set(name=rp_name, referencePoints=(self.root_assembly.referencePoints[rp_id],))
+        return rp_id
+
+    def create_coupling(self, rp_set_name, surface_set_name, constraint_name):
+        self.model.Coupling(alpha=0.0, controlPoint=self.root_assembly.sets[rp_set_name], couplingType=KINEMATIC,
+                            influenceRadius=WHOLE_SURFACE, localCsys=None, name=constraint_name,
+                            surface=self.root_assembly.sets[surface_set_name],
+                            u1=ON, u2=ON, u3=ON, ur1=ON, ur2=ON, ur3=ON)
+
+    def allow_self_contact(self, instance_name, step_name):
+        elements = self.root_assembly.instances[instance_name].elements.getExteriorFaces()
+        _surface = self.root_assembly.Surface(name='ExteriorSurface', side1Elements=elements)
+        _interaction_property_name = 'SelfContactProp'
+        _interaction_name = 'SelfContact'
+        self.model.ContactProperty(_interaction_property_name)
+        self.model.interactionProperties[_interaction_property_name].NormalBehavior(
+            allowSeparation=ON, constraintEnforcementMethod=DEFAULT, pressureOverclosure=HARD)
+        self.model.SelfContactStd(name=_interaction_name, contactTracking=ONE_CONFIG, createStepName=step_name,
+                                  interactionProperty=_interaction_property_name, surface=_surface, thickness=ON)
+
+    def create_job(self, job_name, num_cpus, num_gpus, run):
+        mdb.Job(name=job_name, model=self.model.name, description='',
+                type=ANALYSIS, atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90,
+                memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True,
+                explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF,
+                modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
+                scratch='', resultsFormat=ODB, numThreadsPerMpiProcess=1,
+                multiprocessingMode=DEFAULT, numCpus=num_cpus, numGPUs=num_gpus)
+        if run:
+            mdb.jobs[job_name].submit(consistencyChecking=OFF)
+            mdb.jobs[job_name].waitForCompletion()
 
 
-def abaqus_fieldOutput(w, q):
-    if mode == 'Gaussian':
-        if model == 'original':
-            f = openOdb(path='Job-{}-{}_original.odb'.format(w, q))
-        if model == 'gaussian':
-            f = openOdb(path='Job-{}-{}_gaussian.odb'.format(w, q))
+def open_job_log():
+    _root = tk.Tk()
+    _root.title('Abaqus control log')
+    _frame = JobLogFrame(_root)
+    _frame.pack(fill="both", expand=True)
+    _new_thread = threading.Thread(target=_root.mainloop)
+    _new_thread.setDaemon(True)
+    _new_thread.start()
+    return _frame
 
+
+def save_log(message, job_log_frame):
+    _now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    _message = '[{}]{}\n'.format(_now, message)
+    print(_message)
+    with open('log.txt', mode='a') as f_log:
+        f_log.write(_message)
+    job_log_frame.text.insert('end', _message)
+    job_log_frame.text.see('end')
+
+
+def dump_pickled_dict_data(file_name, key, to_dump, mode):
+    if mode == 'a' and os.path.isfile(file_name):
+        with open(file_name, mode='rb') as f:
+            dict_data = pickle.load(f)
+        dict_data.update({key: to_dump})
     else:
-        f = openOdb(path='Job-{}-{}.odb'.format(w, q))
-    Disp = f.steps['Step-1'].frames[-1].fieldOutputs['U']
-    ReForce = f.steps['Step-1'].frames[-1].fieldOutputs['RF']
-    Ro = f.steps['Step-1'].frames[-1].fieldOutputs['UR']
-    Stress = f.steps['Step-1'].frames[-1].fieldOutputs['S'].values
-    nodesetFX = f.rootAssembly.nodeSets['FX']
-    nodesetFY = f.rootAssembly.nodeSets['FY']
-    nodesetFZ = f.rootAssembly.nodeSets['FZ']
-    nodesetRP = f.rootAssembly.nodeSets['RP2']
-    subsFX = Disp.getSubset(region=nodesetFX)
-    subsFY = Disp.getSubset(region=nodesetFY)
-    subsFZ = Disp.getSubset(region=nodesetFZ)
-    RF_RP = ReForce.getSubset(region=nodesetRP).values[0].data
-    Ro_RP = Ro.getSubset(region=nodesetRP).values[0].data
-    disX = []
-    disY = []
-    disZ = []
-    mises = []
+        dict_data = {key: to_dump}
+    with open(file_name, mode='wb') as f:
+        pickle.dump(dict_data, f)
 
-    for i in subsFX.values:
-        disX.append(i.data[0])
 
-    for i in subsFY.values:
-        disY.append(i.data[1])
+def load_pickled_dict_data(file_name):
+    with open(file_name, mode='rb') as f:
+        dict_data = pickle.load(f)
+    return dict_data
 
-    for i in subsFZ.values:
-        disZ.append(i.data[2])
 
-    for i in Stress:
-        mises.append(i.mises)
+def random_array(shape, probability):
+    from functools import reduce
+    return np.random.choice([1, 0], size=reduce(lambda x, y: x * y, shape),
+                            p=[probability, 1 - probability]).reshape(shape)
 
-    max_mises = max(mises)
-    min_mises = min(mises)
-    avg_mises = 0
-    dis11 = 0
-    dis22 = 0
-    dis33 = 0
 
-    for i in range(len(mises)):
-        avg_mises += mises[i] / len(mises)
-    for i in range(len(disX)):
-        dis11 += disX[i] / len(disX)
-    for i in range(len(disY)):
-        dis22 += disY[i] / len(disY)
-    for i in range(len(disZ)):
-        dis33 += disZ[i] / len(disZ)
+def quaver_to_full(quaver):
+    quarter = np.concatenate((np.flip(quaver, axis=0), quaver), axis=0)
+    half = np.concatenate((np.flip(quarter, axis=1), quarter), axis=1)
+    full = np.concatenate((np.flip(half, axis=2), half), axis=2)
+    return np.swapaxes(full, axis1=0, axis2=2)
 
-    dis = []
-    dis.append(dis11)
-    dis.append(dis22)
-    dis.append(dis33)
 
-    misess = []
-    misess.append(max_mises)
-    misess.append(min_mises)
-    misess.append(avg_mises)
+def bound_setter(whole_bound, option):
+    """
+    Create dictionary of bound limits used for bounding box
+    :param whole_bound: whole bound dictionary for bounding box, six keys in dictionary
+    :param option: This can be either 'xMin', 'yMin', 'zMin', 'xMax', 'yMax', 'zMax'. If 'xMin',
+     bound for x=0 will be returned.
+    :return: a dictionary for bounding box
+    """
+    bound = whole_bound.copy()
+    if 'Min' in option:
+        bound[option[0] + 'Max'] = bound[option[0] + 'Min']
+    elif 'Max' in option:
+        bound[option[0] + 'Min'] = bound[option[0] + 'Max']
+    else:
+        pass
+    return bound
+
+
+def export_outputs(model_name, step_name, rp_name):
+    gen, entity = map(int, model_name.split('-'))
+    history_output_file_header = 'HistoryOutput_offspring'
+    field_output_file_header = 'FieldOutput_offspring'
+    exported_field_outputs = {
+        'displacement': {'xMax': np.ndarray, 'yMax': np.ndarray, 'zMax': np.ndarray},
+        'rotation': np.ndarray,
+        'reaction_force': np.ndarray,
+        'mises_stress': {'max': float, 'min': float, 'average': float}
+    }
+    exported_history_output_properties = ('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3')
     try:
-        eng_const = np.reshape(np.concatenate((dis, RF_RP, Ro_RP, misess)), newshape=(1, 12))
-    except:
-        print('error')
+        odb = openOdb('Job-{}.odb'.format(model_name))
+        try:
+            # Field outputs
+            field_outputs = {
+                'displacement': odb.steps[step_name].frames[-1].fieldOutputs['U'],
+                'rotation': odb.steps[step_name].frames[-1].fieldOutputs['UR'],
+                'reaction_force': odb.steps[step_name].frames[-1].fieldOutputs['RF'],
+                'stress': odb.steps[step_name].frames[-1].fieldOutputs['S']
+            }
+            displacement_of_node_sets = {
+                face: field_outputs['displacement'].getSubset(region=odb.rootAssembly.nodeSets[face.upper()]).values
+                for face in ('xMax', 'yMax', 'zMax')
+            }
+            for face, displacement_of_node_set in displacement_of_node_sets.items():
+                exported_field_outputs['displacement'][face] = np.average(
+                    np.array([data.data for data in displacement_of_node_set]), axis=0)
+            exported_field_outputs['reaction_force'] = field_outputs['reaction_force'].getSubset(
+                region=odb.rootAssembly.nodeSets[rp_name.upper()]).values[0].data
+            exported_field_outputs['rotation'] = field_outputs['rotation'].getSubset(
+                region=odb.rootAssembly.nodeSets[rp_name.upper()]).values[0].data
+            _values = [stress.mises for stress in field_outputs['stress'].values]
+            exported_field_outputs['mises_stress']['max'] = max(_values)
+            exported_field_outputs['mises_stress']['min'] = min(_values)
+            exported_field_outputs['mises_stress']['average'] = np.average(_values)
+            dump_pickled_dict_data(file_name='{}_{}'.format(field_output_file_header, str(gen)),
+                                   key=entity, to_dump=exported_field_outputs, mode='a')
 
-    if mode == 'Random':
-        file_name = 'Output_parent_{}.csv'.format(1)
-        array_to_csv(path=file_name, arr=eng_const[0, :], dtype=np.float32, mode='a')
+            # History outputs
+            history_outputs = odb.steps[step_name].historyRegions['Node ASSEMBLY.1'].historyOutputs
+            exported_history_outputs = {prop: np.array(history_outputs[prop].data)
+                                        for prop in exported_history_output_properties}
+            dump_pickled_dict_data(file_name='{}_{}'.format(history_output_file_header, str(gen)),
+                                   key=entity, to_dump=exported_history_outputs, mode='a')
 
-    else:
-        file_name = 'Output_offspring_{}.csv'.format(w)
-        array_to_csv(path=file_name, arr=eng_const[0, :], dtype=np.float32, mode='a')
-
-    if mode == 'Gaussian':
-        if model == 'original':
-            mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-%d_original' % (q + 1))
-            del mdb.models['Model-%d_original' % (q)]
-            del mdb.jobs['Job-%d-%d_original' % (w, q)]
-
-        if model == 'gaussian':
-            mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-%d_gaussian' % (q + 1))
-            del mdb.models['Model-%d_gaussian' % (q)]
-            del mdb.jobs['Job-%d-%d_gaussian' % (w, q)]
-
-    else:
-        mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-%d' % (q + 1))
-        del mdb.models['Model-%d' % (q)]
-        del mdb.jobs['Job-%d-%d' % (w, q)]
-
-
-def abaqus_jobsubmit(w, q):
-    if mode == 'GA' or mode == 'Random' or mode == 'None':
-        mdb.jobs['Job-%d-%d' % (w, q)].writeInput()
-
-        mdb.jobs['Job-%d-%d' % (w, q)].submit(consistencyChecking=OFF)
-
-        mdb.jobs['Job-%d-%d' % (w, q)].waitForCompletion()
-
-    if mode == 'Gaussian':
-
-        if model == 'original':
-            mdb.jobs['Job-%d-%d_original' % (w, q)].writeInput()
-
-            mdb.jobs['Job-%d-%d_original' % (w, q)].submit(consistencyChecking=OFF)
-
-            mdb.jobs['Job-%d-%d_original' % (w, q)].waitForCompletion()
-
-        if model == 'gaussian':
-            mdb.jobs['Job-%d-%d_gaussian' % (w, q)].writeInput()
-
-            mdb.jobs['Job-%d-%d_gaussian' % (w, q)].submit(consistencyChecking=OFF)
-
-            mdb.jobs['Job-%d-%d_gaussian' % (w, q)].waitForCompletion()
+        except Exception as e2:
+            print('ODB output reading failed: ', e2)
+        finally:
+            odb.close()
+    except Exception as e1:
+        print('There is no ODB file: ', e1)
 
 
-def control_abaqus(w, offspring, frame=None, restart=False):
-    if restart:
-        save_log('Restarting Job{}-{}.odb'.format(w, restart_pop), frame=frame)
-        mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-%d' % restart_pop)
-        del mdb.models['Model-1']
-        for q in range(restart_pop, end_pop + 1):
-            m = mdb.models['Model-%d' % q]
-            rt = m.rootAssembly
-            abaqus_cad(offspring, m, rt, q)
-            abaqus_merge4(5, m, rt)
-            # save_log('merge complete', frame=frame)
-            abaqus_mesh(m)
-            # save_log('mesh complete', frame=frame)
-            abaqus_material_anisotropic(offspring, 1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450, m, q)
-            # save_log('material complete', frame=frame)
-            abaqus_step(m, rt)
-            # save_log('step complete', frame=frame)
-            abaqus_BC(offspring, m, rt, q)
-            # save_log('BC complete', frame=frame)
-            abaqus_jobsetting(w, q)
-            # save_log('job setting complete', frame=frame)
-            abaqus_jobsubmit(w, q)
-            # save_log('job submit complete', frame=frame)
-            abaqus_fieldOutput(w, q)
-            # save_log('field output complete', frame=frame)
-            # save_log('[{}][Gen{} offspring{}] Field output export complete!'.format(now_s(), w, q))
-            abaqus_historyOutput(w, q)  # correction: input () >> (w,q)
-            # save_log('history output complete', frame=frame)
-            save_log('[{}][Gen{}] {}/{} ({:.2f}%) Complete'.format(now_s(), w, q, end_pop, float(q)/float(end_pop) * 100),
-                     frame=frame)
-        mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-1')
-        del mdb.models['Model-%d' % (end_pop + 1)]
-        save_log('[{}] ========== All Generation{} work done! =========='.format(now_s(), w), frame=frame)
-        os.remove('./args')
-    else:
-        for q in range(ini_pop, end_pop + 1):
-            m = mdb.models['Model-%d' % q]
-            rt = m.rootAssembly
-            abaqus_cad(offspring, m, rt, q)
-            abaqus_merge4(5, m, rt)
-            abaqus_mesh(m)
-            abaqus_material_anisotropic(offspring, 1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450, m, q)
-            abaqus_step(m, rt)
-            abaqus_BC(offspring, m, rt, q)
-            abaqus_jobsetting(w, q)
-            abaqus_jobsubmit(w, q)
-            abaqus_fieldOutput(w, q)
-            # save_log('[{}][Gen{} offspring{}] Field output export complete!'.format(now_s(), w, q))
-            abaqus_historyOutput(w, q)  # correction: input () >> (w,q)
-            save_log('[{}][Gen{}] {}/{} ({:.2f}%) Complete'.format(now_s(), w, q, end_pop, float(q)/float(end_pop) * 100),
-                     frame=frame)
-        mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-1')
-        del mdb.models['Model-%d' % (end_pop + 1)]
-        save_log('[{}] ========== All Generation{} work done! =========='.format(now_s(), w), frame=frame)
-        os.remove('./args')
+def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cube_name,
+                 analysis_mode, material_properties, full, displacement=None):
+    topo_arr = quaver_to_full(topo_arr) if full else topo_arr.copy()
+    cube_x_voxels, cube_y_voxels, cube_z_voxels = topo_arr.shape
+    cube_x_size = voxel_unit_length * cube_x_voxels
+    cube_y_size = voxel_unit_length * cube_y_voxels
+    cube_z_size = voxel_unit_length * cube_z_voxels
+    whole_bound = {'xMin': 0., 'yMin': 0., 'zMin': 0., 'xMax': cube_x_size, 'yMax': cube_y_size, 'zMax': cube_z_size}
+    bounds = {option: bound_setter(whole_bound=whole_bound, option=option) for option in whole_bound.keys()}
+    rp_coordinates = {'RP-x': (1.05 * cube_x_size, cube_y_size / 2, cube_z_size / 2),
+                      'RP-y': (cube_x_size / 2, 1.05 * cube_y_size, cube_z_size / 2),
+                      'RP-z': (cube_x_size / 2, cube_y_size / 2, 1.05 * cube_z_size)}
+
+    with MyModel(model_name='Model-{}'.format(model_name), params=params) as mm:
+        material_name = material_properties['material_name']
+        mm.create_voxel_part(voxel_name=voxel_name)
+        mm.create_mesh_of_part(part_name=voxel_name)
+        mm.create_cube_part(voxel_name=voxel_name, cube_name=cube_name, topo_arr=topo_arr)
+        mm.create_material(**material_properties)
+        mm.assign_section_to_elements_of_part_by_bounding_box(part_name=cube_name, material_name=material_name,
+                                                              section_name=material_name + '-section',
+                                                              bound_definition=whole_bound)
+        for option, bound in bounds.items():
+            mm.create_set_by_bounding_box(instance_name=cube_name + '-1', set_name=option, bound_definition=bound)
+        for rp_name, rp_coordinate in rp_coordinates.items():
+            mm.create_reference_point_and_set(rp_name=rp_name, rp_coordinate=rp_coordinate)
+        for symmetry_diction, boundary_set_name in (('x', 'xMin'), ('y', 'yMin'), ('z', 'zMin')):
+            mm.set_boundary_condition(symmetry_direction=symmetry_diction, set_name=boundary_set_name)
+        if analysis_mode == 'modal':
+            mm.create_step(step_name=analysis_mode + '-step', previous_step='Initial', step_type=analysis_mode)
+            mm.set_encastre(bc_name='encastre_bottom', set_name='yMin', step_name='Initial')
+        elif analysis_mode == 'compression':
+            analysis_step_name = analysis_mode + '-step'
+            mm.create_step(step_name=analysis_step_name, previous_step='Initial', step_type=analysis_mode)
+            mm.allow_self_contact(instance_name=cube_name + '-1', step_name=analysis_step_name)
+            mm.create_coupling(rp_set_name='RP-y', surface_set_name='yMax', constraint_name='coupling')
+            mm.set_displacement(bc_name='displacement',
+                                set_name='RP-y',
+                                step_name=analysis_step_name, displacement=displacement)
+            mm.create_output_requests(step_name=analysis_step_name, history_output_name='H-Output', set_name='RP-y',
+                                      field_outputs=('S', 'U', 'RF', 'IVOL', 'MISESMAX'),
+                                      history_outputs=('U1', 'U2', 'U3', 'RF1', 'RF2', 'RF3', 'ALLIE'))
+        else:
+            raise ValueError
+        mm.root_assembly.regenerate()
+        mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=1, num_gpus=0, run=True)
+        export_outputs(model_name=model_name, step_name=analysis_step_name, rp_name='RP-y')
 
 
-# The main part begins...
-frame = open_log_window()
-while True:
-    print('[{}] ..... scanning for args or args_end .....'.format(now_s()))
-    if os.path.isfile('./args'):
-        # save_log('[{}] args found'.format(now_s()))
-        with open('./args', mode='rb') as f_args:
-            args = pickle.load(f_args)
-        restart = args['restart']
-        w = args['w']
-        offspring = args['offspring']
-        control_abaqus(w=w, offspring=offspring, frame=frame, restart=restart)
-    elif os.path.isfile('./args_end'):
-        os.remove('./args_end')
-        break
-    sleep(1)
-save_log('ABAQUS SESSION DONE!', frame=frame)
+if __name__ == '__main__':
+    client = Client(host=host, port=port, option='json', connect=True)
+    frame = open_job_log()
+    save_log('connected to {}:{}'.format(port, host), job_log_frame=frame)
+    while True:
+        while True:
+            parameters = client.recv()
+            if parameters is not None:
+                break
+        print('Received: ', parameters)
+        if parameters['exit_abaqus']:
+            break
+        restart = parameters['restart']
+        topologies_file_name = parameters['topologies_file_name']
+        topologies_key = parameters['topologies_key']
+        topologies = load_pickled_dict_data(topologies_file_name)[topologies_key]
+        gen_num = topologies_file_name.split('_')[-1]
+        for entity_num, topology in enumerate(topologies, start=1):
+            run_analysis(model_name='{}-{}'.format(gen_num, entity_num), analysis_mode='compression',
+                         topo_arr=topology, voxel_unit_length=parameters['unit_l'], full=False, params=parameters,
+                         material_properties=material, voxel_name='voxel', cube_name='cube',
+                         displacement={'u1': 0, 'u2': parameters['dis_y'], 'u3': 0, 'ur1': 0, 'ur2': 0, 'ur3': 0})
+            save_log('Created Job{}-{}.odb'.format(gen_num, entity_num), job_log_frame=frame)
+        client.send('[{}] Generation {} finished!'.format(datetime.now(), gen_num))
