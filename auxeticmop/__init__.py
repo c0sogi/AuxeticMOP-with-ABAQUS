@@ -10,4 +10,4 @@ from .GraphicUserInterface import *
 from .MutateAndValidate import *
 from .Network import *
 from .PostProcessing import *
-from .ClassDefinitions import *
+from .ParameterDefinitions import *

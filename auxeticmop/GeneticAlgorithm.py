@@ -5,7 +5,7 @@ import os
 from functools import reduce
 from .MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
 from .FileIO import dump_pickled_dict_data, load_pickled_dict_data
-from .ClassDefinitions import Parameters
+from .ParameterDefinitions import Parameters
 
 
 def inspect_clone_in_all_parents(w, topology_flattened, all_parent_topologies):

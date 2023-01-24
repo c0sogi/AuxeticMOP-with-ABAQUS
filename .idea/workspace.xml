@@ -5,9 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="New abaqus script with server">
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/ABQ2.py" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/ABQ2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/__forTesting__/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abaqus data/ABQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/ABQ.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/ClassDefinitions.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +57,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/dcas/PythonCodes/Coop/pythoncode&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -66,7 +74,7 @@
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main (1)">
+  <component name="RunManager" selected="Python.test">
     <configuration name="Network (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -278,8 +286,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main (1)" />
         <item itemvalue="Python.test" />
+        <item itemvalue="Python.main (1)" />
         <item itemvalue="Python.Network (1)" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.main" />
@@ -368,7 +376,21 @@
       <option name="project" value="LOCAL" />
       <updated>1674480088928</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="New abaqus script with server">
+      <created>1674482957937</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1674482957937</updated>
+    </task>
+    <task id="LOCAL-00012" summary="New abaqus script with server">
+      <created>1674482966679</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1674482966679</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

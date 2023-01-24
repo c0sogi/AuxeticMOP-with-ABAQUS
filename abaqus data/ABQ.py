@@ -430,7 +430,7 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
         else:
             raise ValueError
         mm.root_assembly.regenerate()
-        mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=1, num_gpus=0, run=True)
+        mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=params['n'], num_gpus=0, run=True)
         export_outputs(model_name=model_name, step_name=analysis_step_name, rp_name='RP-y')
 
 

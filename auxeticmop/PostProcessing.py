@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
-from .ClassDefinitions import Parameters
+from .ParameterDefinitions import Parameters
 
 
 def get_datum_hv(pareto_1_sorted: np.ndarray, pareto_2_sorted: np.ndarray) -> float:
@@ -58,6 +58,35 @@ def evaluate_fitness_values(topo: np.ndarray[int], result: dict, params: Paramet
             fit_val2 = np.sum(topo[offspring_idx]) / (lx * ly * lz)
             fitness_values[offspring_idx, 1] = fit_val2
     return fitness_values
+
+
+def fitness_evaluation_for_one_entity(var_and_definitions: dict, fitness_value_definitions: dict, params: dict,
+                                      topology: np.ndarray, result: dict) -> dict:
+    vars_dict = dict()
+    predefined_vars = {
+        'total_voxels': np.sum(topology)
+    }
+    for var, definition in var_and_definitions.items():
+        if isinstance(definition, (list, tuple, set)):
+            _results = result.copy()
+            for result_key in definition:
+                _results = _results[result_key]
+            vars_dict.update({var: _results})
+        elif isinstance(definition, str):
+            if definition.startswith('@'):
+                vars_dict.update({var: params[definition[1:]]})
+            elif definition.startswith('$'):
+                vars_dict.update({var: predefined_vars[definition[1:]]})
+            else:
+                raise ValueError
+        else:
+            raise ValueError
+
+    locals().update(vars_dict)
+    _fitness_value_definitions = fitness_value_definitions.copy()
+    for fitness_value_num, definition in fitness_value_definitions.items():
+        _fitness_value_definitions[fitness_value_num] = eval(definition)
+    return _fitness_value_definitions
 
 
 def find_pareto_front_points(costs: np.ndarray, return_index: bool = False) -> np.ndarray:

@@ -10,18 +10,19 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
 from .PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_fitness_values
 from .FileIO import load_pickled_dict_data
-from .ClassDefinitions import Parameters
+from .ParameterDefinitions import Parameters, GuiParameters, translate_dictionary
 
 # Define parameters for gui
-PARAMETER_FILE_NAME = '_PARAMETERS_'
-padx = 5  # Padding width
-pady = 5  # Padding height
-left_width = 1400  # default width: 400
-right_width = 400
-height = 750
-button_width = 15
-parameters = Parameters()
-parameters_dict = asdict(parameters)
+gui_parameters = GuiParameters()
+PARAMETER_FILE_NAME = gui_parameters.parameter_file_name
+LEFT_WIDTH = gui_parameters.left_width
+RIGHT_WIDTH = gui_parameters.right_width
+BUTTON_WIDTH = gui_parameters.button_width
+PADX = gui_parameters.padx
+PADY = gui_parameters.pady
+HEIGHT = gui_parameters.height
+POLLING_RATE = gui_parameters.polling_rate
+TITLE = gui_parameters.title
 
 
 class App:  # GUI class
@@ -31,39 +32,41 @@ class App:  # GUI class
         self.ready_to_run = False
         self.root = tk.Tk()
         self.root.protocol("WM_DELETE_WINDOW", self.callback_quit)
-        self.root.title('Abaqus-Python Unified Control Interface')
+        self.root.title(TITLE)
         self.root.config(background='#FFFFFF')
         self.root.resizable(False, False)
 
         # Frames
-        self.up_frame = tk.Frame(self.root, width=left_width + right_width + 2 * padx, height=100)
+        self.up_frame = tk.Frame(self.root, width=LEFT_WIDTH + RIGHT_WIDTH + 2 * PADX, height=100)
         self.up_frame.config(background='#FFFFFF')
-        self.up_frame.grid(row=0, column=0, padx=padx, pady=pady / 2)
+        self.up_frame.grid(row=0, column=0, padx=PADX, pady=PADY / 2)
         self.up_frame.grid_propagate(False)
-        self.down_frame = tk.Frame(self.root, width=right_width + left_width + 2 * padx, height=height)
+        self.down_frame = tk.Frame(self.root, width=RIGHT_WIDTH + LEFT_WIDTH + 2 * PADX, height=HEIGHT)
         self.down_frame.config(background='#FFFFFF')
-        self.left_frame = tk.Frame(self.down_frame, width=left_width, height=height, padx=padx, pady=pady)
-        self.right_frame = tk.Frame(self.down_frame, width=right_width, height=height, padx=padx, pady=pady)
+        self.left_frame = tk.Frame(self.down_frame, width=LEFT_WIDTH, height=HEIGHT, padx=PADX, pady=PADY)
+        self.right_frame = tk.Frame(self.down_frame, width=RIGHT_WIDTH, height=HEIGHT, padx=PADX, pady=PADY)
 
         # Elements
         self.set_path_title = tk.Label(self.up_frame,
                                        text='Choose the folder containing the Abaqus script and CSV files.')
         self.set_path_title.config(background='#FFFFFF')
         self.set_path_display = tk.Listbox(self.up_frame, width=50, height=1)
-        self.set_path_btn = tk.Button(self.up_frame, text='Browse folder...', width=button_width,
+        self.set_path_btn = tk.Button(self.up_frame, text='Browse folder...', width=BUTTON_WIDTH,
                                       command=self.onclick_set_path_button)
-        self.submit_btn = tk.Button(self.right_frame, width=button_width, text='Save presets',
+        self.submit_btn = tk.Button(self.right_frame, width=BUTTON_WIDTH, text='Save presets',
                                     command=self.onclick_submit_btn)
-        self.exit_btn = tk.Button(self.right_frame, width=button_width, text='Exit',
+        self.exit_btn = tk.Button(self.right_frame, width=BUTTON_WIDTH, text='Exit',
                                   command=self.onclick_exit_btn, background='#FF0000', foreground='#FFFFFF')
-        self.set_default_btn = tk.Button(self.right_frame, width=button_width, text='Load defaults',
+        self.set_default_btn = tk.Button(self.right_frame, width=BUTTON_WIDTH, text='Load defaults',
                                          command=self.onclick_set_default_btn)
         self.setPath = tk.StringVar()
         self.string_vars = [tk.StringVar() for _ in Parameters.__dict__]
         self.figure, self.ax = plt.subplots(nrows=1, ncols=2,
-                                            figsize=((left_width - padx) / 100, (height - pady) / 100), dpi=100)
+                                            figsize=((LEFT_WIDTH - PADX) / 100, (HEIGHT - PADY) / 100), dpi=100)
         self.bar = FigureCanvasTkAgg(self.figure, self.left_frame)
         self.bar.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
+        self.parameters = Parameters()
+        self.parameters_dict = asdict(self.parameters)
 
         # Show main
         self.set_path_title.pack()
@@ -82,9 +85,9 @@ class App:  # GUI class
         self.ax[1].grid(True)
         self.ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
         if self.conn is not None:
-            self.update_canvas()
+            self.update_canvas(polling_rate=POLLING_RATE)
 
-    def update_canvas(self, polling_rate: float = 10.0):
+    def update_canvas(self, polling_rate: float):
         if self.conn.poll():  # Checking if any received data available for every 1/polling_rate second
             try:
                 _x1, _y1, _x2y2 = self.conn.recv()
@@ -144,12 +147,12 @@ class App:  # GUI class
             messagebox.showerror("Error", f"An error occurred:\n{error_message}")
 
     def onclick_set_default_btn(self):
-        for _idx, _value in enumerate(parameters_dict.values()):
+        for _idx, _value in enumerate(self.parameters_dict.values()):
             self.string_vars[_idx].set(_value)
 
     def return_radiobutton_frame_instead_of_entry(self, key: str, str_var_idx: int, name_dict: dict):  # right_Frame
-        _radiobutton_frame = tk.Frame(self.right_frame, width=left_width - 2 * padx,
-                                      height=height / len(parameters_dict) - pady)
+        _radiobutton_frame = tk.Frame(self.right_frame, width=LEFT_WIDTH - 2 * PADX,
+                                      height=HEIGHT / len(self.parameters_dict) - PADY)
         if len(name_dict[key]) == 2:
             _label_width = 25
             _radio_button_width = 9
@@ -158,7 +161,8 @@ class App:  # GUI class
             _radio_button_width = 5
         else:
             raise ValueError('Please make sure the number of checkboxes is less than 3.')
-        _label = tk.Label(_radiobutton_frame, width=_label_width, text=translator(s=key, flip=False), anchor='w')
+        _label = tk.Label(_radiobutton_frame, width=_label_width, text=translator(dictionary=translate_dictionary,
+                                                                                  s=key, flip=False), anchor='w')
         _label.grid(row=0, column=0)
 
         for menu_idx, menu in enumerate(name_dict[key]):
@@ -168,16 +172,16 @@ class App:  # GUI class
         return _radiobutton_frame
 
     def onclick_submit_btn(self):
-        for params_idx, key in enumerate(parameters_dict.keys()):
-            parameters_dict[key] = atoi(self.string_vars[params_idx].get())
+        for params_idx, key in enumerate(self.parameters_dict.keys()):
+            self.parameters_dict[key] = atoi(self.string_vars[params_idx].get())
         if self.ready_to_run and self.conn is not None:
-            self.conn.send((self.setPath.get(), Parameters(**parameters_dict)))
+            self.conn.send((self.setPath.get(), Parameters(**self.parameters_dict)))
             self.submit_btn.config(background='#0000FF', foreground='#FFFFFF', text='Running...')
         else:
             with open(PARAMETER_FILE_NAME, mode='wb') as f_params:
-                pickle.dump(parameters_dict, f_params)
+                pickle.dump(self.parameters_dict, f_params)
                 print(f'[GUI] Dumping to "{os.getcwd()}" Complete')
-                for key, value in parameters_dict.items():
+                for key, value in self.parameters_dict.items():
                     print(f'- {key}: {value}')
             self.submit_btn.config(background='#00FF00', text='Run')
             self.ready_to_run = True
@@ -192,11 +196,11 @@ class App:  # GUI class
             'mode': ('GA', 'random'),
             'evaluation_version': ('ver1', 'ver2', 'ver3')
         }
-        self.down_frame.grid(row=1, column=0, padx=padx, pady=pady / 2)
+        self.down_frame.grid(row=1, column=0, padx=PADX, pady=PADY / 2)
         self.down_frame.grid_propagate(False)
-        self.left_frame.grid(row=1, column=0, padx=padx, pady=pady / 2)
+        self.left_frame.grid(row=1, column=0, padx=PADX, pady=PADY / 2)
         self.left_frame.grid_propagate(False)
-        self.right_frame.grid(row=1, column=1, padx=padx, pady=pady / 2)
+        self.right_frame.grid(row=1, column=1, padx=PADX, pady=PADY / 2)
         self.right_frame.grid_propagate(False)
         for row_idx, key in enumerate(asdict(Parameters()).keys()):
             if key in radiobutton_name_dict.keys():
@@ -205,9 +209,10 @@ class App:  # GUI class
                 _radio_button_frame.grid(row=row_idx, column=0)
 
             else:
-                _entry_frame = tk.Frame(self.right_frame, width=left_width - 2 * padx,
-                                        height=height / len(asdict(Parameters()).keys()) - pady)
-                _label = tk.Label(_entry_frame, width=25, text=translator(s=key, flip=False), anchor='w')
+                _entry_frame = tk.Frame(self.right_frame, width=LEFT_WIDTH - 2 * PADX,
+                                        height=HEIGHT / len(asdict(Parameters()).keys()) - PADY)
+                _label = tk.Label(_entry_frame, width=25, text=translator(dictionary=translate_dictionary,
+                                                                          s=key, flip=False), anchor='w')
                 _entry = tk.Entry(_entry_frame, width=25, textvariable=self.string_vars[row_idx])
                 _entry_frame.grid(row=row_idx, column=0)
                 _label.grid(row=0, column=0)
@@ -327,34 +332,7 @@ def atoi(s: str) -> str | int | float:
         return s
 
 
-def translator(s: str, flip: bool = False) -> str:
-    dictionary = {'abaqus_script': 'Filename of ABAQUS script',
-                  'abaqus_mode': 'ABAQUS execution mode',
-                  'mode': 'GA Mode',
-                  'evaluation_version': 'GA evaluation version',
-                  'restart_pop': '[P] Restart from population',
-                  'ini_pop': '[P] First Population',
-                  'end_pop': '[P] Last Population',
-                  'ini_gen': '[G] First Generation',
-                  'end_gen': '[G] Last Generation',
-                  'mutation_rate': 'Mutation rate(0~1)',
-                  'unit_l': 'Voxel unit length(mm)',
-                  'lx': 'Voxel number in X-direction',
-                  'ly': 'Voxel number in Y-direction',
-                  'lz': 'Voxel number in Z-direction',
-                  'divide_number': 'Upscale multiplier(1~)',
-                  'mesh_size': 'Mesh size/Voxel size(0~1)',
-                  'dis_y': 'Y Compression ratio(-1~1)',
-                  'material_modulus': "Young's modulus(MPa)",
-                  'poisson_ratio': "Poisson's ratio(0~1)",
-                  'density': 'Material density(ton/mm3)',
-                  'MaxRF22': 'Maximum RF22(N)',
-                  'penalty_coefficient': 'Penalty coefficient',
-                  'sigma': 'Sigma for filtering',
-                  'threshold': 'Threshold for filtering',
-                  'n_cpus': 'CPU cores for abaqus',
-                  'n_gpus': 'GPU cores for abaqus',
-                  'timeout': 'Timeout of validation process(s)'}
+def translator(dictionary: dict, s: str, flip: bool = False) -> str:
     return {value: key for key, value in dictionary.items()}.get(s) if flip else dictionary.get(s)
 
 
