@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from dataclasses import asdict
 from scipy.ndimage import gaussian_filter
 from .ParameterDefinitions import Parameters
 
@@ -21,52 +22,13 @@ def get_hv_from_datum_hv(datum_hv: float, lower_bounds: list, ref_x: float, ref_
     return datum_hv + (ref_x - lower_bounds[0]) * (ref_y - lower_bounds[1])
 
 
-def evaluate_fitness_values(topo: np.ndarray[int], result: dict, params: Parameters) -> np.ndarray[float]:
-    fitness_values = np.empty((len(topo), 2), dtype=float)
-    max_rf22 = params.MaxRF22
-    lx, ly, lz = params.lx, params.ly, params.lz
-    k = params.penalty_coefficient
-    if params.evaluation_version == 'ver1':
-        for offspring_idx in range(topo.shape[0]):
-            dis11 = result[offspring_idx, 0]
-            dis22 = result[offspring_idx, 1]
-            rf22 = result[offspring_idx, 4]
-            fit_val1 = (rf22 / max_rf22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
-            fitness_values[offspring_idx, 0] = fit_val1
-            fit_val2 = - (dis11 / dis22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
-            fitness_values[offspring_idx, 1] = fit_val2
-    elif params.evaluation_version == 'ver2':
-        for offspring_idx in range(topo.shape[0]):
-            rf22 = result[offspring_idx, 4]
-            fit_val1 = np.sum(topo[offspring_idx]) / (lx * ly * lz)
-            fitness_values[offspring_idx, 0] = fit_val1
-            fit_val2 = rf22 / max_rf22
-            fitness_values[offspring_idx, 1] = fit_val2
-    elif params.evaluation_version == 'ver3':
-        for offspring_idx in range(len(result)):
-            dis11 = result[offspring_idx+1]['displacement']['xMax'][0]
-            dis22 = result[offspring_idx+1]['displacement']['yMax'][1]
-            dis33 = result[offspring_idx+1]['displacement']['zMax'][2]
-            fit_val1 = - (dis11 / dis22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
-            fitness_values[offspring_idx, 0] = fit_val1
-            fit_val2 = - (dis33 / dis22) + k * (np.sum(topo[offspring_idx]) / (lx * ly * lz))
-            fitness_values[offspring_idx, 1] = fit_val2
-    elif params.evaluation_version == 'ver4':
-        for offspring_idx in range(topo.shape[0]):
-            fit_val1 = result[offspring_idx, 9]
-            fitness_values[offspring_idx, 0] = fit_val1
-            fit_val2 = np.sum(topo[offspring_idx]) / (lx * ly * lz)
-            fitness_values[offspring_idx, 1] = fit_val2
-    return fitness_values
-
-
-def fitness_evaluation_for_one_entity(var_and_definitions: dict, fitness_value_definitions: dict, params: dict,
-                                      topology: np.ndarray, result: dict) -> dict:
+def evaluate_fitness_value_for_one_entity(vars_definitions: dict, fitness_value_definitions: tuple | list,
+                                          params_dict: dict, result: dict, topology: np.ndarray) -> np.ndarray:
     vars_dict = dict()
     predefined_vars = {
         'total_voxels': np.sum(topology)
     }
-    for var, definition in var_and_definitions.items():
+    for var, definition in vars_definitions.items():
         if isinstance(definition, (list, tuple, set)):
             _results = result.copy()
             for result_key in definition:
@@ -74,19 +36,33 @@ def fitness_evaluation_for_one_entity(var_and_definitions: dict, fitness_value_d
             vars_dict.update({var: _results})
         elif isinstance(definition, str):
             if definition.startswith('@'):
-                vars_dict.update({var: params[definition[1:]]})
+                vars_dict.update({var: params_dict[definition[1:]]})
             elif definition.startswith('$'):
                 vars_dict.update({var: predefined_vars[definition[1:]]})
             else:
                 raise ValueError
         else:
             raise ValueError
-
     locals().update(vars_dict)
-    _fitness_value_definitions = fitness_value_definitions.copy()
-    for fitness_value_num, definition in fitness_value_definitions.items():
-        _fitness_value_definitions[fitness_value_num] = eval(definition)
-    return _fitness_value_definitions
+    fitness_values = np.empty((1, len(fitness_value_definitions)), dtype=float)
+    for fitness_value_idx, definition in enumerate(fitness_value_definitions):
+        fitness_values[0, fitness_value_idx] = eval(definition)
+    return fitness_values
+
+
+def evaluate_all_fitness_values(fitness_definitions: dict, params_dict: dict,
+                                results: dict, topologies: np.ndarray) -> np.ndarray:
+    evaluation_version = params_dict['evaluation_version']
+    vars_definitions = fitness_definitions[evaluation_version].vars_definitions
+    fitness_value_definitions = fitness_definitions[evaluation_version].fitness_value_definitions
+
+    all_fitness_values = np.empty((0, len(fitness_value_definitions)), dtype=float)
+    assert len(topologies) == len(results)
+    for entity_idx in range(len(topologies)):
+        all_fitness_values = np.vstack((all_fitness_values, evaluate_fitness_value_for_one_entity(
+            vars_definitions=vars_definitions, fitness_value_definitions=fitness_value_definitions,
+            params_dict=params_dict, result=results[entity_idx+1], topology=topologies[entity_idx])))
+    return all_fitness_values
 
 
 def find_pareto_front_points(costs: np.ndarray, return_index: bool = False) -> np.ndarray:
@@ -254,6 +230,7 @@ def visualize_n_cubes(arr_4d, full=False):
         ax[idx].grid(True)
     plt.show()
 
+
 #
 # def show_pareto_fronts(gen: int, params, directory: str = None, show: bool = False) -> np.ndarray:
 #     def find_job_location_from_offspring(g, tp):
@@ -291,9 +268,10 @@ def visualize_n_cubes(arr_4d, full=False):
 #     return pareto_indices
 
 
-def print_origin_of_paretos(params) -> None:
+def print_origin_of_paretos(params: Parameters, fitness_definitions: dict) -> None:
     """
     Print original location of pareto topologies from whole csv files.
+    :param fitness_definitions: A dictionary containing of FitnessDefinitions dataclass
     :param params: Parameter dataclass
     :return: None
     """
@@ -320,15 +298,15 @@ def print_origin_of_paretos(params) -> None:
                                                                  dtype=dtype, delimiter=','), axis=0)))
         return ad
 
-    def _find_job_location_from_offspring(gen, pareto_idx, tpp, tpo, tpfp, nd):
+    def _find_job_location_from_offspring(g, prt_idx, tpp, tpo, tpfp, nd):
         # tpp: topo_pareto, tpo: topo_offspring, tpfp: topo_first_parent, nd: num_dict
         arg = np.argwhere(np.all(tpo == tpp, axis=(2,)))
 
         if len(arg) == 0:
             arg = np.argwhere(np.all(tpfp == tpp, axis=(1,)))
-            print(f'Pareto topo in parent {gen} - {pareto_idx + 1} is in parent ', 1, '-', arg[0, 0] + 1)
+            print(f'Pareto topo in parent {g} - {prt_idx + 1} is in parent ', 1, '-', arg[0, 0] + 1)
         else:
-            print(f'Pareto topo in parent {gen} - {pareto_idx + 1} is in offspring ', nd['topo_offspring'][arg[0, 0]],
+            print(f'Pareto topo in parent {g} - {prt_idx + 1} is in offspring ', nd['topo_offspring'][arg[0, 0]],
                   '-', arg[0, 1] + 1)
 
     filename_headers = ('topo_parent', 'topo_offspring', 'Output_parent', 'Output_offspring')
@@ -341,13 +319,14 @@ def print_origin_of_paretos(params) -> None:
         thread.join()
     del threads
     for arr_idx, gen in enumerate(num_dict['Output_parent']):
-        fitness_values = evaluate_fitness_values(topo=arr_dict['topo_parent'][arr_idx],
-                                                 result=arr_dict['Output_parent'][arr_idx], params=params)
+        fitness_values = evaluate_all_fitness_values(
+            topologies=arr_dict['topo_parent'][arr_idx], results=arr_dict['Output_parent'][arr_idx],
+            params_dict=asdict(params), fitness_definitions=fitness_definitions)
         pareto_indices = find_pareto_front_points(costs=fitness_values, return_index=True)
         print('=' * 30, f'Parent {gen}', '=' * 30)
         for pareto_idx in pareto_indices:
             topo_pareto = arr_dict['topo_parent'][arr_idx, pareto_idx]
-            _find_job_location_from_offspring(gen=gen, pareto_idx=pareto_idx, tpp=topo_pareto, nd=num_dict,
+            _find_job_location_from_offspring(g=gen, prt_idx=pareto_idx, tpp=topo_pareto, nd=num_dict,
                                               tpo=arr_dict['topo_offspring'], tpfp=arr_dict['topo_parent'][0])
 
 
@@ -366,11 +345,11 @@ def open_history_output(gen, path=None):
 
 
 if __name__ == '__main__':
-    from GraphicUserInterface import Parameters
     from os import chdir
+    from .ParameterDefinitions import fitness_definitions as fit_def
 
     set_path = r'f:\shshsh\data-23-1-4'
     chdir(set_path)
     parameters = Parameters()
     parameters.post_initialize()
-    print_origin_of_paretos(params=parameters)
+    print_origin_of_paretos(params=parameters, fitness_definitions=fit_def)

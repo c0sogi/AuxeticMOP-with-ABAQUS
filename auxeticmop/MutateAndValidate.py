@@ -218,24 +218,24 @@ def one_survived_tree_labels(labeled_arr: np.ndarray, lx: int, ly: int, lz: int)
     labels_plane_5 = set()
     labels_plane_6 = set()
 
-    for i in range(ly):
-        for j in range(lz):
-            labels_plane_1.add(labeled_arr[0, i, j])
-    for i in range(ly):
-        for j in range(lz):
-            labels_plane_2.add(labeled_arr[lx - 1, i, j])
-    for i in range(lx):
-        for j in range(lz):
-            labels_plane_3.add(labeled_arr[i, 0, j])
-    for i in range(lx):
-        for j in range(lz):
-            labels_plane_4.add(labeled_arr[i, ly - 1, j])
-    for i in range(lx):
-        for j in range(ly):
-            labels_plane_5.add(labeled_arr[i, j, 0])
-    for i in range(lx):
-        for j in range(ly):
-            labels_plane_6.add(labeled_arr[i, j, lz - 1])
+    for idx_1 in range(ly):
+        for idx_2 in range(lz):
+            labels_plane_1.add(labeled_arr[0, idx_1, idx_2])
+    for idx_1 in range(ly):
+        for idx_2 in range(lz):
+            labels_plane_2.add(labeled_arr[lx - 1, idx_1, idx_2])
+    for idx_1 in range(lx):
+        for idx_2 in range(lz):
+            labels_plane_3.add(labeled_arr[idx_1, 0, idx_2])
+    for idx_1 in range(lx):
+        for idx_2 in range(lz):
+            labels_plane_4.add(labeled_arr[idx_1, ly - 1, idx_2])
+    for idx_1 in range(lx):
+        for idx_2 in range(ly):
+            labels_plane_5.add(labeled_arr[idx_1, idx_2, 0])
+    for idx_1 in range(lx):
+        for idx_2 in range(ly):
+            labels_plane_6.add(labeled_arr[idx_1, idx_2, lz - 1])
     return labels_plane_1, labels_plane_2, labels_plane_3, labels_plane_4, labels_plane_5, labels_plane_6
 
 
@@ -245,12 +245,12 @@ def one_survived_tree(arr_3d: np.ndarray, labeled_arr: np.ndarray, last_survived
     ly = arr_3d.shape[1]
     lz = arr_3d.shape[2]
     changed_voxels = 0
-    for i in range(lx):
-        for j in range(ly):
-            for k in range(lz):
-                if labeled_arr[i, j, k] not in (0, last_survived_label):
+    for idx_1 in range(lx):
+        for idx_2 in range(ly):
+            for idx_3 in range(lz):
+                if labeled_arr[idx_1, idx_2, idx_3] not in (0, last_survived_label):
                     changed_voxels -= 1
-                    arr_3d[i, j, k] = 0
+                    arr_3d[idx_1, idx_2, idx_3] = 0
     return arr_3d, changed_voxels
 
 
@@ -337,16 +337,16 @@ def mutation(arr_3d: np.ndarray, mutation_probability: float) -> tuple[np.ndarra
     lz = arr_3d.shape[2]
     changed_voxels = 0
 
-    for i in range(lx):
-        for j in range(ly):
-            for k in range(lz):
+    for idx_1 in range(lx):
+        for idx_2 in range(ly):
+            for idx_3 in range(lz):
                 p = np.random.random()
                 if p < mutation_probability:
-                    if arr_copy[i, j, k] == 1:
-                        arr_copy[i, j, k] = 0
+                    if arr_copy[idx_1, idx_2, idx_3] == 1:
+                        arr_copy[idx_1, idx_2, idx_3] = 0
                         changed_voxels -= 1
                     else:
-                        arr_copy[i, j, k] = 1
+                        arr_copy[idx_1, idx_2, idx_3] = 1
                         changed_voxels += 1
     return arr_copy, changed_voxels
 
@@ -426,8 +426,7 @@ if __name__ == '__main__':
     import os
     from GeneticAlgorithm import generate_offspring
     os.chdir('f:/shshsh/temp')
-    for i in range(51):
-        arr_4d = np.genfromtxt(f'topo_parent_{i+1}.csv', delimiter=',', dtype=int)
-        generate_offspring(topo_parent=arr_4d, gen=i+1, lx=10, ly=10, lz=10, end_pop=100, mutation_rate=0.05,
+    for n in range(51):
+        arrs = np.genfromtxt(f'topo_parent_{n + 1}.csv', delimiter=',', dtype=int)
+        generate_offspring(topo_parent=arrs, gen=n + 1, lx=10, ly=10, lz=10, end_pop=100, mutation_rate=0.05,
                            timeout=100.0)
-

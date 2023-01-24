@@ -58,28 +58,84 @@ class GuiParameters:
     title: str = 'Abaqus-Python Unified Control Interface'
 
 
+radiobutton_name_dict = {
+    'abaqus_mode': ('noGUI', 'script'),
+    'mode': ('GA', 'random'),
+    'evaluation_version': ('ver1', 'ver2', 'ver3')
+}
+
+
 @dataclass
-class FitnessEvaluation:
-    variables_and_keys: dict
-    variables_to_fitness_value: dict
+class FitnessDefinitions:
+    vars_definitions: dict
+    fitness_value_definitions: tuple | list
 
 
-var_and_definitions_ver3 = {
-    'dis11': ('displacement', 'xMax', 0),
-    'dis22': ('displacement', 'yMax', 1),
-    'dis33': ('displacement', 'zMax', 2),
-    'k': '@penalty_coefficient',  # The prefix @ means this is variable is from Parameters
-    'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
-    'lx': '@lx',
-    'ly': '@ly',
-    'lz': '@lz'
+exported_field_outputs_format = {
+    'displacement': {'xMax': np.ndarray, 'yMax': np.ndarray, 'zMax': np.ndarray},
+    'rotation': np.ndarray,
+    'reaction_force': np.ndarray,
+    'mises_stress': {'max': float, 'min': float, 'average': float}
 }
 
-fitness_value_definitions_ver3 = {
-    1: '- (dis11 / dis22) + k * (total_voxels) / (lx * ly * lz)',
-    2: '- (dis33 / dis22) + k * (total_voxels) / (lx * ly * lz)'
+fitness_definitions = {
+    'ver1': FitnessDefinitions(
+        vars_definitions={
+            'dis11': ('displacement', 'xMax', 0),
+            'dis22': ('displacement', 'yMax', 1),
+            'rf22': ('reaction_force', 2),
+            'max_rf22': '@MaxRF22',
+            'k': '@penalty_coefficient',  # The prefix @ means this is variable is from Parameters
+            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'lx': '@lx',
+            'ly': '@ly',
+            'lz': '@lz'
+        },
+        fitness_value_definitions=(
+            '(rf22 / max_rf22) + k * total_voxels / (lx * ly * lz)',
+            '- (dis11 / dis22) + k * total_voxels / (lx * ly * lz)'
+        )),
+    'ver2': FitnessDefinitions(
+        vars_definitions={
+            'rf22': ('reaction_force', 2),
+            'max_rf22': '@MaxRF22',  # The prefix @ means this is variable is from Parameters
+            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'lx': '@lx',
+            'ly': '@ly',
+            'lz': '@lz'
+        },
+        fitness_value_definitions=(
+            'total_voxels / (lx * ly * lz)',
+            'rf22 / max_rf22'
+        )),
+    'ver3': FitnessDefinitions(
+        vars_definitions={
+            'dis11': ('displacement', 'xMax', 0),
+            'dis22': ('displacement', 'yMax', 1),
+            'dis33': ('displacement', 'zMax', 2),
+            'k': '@penalty_coefficient',  # The prefix @ means this is variable is from Parameters
+            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'lx': '@lx',
+            'ly': '@ly',
+            'lz': '@lz'
+        },
+        fitness_value_definitions=(
+            '- (dis11 / dis22) + k * (total_voxels) / (lx * ly * lz)',
+            '- (dis33 / dis22) + k * (total_voxels) / (lx * ly * lz)'
+        )),
+    'ver4': FitnessDefinitions(
+        vars_definitions={
+            'max_mises': ('mises_stress', 'max'),
+            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'lx': '@lx',  # The prefix @ means this is variable is from Parameters
+            'ly': '@ly',
+            'lz': '@lz'
+        },
+        fitness_value_definitions=(
+            'max_mises',
+            'total_voxels / (lx * ly * lz)'
+        ))
 }
-
 
 translate_dictionary = {'abaqus_script': 'Filename of ABAQUS script',
                         'abaqus_mode': 'ABAQUS execution mode',

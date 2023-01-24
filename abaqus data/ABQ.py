@@ -27,8 +27,8 @@ material = {
     'density': 1.2e-09,
     'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
 }
-host = 'localhost'
-port = 12345
+HOST = 'localhost'
+PORT = 12345
 
 
 class Client:
@@ -435,9 +435,9 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
 
 
 if __name__ == '__main__':
-    client = Client(host=host, port=port, option='json', connect=True)
+    client = Client(host=HOST, port=PORT, option='json', connect=True)
     frame = open_job_log()
-    save_log('connected to {}:{}'.format(port, host), job_log_frame=frame)
+    save_log('connected to {}:{}'.format(PORT, HOST), job_log_frame=frame)
     while True:
         while True:
             parameters = client.recv()

@@ -7,10 +7,11 @@ import multiprocessing as mp
 from multiprocessing import connection
 from dataclasses import asdict
 from auxeticmop import generate_offspring, random_parent_generation
-from auxeticmop import App, Visualizer, Parameters
-from auxeticmop import evaluate_fitness_values, selection
+from auxeticmop import App, Visualizer
+from auxeticmop import evaluate_all_fitness_values, selection
 from auxeticmop import load_pickled_dict_data, dump_pickled_dict_data
 from auxeticmop import Server
+from auxeticmop.ParameterDefinitions import Parameters, fitness_definitions
 
 
 def make_and_start_process(target: any, duplex: bool = True,
@@ -116,16 +117,18 @@ def one_generation(gen: int, restart: bool, params: Parameters, visualizer: Visu
 
     # Import parent outputs of current generation from abaqus
     result_offspring = load_pickled_dict_data(f'FieldOutput_offspring_{gen}')
+    assert len(topo_parent) == len(result_parent) == len(topo_offspring) == len(result_offspring)
     all_topologies = np.vstack((topo_parent, topo_offspring))
-    fitness_value_parent = evaluate_fitness_values(topo=topo_parent, result=result_parent, params=params)
-    fitness_value_offspring = evaluate_fitness_values(topo=topo_offspring, result=result_offspring, params=params)
-    all_fitness_values = np.vstack((fitness_value_parent, fitness_value_offspring))
+    # This dict union using pipe operator is allowed only for Python version >= 3.9
+    all_results = dict(result_parent | {key + len(result_parent): value for key, value in result_offspring.items()})
+    all_fitness_values = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
+                                                     params_dict=asdict(params),
+                                                     results=all_results, topologies=all_topologies)
 
     # Topologies of parent of next generation will be selected by pareto fronts criterion
     pareto_indices = selection(all_fitness_values=all_fitness_values, selected_size=params.end_pop)
     selected_topologies = all_topologies[pareto_indices]
-    selected_results = {entity_num: result_parent[pareto_idx % params.end_pop + 1]
-                        if pareto_idx < params.end_pop else result_offspring[pareto_idx % params.end_pop + 1]
+    selected_results = {entity_num: all_results[pareto_idx + 1]
                         for entity_num, pareto_idx in enumerate(pareto_indices, start=1)}
     dump_pickled_dict_data(f'Topologies_{gen + 1}', key='parent', to_dump=selected_topologies, mode='w')
     with open(f'FieldOutput_{gen + 1}', mode='wb') as f:
@@ -192,14 +195,3 @@ if __name__ == '__main__':
 
     # Make abaqus exit itself
     server_to_abaqus.send(client_socket=server_to_abaqus.connected_clients[-1], data={'exit_abaqus': True})
-
-    # except Exception as error_message:
-    #     # An error message
-    #     print('[MAIN] An error in main function occurred while generating generations: \n', error_message)
-    # finally:
-    #     # Clear processes
-    #     gui_process.kill()
-    #     abaqus_process.kill()
-    #     parent_conn.close()
-    #     child_conn.close()
-    #     print('Main Process complete')

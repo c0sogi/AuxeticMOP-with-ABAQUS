@@ -8,9 +8,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
-from .PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_fitness_values
+from .PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_all_fitness_values
 from .FileIO import load_pickled_dict_data
-from .ParameterDefinitions import Parameters, GuiParameters, translate_dictionary
+from .ParameterDefinitions import Parameters, GuiParameters, translate_dictionary, radiobutton_name_dict, \
+    fitness_definitions
 
 # Define parameters for gui
 gui_parameters = GuiParameters()
@@ -23,6 +24,7 @@ PADY = gui_parameters.pady
 HEIGHT = gui_parameters.height
 POLLING_RATE = gui_parameters.polling_rate
 TITLE = gui_parameters.title
+RADIOBUTTON_NAME_DICT = radiobutton_name_dict
 
 
 class App:  # GUI class
@@ -191,11 +193,6 @@ class App:  # GUI class
         self.root.quit()
 
     def show_parameters(self, loaded: None | dict) -> None:
-        radiobutton_name_dict = {
-            'abaqus_mode': ('noGUI', 'script'),
-            'mode': ('GA', 'random'),
-            'evaluation_version': ('ver1', 'ver2', 'ver3')
-        }
         self.down_frame.grid(row=1, column=0, padx=PADX, pady=PADY / 2)
         self.down_frame.grid_propagate(False)
         self.left_frame.grid(row=1, column=0, padx=PADX, pady=PADY / 2)
@@ -203,9 +200,9 @@ class App:  # GUI class
         self.right_frame.grid(row=1, column=1, padx=PADX, pady=PADY / 2)
         self.right_frame.grid_propagate(False)
         for row_idx, key in enumerate(asdict(Parameters()).keys()):
-            if key in radiobutton_name_dict.keys():
+            if key in RADIOBUTTON_NAME_DICT.keys():
                 _radio_button_frame = self.return_radiobutton_frame_instead_of_entry(key=key, str_var_idx=row_idx,
-                                                                                     name_dict=radiobutton_name_dict)
+                                                                                     name_dict=RADIOBUTTON_NAME_DICT)
                 _radio_button_frame.grid(row=row_idx, column=0)
 
             else:
@@ -306,10 +303,11 @@ class Visualizer:
             self.axes[1].grid(True)
 
     def visualize(self, params, w, use_manual_rp, ref_x=0.0, ref_y=0.0):
-        topo_next_parent = load_pickled_dict_data(f'Topologies_{w+1}')['parent']
-        result_next_parent = load_pickled_dict_data(f'FieldOutput_{w+1}')
-        fitness_values_next_parent = evaluate_fitness_values(topo=topo_next_parent, result=result_next_parent,
-                                                             params=params)
+        topo_next_parent = load_pickled_dict_data(f'Topologies_{w + 1}')['parent']
+        result_next_parent = load_pickled_dict_data(f'FieldOutput_{w + 1}')
+        fitness_values_next_parent = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
+                                                                 params_dict=asdict(params), results=topo_next_parent,
+                                                                 topologies=result_next_parent)
         fitness_pareto_next_parent = find_pareto_front_points(costs=fitness_values_next_parent, return_index=False)
         self.plot(gen_num=w,
                   pareto_1_sorted=fitness_pareto_next_parent[:, 0], pareto_2_sorted=fitness_pareto_next_parent[:, 1],

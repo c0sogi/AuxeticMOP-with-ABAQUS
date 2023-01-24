@@ -11,6 +11,7 @@ try:
 except ImportError:
     from queue import Queue
 
+
 class Server:
     def __init__(self, host, port, option, run_nonblocking):
         self.host = host
@@ -173,9 +174,9 @@ if __name__ == '__main__':
         while len(server.connected_clients) == 0:
             sleep(1)
         while True:
-            data = {'a': 1, 'b': 2.0, 'c': 'hello'}
-            json_data = json.dumps(data)
-            server.send(client_socket=server.connected_clients[-1], data=data)
+            data_to_send = {'a': 1, 'b': 2.0, 'c': 'hello'}
+            json_data = json.dumps(data_to_send)
+            server.send(client_socket=server.connected_clients[-1], data=data_to_send)
             print('sending: ', json_data)
             sleep(5)
 
