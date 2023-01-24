@@ -20,6 +20,6 @@ The overall steps are,
 5. Redo 1~4 steps for next generations.
 
 ## Required
-- Language: Python 3.10
+- Language: Python, with version >=3.9 for some new PEP syntax. 3.10 is recommended
 - External libraries: numpy, numba, scipy, matplotlib
 - Other software: ABAQUS CAE
