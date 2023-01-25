@@ -4,21 +4,165 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="New abaqus script with server">
-      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_1" afterDir="false" />
+    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Cleaned up some minor code duplications">
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_10" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_11" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_12" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_13" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_14" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_15" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_16" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_17" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_18" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_19" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_20" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_21" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_22" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_23" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_24" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_25" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_26" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_27" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_28" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_29" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_30" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_31" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_32" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_33" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_34" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_35" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_36" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_37" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_38" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_39" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_40" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_41" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_42" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_43" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_44" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_45" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_46" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_47" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_48" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_49" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_50" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_51" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_6" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_7" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_9" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_10" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_11" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_12" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_13" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_14" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_15" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_16" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_17" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_18" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_19" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_20" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_21" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_22" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_23" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_24" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_25" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_26" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_27" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_28" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_29" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_30" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_31" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_32" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_33" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_34" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_35" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_36" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_37" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_38" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_39" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_40" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_41" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_42" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_43" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_44" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_45" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_46" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_47" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_48" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_49" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_50" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_6" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_7" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_9" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_10" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_11" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_12" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_13" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_14" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_15" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_16" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_17" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_18" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_19" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_20" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_21" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_22" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_23" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_24" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_25" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_26" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_27" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_28" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_29" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_30" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_31" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_32" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_33" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_34" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_35" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_36" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_37" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_38" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_39" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_40" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_41" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_42" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_43" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_44" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_45" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_46" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_47" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_48" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_49" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_50" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_51" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_6" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_7" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_9" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__forTesting__/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/__forTesting__/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/ABQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/ABQ.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/abaqus data/FieldOutput_1" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_1" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/FieldOutput_offspring_1" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_1" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/FileIO.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/FileIO.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/Network.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +204,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/dcas/PythonCodes/Coop/pythoncode&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -77,7 +221,28 @@
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.PostProcessing">
+    <configuration name="FileIO" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AuxeticMOP" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/auxeticmop" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/auxeticmop/FileIO.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Network (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -99,7 +264,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Sandbox2 (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="PostProcessing" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -107,11 +272,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/23-1-4" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/auxeticmop" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/23-1-4/Sandbox2.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/auxeticmop/PostProcessing.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -151,28 +316,6 @@
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AuxeticMOP" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="C:\Users\dcas\AppData\Local\Programs\Python\Python310\python.exe" />
-      <option name="SDK_NAME" value="Python 3.10" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
@@ -289,11 +432,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.PostProcessing" />
+        <item itemvalue="Python.FileIO" />
         <item itemvalue="Python.test" />
         <item itemvalue="Python.main (1)" />
         <item itemvalue="Python.Network (1)" />
-        <item itemvalue="Python.main" />
-        <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
   </component>
@@ -400,7 +543,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674527700550</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Cleaned up some minor code duplications">
+      <created>1674561646016</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1674561646016</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -447,6 +597,7 @@
     <MESSAGE value="Modifying hyper calculation in progress..." />
     <MESSAGE value="Improving abaqus script" />
     <MESSAGE value="New abaqus script with server" />
-    <option name="LAST_COMMIT_MESSAGE" value="New abaqus script with server" />
+    <MESSAGE value="Cleaned up some minor code duplications" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaned up some minor code duplications" />
   </component>
 </project>

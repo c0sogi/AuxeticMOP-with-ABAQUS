@@ -306,8 +306,8 @@ class Visualizer:
         topo_next_parent = load_pickled_dict_data(f'Topologies_{w + 1}')['parent']
         result_next_parent = load_pickled_dict_data(f'FieldOutput_{w + 1}')
         fitness_values_next_parent = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
-                                                                 params_dict=asdict(params), results=topo_next_parent,
-                                                                 topologies=result_next_parent)
+                                                                 params_dict=asdict(params), topologies=topo_next_parent,
+                                                                 results=result_next_parent)
         fitness_pareto_next_parent = find_pareto_front_points(costs=fitness_values_next_parent, return_index=False)
         self.plot(gen_num=w,
                   pareto_1_sorted=fitness_pareto_next_parent[:, 0], pareto_2_sorted=fitness_pareto_next_parent[:, 1],

@@ -4,6 +4,7 @@ from . import GraphicUserInterface
 from . import MutateAndValidate
 from . import Network
 from . import PostProcessing
+from . import ParameterDefinitions
 from .GeneticAlgorithm import *
 from .FileIO import *
 from .GraphicUserInterface import *

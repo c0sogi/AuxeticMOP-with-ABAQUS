@@ -1,7 +1,6 @@
 import random
 import numpy as np
 import itertools
-import os
 from functools import reduce
 from .MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
 from .FileIO import dump_pickled_dict_data, load_pickled_dict_data
@@ -158,7 +157,7 @@ def random_parent_generation(gen: int, density: float, params: Parameters, show_
     return parents
 
 
-def inspect_topologies(generation):
+def inspect_topologies(path, generation):
     # offspring끼리 비교
     for w in range(1, generation):
         topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
@@ -243,17 +242,4 @@ def inspect_topologies(generation):
 
 
 if __name__ == '__main__':
-    from FileIO import parent_import
-    path = 'F:/shshsh/data-23-1-4/'
-    os.chdir(path)
-    topos, _ = parent_import(gen_num=18)  # topo: (100, 1000), result: (100, 12)
-    number_of_voxels_x = 10
-    number_of_voxels_y = 10
-    number_of_voxels_z = 10
-    end_population = 100
-    offsprings = generate_offspring(topo_parent=topos, gen=18, end_pop=end_population,
-                                    mutation_rate=0.05, timeout=0.5,
-                                    lx=number_of_voxels_x, ly=number_of_voxels_y, lz=number_of_voxels_z)
-    inspect_topologies(generation=19)
-    for off_idx in range(100):
-        visualize_one_cube(offsprings[off_idx])
+    pass
