@@ -21,5 +21,5 @@ The overall steps are,
 
 ## Required
 - Language: Python, with version >=3.9 for some new PEP syntax. 3.10 is recommended
-- External libraries: numpy, numba, scipy, matplotlib
+- External libraries: numpy, numba, scipy, matplotlib, aiofiles
 - Other software: ABAQUS CAE
