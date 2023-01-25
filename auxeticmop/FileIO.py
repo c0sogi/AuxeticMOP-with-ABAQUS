@@ -36,7 +36,7 @@ def find_job_location_from_offspring(params_dict):
     for file_header in file_headers:
         file_numbers = get_sorted_file_numbers_from_pattern(rf'{file_header}_\d+')
         file_names = [f'{file_header}_{file_number}' for file_number in file_numbers]
-        loaded_dict = asyncio.run(pickles_io(file_names, mode='r', key_option='int'))
+        loaded_dict = asyncio.run(pickles_aio(file_names, mode='r', key_option='int'))
         for gen_num in loaded_dict.keys():
             if 'parent' in loaded_dict[gen_num]:
                 if topo_parent is None:
@@ -83,7 +83,7 @@ def load_pickled_dict_data(file_name: str) -> dict:
     return dict_data
 
 
-async def pickle_io(file_name: str, mode: str, to_dump: object = None) -> object | None:
+async def pickle_aio(file_name: str, mode: str, to_dump: object = None) -> any:
     encoding = 'latin1'
     if mode == 'r':
         async with aiofiles.open(file_name, mode='rb') as f:
@@ -115,14 +115,22 @@ async def pickle_io(file_name: str, mode: str, to_dump: object = None) -> object
         raise ValueError
 
 
-async def pickles_io(file_names: list | tuple, mode: str, to_dumps=None, key_option=None) -> dict:
+async def pickles_aio(file_names: list | tuple, mode: str, to_dumps=None, key_option=None) -> dict:
     if mode == 'r':
-        loaded = await asyncio.gather(*[asyncio.ensure_future(pickle_io(file_name, mode=mode))
+        loaded = await asyncio.gather(*[asyncio.ensure_future(pickle_aio(file_name, mode=mode))
                                         for file_name in file_names])
         return {key_modifier(key, option=key_option): value for key, value in zip(file_names, loaded)}
     else:
-        await asyncio.gather(*[asyncio.ensure_future(pickle_io(file_name, mode=mode, to_dump=to_dump))
+        await asyncio.gather(*[asyncio.ensure_future(pickle_aio(file_name, mode=mode, to_dump=to_dump))
                                for to_dump, file_name in zip(to_dumps, file_names)])
+
+
+def pickle_io(file_name: str, mode: str, to_dump: object = None) -> any:
+    return asyncio.run(pickle_aio(file_name=file_name, mode=mode, to_dump=to_dump))
+
+
+def pickles_io(file_names: list | tuple, mode: str, to_dumps=None, key_option=None) -> dict:
+    return asyncio.run(pickles_aio(file_names=file_names, mode=mode, to_dumps=to_dumps, key_option=key_option))
 
 
 def open_history_output(gen, path=None):

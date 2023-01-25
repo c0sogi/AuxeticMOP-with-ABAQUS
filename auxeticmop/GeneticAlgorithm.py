@@ -2,25 +2,17 @@ import random
 import numpy as np
 import itertools
 from functools import reduce
+import asyncio
 from .MutateAndValidate import mutate_and_validate_topology, visualize_one_cube
-from .FileIO import dump_pickled_dict_data, load_pickled_dict_data
+from .FileIO import dump_pickled_dict_data, pickles_aio
 from .ParameterDefinitions import Parameters
 
 
-def inspect_clone_in_all_parents(w, topology_flattened, all_parent_topologies):
-    for generation_idx in range(w):
-        parents_topologies = all_parent_topologies[generation_idx]
-        for parent_idx in range(len(parents_topologies)):
-            if np.array_equal(parents_topologies[parent_idx], topology_flattened):
-                return True
-    return False
-
-
-def inspect_clone_in_current_offsprings(topology, offspring):  # inspect topology clones
-    for offspring_idx in range(len(offspring)):
-        if np.array_equal(offspring[offspring_idx], topology):
-            return True
-    return False
+def find_where_same_array_locates(arr_to_find, big_arr):
+    small_dimensions = len(arr_to_find.shape)
+    big_dimensions = len(big_arr.shape)
+    axis_range = tuple(i for i in range(big_dimensions - small_dimensions, big_dimensions))
+    return np.argwhere(np.all(big_arr == arr_to_find, axis=axis_range))
 
 
 def cutting_function(topologies):
@@ -82,10 +74,10 @@ def generate_offspring(topo_parent: np.ndarray, gen: int, lx: int, ly: int, lz: 
     topo_offspring = np.empty((0, lx, ly, lz), int)
     trial = 1
     validation_count = 0
-    all_parents_topologies = np.empty((0, end_pop, lx, ly, lz), int)
-    for generation_idx in range(gen):
-        parent_topologies = load_pickled_dict_data(f'Topologies_{generation_idx + 1}')['parent']
-        all_parents_topologies = np.vstack((all_parents_topologies, np.expand_dims(parent_topologies, axis=0)))
+    all_topos = asyncio.run(
+        pickles_aio(file_names=[f'Topologies_{g}' for g in range(1, gen + 1)], mode='r', key_option='int')
+    )
+    all_topos_parent = np.array([topos['parent'] for topos in all_topos.values()], dtype=int)
     while True:
         print('[Generate topo_offspring] Trial: ', trial)
         trial += 1
@@ -107,14 +99,12 @@ def generate_offspring(topo_parent: np.ndarray, gen: int, lx: int, ly: int, lz: 
                     print('[Generate topo_offspring] <!> Non-connected tree detected')
                     continue
                 else:
-                    is_any_clone_in_all_parents = inspect_clone_in_all_parents(
-                        w=gen, topology_flattened=validated_chromosome, all_parent_topologies=all_parents_topologies)
-                    is_any_clone_in_current_offsprings = inspect_clone_in_current_offsprings(
-                        topology=validated_chromosome, offspring=topo_offspring)
-                    if is_any_clone_in_all_parents:
+                    if len(find_where_same_array_locates(arr_to_find=validated_chromosome,
+                                                         big_arr=all_topos_parent)):
                         print('[Generate topo_offspring] Clone structure found in parents!')
                         continue
-                    elif is_any_clone_in_current_offsprings:
+                    elif len(find_where_same_array_locates(arr_to_find=validated_chromosome,
+                                                           big_arr=topo_offspring)):
                         print('[Generate topo_offspring] Clone structure found in current offsprings!')
                         continue
                     else:
@@ -155,91 +145,3 @@ def random_parent_generation(gen: int, density: float, params: Parameters, show_
         for parent in parents:
             visualize_one_cube(parent, full=False)
     return parents
-
-
-def inspect_topologies(path, generation):
-    # offspring끼리 비교
-    for w in range(1, generation):
-        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
-        topo_2 = np.genfromtxt(path + f'topo_offspring_{w + 1}.csv', delimiter=',', dtype=int)
-        count = 0
-        for i in range(100):
-            flag = False
-            for j in range(100):
-                if np.array_equal(topo_1[i], topo_2[j]):
-                    flag = True
-            if flag:
-                count += 1
-        print(f'offspring {w} vs {w + 1}: ', count)
-
-    # parent끼리 비교
-    for w in range(1, generation):
-        topo_1 = np.genfromtxt(path + f'topo_parent_{w}.csv', delimiter=',', dtype=int)
-        topo_2 = np.genfromtxt(path + f'topo_parent_{w + 1}.csv', delimiter=',', dtype=int)
-        count = 0
-        for i in range(100):
-            flag = False
-            for j in range(100):
-                if np.array_equal(topo_1[i], topo_2[j]):
-                    flag = True
-            if flag:
-                count += 1
-        print(f'parent {w} vs {w + 1}: ', count)
-
-    # Parent와 offspring끼리 비교
-    for w in range(1, generation+1):
-        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
-        topo_2 = np.genfromtxt(path + f'topo_parent_{w}.csv', delimiter=',', dtype=int)
-        count = 0
-        for i in range(100):
-            flag = False
-            for j in range(100):
-                if np.array_equal(topo_1[i], topo_2[j]):
-                    flag = True
-            if flag:
-                count += 1
-        print(f'offspring {w} vs parent {w}: ', count)
-
-    # offspring 내부 비교
-    for w in range(1, generation+1):
-        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
-        count = 0
-        for i in range(100):
-            flag = False
-            for j in range(100):
-                if i != j and np.array_equal(topo_1[i], topo_1[j]):
-                    flag = True
-            if flag:
-                count += 1
-        print(f'offspring {w}: ', count)
-
-    # parent 내부 비교
-    for w in range(1, generation+1):
-        topo_1 = np.genfromtxt(path + f'topo_parent_{w}.csv', delimiter=',', dtype=int)
-        count = 0
-        for i in range(100):
-            flag = False
-            for j in range(100):
-                if i != j and np.array_equal(topo_1[i], topo_1[j]):
-                    flag = True
-            if flag:
-                count += 1
-        print(f'parent {w}: ', count)
-
-    # offspring vs parent 다음세대 비교
-    for w in range(1, generation):
-        topo_1 = np.genfromtxt(path + f'topo_offspring_{w}.csv', delimiter=',', dtype=int)
-        topo_2 = np.genfromtxt(path + f'topo_parent_{w + 1}.csv', delimiter=',', dtype=int)
-        count = 0
-        for i in range(100):
-            flag = False
-            for j in range(100):
-                if np.array_equal(topo_1[i], topo_2[j]):
-                    flag = True
-            if flag:
-                count += 1
-        print(f'offspring {w} vs parent {w + 1}: ', count)
-
-
-if __name__ == '__main__':
-    pass

@@ -50,7 +50,7 @@ class App:  # GUI class
 
         # Elements
         self.set_path_title = tk.Label(self.up_frame,
-                                       text='Choose the folder containing the Abaqus script and CSV files.')
+                                       text='Choose the folder containing the Abaqus script and pickle files.')
         self.set_path_title.config(background='#FFFFFF')
         self.set_path_display = tk.Listbox(self.up_frame, width=50, height=1)
         self.set_path_btn = tk.Button(self.up_frame, text='Browse folder...', width=BUTTON_WIDTH,
