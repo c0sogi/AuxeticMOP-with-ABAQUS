@@ -91,7 +91,6 @@ def find_pareto_front_points(costs: np.ndarray, return_index: bool = False) -> n
 
 
 def crowding_calculation(fitness_values: np.ndarray):
-    print('fitval: ', fitness_values)
     population_size, number_of_fitness_values = fitness_values.shape[0], fitness_values.shape[1]
     matrix_for_crowding = np.zeros((population_size, number_of_fitness_values))
     normalize_fitness_values = (fitness_values - np.min(fitness_values, axis=0)) / np.ptp(fitness_values, axis=0)
@@ -111,7 +110,6 @@ def crowding_calculation(fitness_values: np.ndarray):
         matrix_for_crowding[:, i] = crowding_results[re_sorting]
 
     crowding_distance = np.sum(matrix_for_crowding, axis=1)  # crowding distance of each solution
-    print('crowding distance: ', crowding_distance)
     return crowding_distance
 
 

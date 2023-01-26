@@ -90,37 +90,37 @@ def one_generation(gen: int, restart: bool, params: Parameters, visualizer: Visu
     """
     # Import parent topologies and outputs of current generation
     try:
-        topo_parent = load_pickled_dict_data(f'Topologies_{gen}')['parent']
+        parent_topologies = load_pickled_dict_data(f'Topologies_{gen}')['parent']
     except FileNotFoundError or KeyError:
-        topo_parent = random_parent_generation(gen=gen, density=0.5, params=params, show_parent=False)
+        parent_topologies = random_parent_generation(density=0.5, params=params, save_file_as=f'Topologies_{gen}')
     try:
-        result_parent = load_pickled_dict_data(f'FieldOutput_{gen}')
+        parent_results = load_pickled_dict_data(f'FieldOutput_{gen}')
     except FileNotFoundError:
         wait_for_abaqus(restart=False, topologies_file_name='Topologies_1', params_dict=asdict(params),
                         server=server_to_abaqus, topologies_key='parent')
-        result_parent = load_pickled_dict_data('FieldOutput_offspring_1')
+        parent_results = load_pickled_dict_data('FieldOutput_offspring_1')
         remove_file('FieldOutput_offspring_1')
         with open('FieldOutput_1', mode='wb') as f:
-            pickle.dump(result_parent, f, protocol=2)
+            pickle.dump(parent_results, f, protocol=2)
 
     # Make offspring topologies
     if restart:
-        topo_offspring = load_pickled_dict_data(f'Topologies_{gen}')['offspring']
+        offspring_topologies = load_pickled_dict_data(f'Topologies_{gen}')['offspring']
     else:
-        topo_offspring = generate_offspring(topo_parent=topo_parent, gen=gen, end_pop=params.end_pop,
-                                            timeout=params.timeout, mutation_rate=params.mutation_rate,
-                                            lx=params.lx, ly=params.ly, lz=params.lz)
+        offspring_topologies = generate_offspring(topo_parents=parent_topologies, end_pop=params.end_pop,
+                                                  mutation_rate=params.mutation_rate, save_file_as=f'Topologies_{gen}',
+                                                  lx=params.lx, ly=params.ly, lz=params.lz, gen=gen)
 
     # Make abaqus work
     wait_for_abaqus(restart=False, topologies_file_name=f'Topologies_{gen}', params_dict=asdict(params),
                     server=server_to_abaqus, topologies_key='offspring')
 
     # Import parent outputs of current generation from abaqus
-    result_offspring = load_pickled_dict_data(f'FieldOutput_offspring_{gen}')
-    assert len(topo_parent) == len(result_parent) == len(topo_offspring) == len(result_offspring)
-    all_topologies = np.vstack((topo_parent, topo_offspring))
-    # This dict union using pipe operator is allowed only for Python version >= 3.9
-    all_results = dict(result_parent | {key + len(result_parent): value for key, value in result_offspring.items()})
+    offspring_results = load_pickled_dict_data(f'FieldOutput_offspring_{gen}')
+    assert len(parent_topologies) == len(parent_results) == len(offspring_topologies) == len(offspring_results)
+    all_topologies = np.vstack((parent_topologies, offspring_topologies))
+    all_results = dict(parent_results | {entity_num + len(parent_results): offspring_results[entity_num]
+                                         for entity_num in sorted(offspring_results.keys())})  # This dict union using pipe operator is allowed only for Python version >= 3.9
     all_fitness_values = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
                                                      params_dict=asdict(params),
                                                      results=all_results, topologies=all_topologies)

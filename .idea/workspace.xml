@@ -5,64 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Organized some functions, added 50 generations of file samples">
-      <change afterPath="$PROJECT_DIR$/__forTesting__/test2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sample_scripts/FieldOutput_1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sample_scripts/FieldOutput_offspring_1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sample_scripts/Step1_Randomly_generates_parent_topologies.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sample_scripts/Step2_Generate_offspring_topologies.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sample_scripts/Step3_Evaluate_fitness_values_and_select.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sample_scripts/Topologies_1" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/abaqus data/Topologies_1 - 복사본" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_1" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_10" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_10" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_11" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_11" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_12" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_12" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_13" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_13" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_14" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_14" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_15" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_15" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_16" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_16" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_17" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_17" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_18" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_18" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_19" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_19" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_2" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_20" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_20" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_21" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_21" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_22" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_22" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_23" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_23" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_24" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_24" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_25" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_25" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_26" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_26" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_27" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_27" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_28" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_28" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_29" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_29" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_3" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_30" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_30" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_31" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_31" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_32" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_32" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_33" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_33" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_34" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_34" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_35" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_35" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_36" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_36" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_37" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_37" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_38" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_38" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_39" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_39" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_4" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_40" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_40" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_41" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_41" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_42" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_42" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_43" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_43" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_44" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_44" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_45" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_45" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_46" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_46" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_47" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_47" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_48" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_48" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_49" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_49" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_5" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_5" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_50" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_50" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_51" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_51" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_6" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_6" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_7" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_7" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_8" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/Topologies_9" beforeDir="false" afterPath="$PROJECT_DIR$/abaqus data/Topologies_9" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/FileIO.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/FileIO.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/__forTesting__/test2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,17 +54,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/dcas/PythonCodes/Coop/pythoncode&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/pythoncode/AuxeticMOP/Sample_scripts",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\pythoncode\AuxeticMOP\Sample_scripts" />
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode" />
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode\23-1-1" />
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode\22-12-31" />
@@ -121,28 +78,7 @@
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test2">
-    <configuration name="FileIO" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AuxeticMOP" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/auxeticmop" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/auxeticmop/FileIO.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.Step3_Evaluate_fitness_values_and_select">
     <configuration name="GeneticAlgorithm" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -161,7 +97,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="PostProcessing" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="Step1_Randomly_generates_parent_topologies" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -169,11 +105,53 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/auxeticmop" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sample_scripts" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/auxeticmop/PostProcessing.py" />
+      <option name="SCRIPT_NAME" value="C:\pythoncode\AuxeticMOP\Sample_scripts\Step1_Randomly_generates_parent_topologies.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Step2_Generate_offspring_topologies" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AuxeticMOP" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sample_scripts" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sample_scripts/Step2_Generate_offspring_topologies.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Step3_Evaluate_fitness_values_and_select" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AuxeticMOP" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sample_scripts" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\pythoncode\AuxeticMOP\Sample_scripts\Step3_Evaluate_fitness_values_and_select.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -195,27 +173,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AuxeticMOP" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/__forTesting__" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/__forTesting__/test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -308,11 +265,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Step3_Evaluate_fitness_values_and_select" />
+        <item itemvalue="Python.Step2_Generate_offspring_topologies" />
+        <item itemvalue="Python.Step1_Randomly_generates_parent_topologies" />
         <item itemvalue="Python.test2" />
         <item itemvalue="Python.GeneticAlgorithm" />
-        <item itemvalue="Python.test" />
-        <item itemvalue="Python.PostProcessing" />
-        <item itemvalue="Python.FileIO" />
       </list>
     </recent_temporary>
   </component>
@@ -440,7 +397,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674627328756</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Organized some functions, added 50 generations of file samples">
+      <created>1674656625458</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1674656625458</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

@@ -12,8 +12,8 @@ def generate_offspring_test():
     print('[1] topo_parent shape: ', topo_parent.shape)
 
     # Generate offspring
-    topo_offsprings = generate_offspring(topo_parent=topo_parent, gen=1, lx=10, ly=10, lz=10, end_pop=100,
-                                         mutation_rate=0.1, timeout=0.5)
+    topo_offsprings = generate_offspring(topo_parents=topo_parent, gen=1, lx=10, ly=10, lz=10, end_pop=100,
+                                         mutation_rate=0.1)
     print('[2] topo_offsprings shape: ', topo_offsprings.shape)
     for topo_offspring in topo_offsprings:
         visualize_one_cube(cube_3d_array=topo_offspring)
@@ -43,6 +43,10 @@ def flattened_topos_to_3d_topos():
         except KeyError:
             pass
         asyncio.run(pickle_aio(topos_filename, mode='w', to_dump=new_dict))
+
+
+def cutting_test():
+    pass
 
 
 if __name__ == '__main__':

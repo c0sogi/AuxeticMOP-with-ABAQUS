@@ -30,7 +30,6 @@ class Parameters:
     threshold: float = 0.5  # filtering option
     n_cpus: int = 1  # abaqus option
     n_gpus: int = 0  # abaqus option
-    timeout: float = 0.5  # validation process option
 
     def post_initialize(self):  # call this method to set initial values to real value to be used
         self.lx *= self.divide_number

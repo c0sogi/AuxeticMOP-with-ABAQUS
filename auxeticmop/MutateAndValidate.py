@@ -1,108 +1,8 @@
-import datetime as dt
+# import datetime as dt
 from scipy.ndimage import label
 from numba import njit
 import numpy as np
 import random
-from .PostProcessing import visualize_one_cube
-
-
-@njit
-def make_voxels_surface_contact(topologies: np.ndarray, lx: int, ly: int, lz: int) -> tuple[np.ndarray, bool, int]:
-    topo = topologies.copy()
-    flag = 1
-    direction = np.array([[1, 1],
-                          [1, -1],
-                          [-1, 1],
-                          [-1, -1]])
-    changed_voxels = 0
-
-    while flag:
-        flag = 0
-        for i in range(lx):
-            for j in range(ly):
-                for k in range(lz):
-                    if topo[k, j, i] == 1:
-                        for m in range(4):
-                            if k + direction[m, 0] in range(lz) and j + direction[m, 1] in range(ly):
-                                if topo[k + direction[m, 0], j + direction[m, 1], i] == 1:
-                                    if topo[k + direction[m, 0], j, i] == 0 and topo[k, j + direction[m, 1], i] == 0:
-                                        if random.getrandbits(1) == 1:
-                                            topo[k + direction[m, 0], j, i] = 1
-                                            changed_voxels += 1
-                                        else:
-                                            topo[k, j + direction[m, 1], i] = 1
-                                            changed_voxels += 1
-                                        flag = 1
-                                        break
-
-                            if k + direction[m, 0] in range(lz) and i + direction[m, 1] in range(lx):
-                                if topo[k + direction[m, 0], j, i + direction[m, 1]] == 1:
-                                    if topo[k + direction[m, 0], j, i] == 0 and topo[k, j, i + direction[m, 1]] == 0:
-                                        if random.getrandbits(1) == 1:
-                                            topo[k + direction[m, 0], j, i] = 1
-                                            changed_voxels += 1
-                                        else:
-                                            topo[k, j, i + direction[m, 1]] = 1
-                                            changed_voxels += 1
-                                        flag = 1
-                                        break
-
-                            if j + direction[m, 0] in range(ly) and i + direction[m, 1] in range(lx):
-                                if topo[k, j + direction[m, 0], i + direction[m, 1]] == 1:
-                                    if topo[k, j + direction[m, 0], i] == 0 and topo[k, j, i + direction[m, 1]] == 0:
-                                        if random.getrandbits(1) == 1:
-                                            topo[k, j + direction[m, 0], i] = 1
-                                            changed_voxels += 1
-                                        else:
-                                            topo[k, j, i + direction[m, 1]] = 1
-                                            changed_voxels += 1
-                                        flag = 1
-                                        break
-
-                            for z in [1, -1]:
-                                if k + direction[m, 0] in range(lz) and j + direction[m, 1] in range(
-                                        ly) and i + z in range(lx):
-                                    if topo[k + direction[m, 0], j + direction[m, 1], i + z] == 1:
-                                        if topo[k + direction[m, 0], j, i] == 0 and topo[
-                                            k, j + direction[m, 1], i] == 0 and topo[k, j, i + z] == 0:
-                                            if topo[k + direction[m, 0], j + direction[m, 1], i] == 0 and topo[
-                                                k + direction[m, 0], j, i + z] == 0 and topo[
-                                                k, j + direction[m, 1], i + z] == 0:
-                                                rand1 = random.randint(1, 3)
-                                                rand2 = random.randint(1, 2)
-
-                                                if rand1 == 1:
-                                                    topo[k + direction[m, 0], j, i] = 1
-                                                    changed_voxels += 1
-                                                    if rand2 == 1:
-                                                        topo[k + direction[m, 0], j + direction[m, 1], i] = 1
-                                                        changed_voxels += 1
-                                                    else:
-                                                        topo[k + direction[m, 0], j, i + z] = 1
-                                                        changed_voxels += 1
-
-                                                if rand1 == 2:
-                                                    topo[k, j + direction[m, 1], i] = 1
-                                                    changed_voxels += 1
-                                                    if rand2 == 1:
-                                                        topo[k + direction[m, 0], j + direction[m, 1], i] = 1
-                                                        changed_voxels += 1
-
-                                                    else:
-                                                        topo[k, j + direction[m, 1], i + z] = 1
-                                                        changed_voxels += 1
-
-                                                if rand1 == 3:
-                                                    topo[k, j, i + z] = 1
-                                                    changed_voxels += 1
-                                                    if rand2 == 1:
-                                                        topo[k + direction[m, 0], j, i + z] = 1
-                                                        changed_voxels += 1
-                                                    else:
-                                                        topo[k, j + direction[m, 1], i + z] = 1
-                                                        changed_voxels += 1
-                                                flag = 1
-    return topo, np.array_equal(topologies, topo), changed_voxels
 
 
 def make_3d_print_without_support(arr_3d: np.ndarray, max_distance: int = 1) -> tuple[np.ndarray, bool, int]:
@@ -254,35 +154,13 @@ def one_survived_tree(arr_3d: np.ndarray, labeled_arr: np.ndarray, last_survived
     return arr_3d, changed_voxels
 
 
-# @njit  # Currently not in use. Instead, make_voxels_surface_contact is used.
-# def connect_island(local_arr: np.ndarray, labeled_arr: np.ndarray, max_label: int,
-#                    x_start_gap: int, y_start_gap: int, z_start_gap: int) -> tuple[np.ndarray, int]:
-#     arr_copy = local_arr.copy()
-#     llx = local_arr.shape[0]
-#     lly = local_arr.shape[1]
-#     llz = local_arr.shape[2]
-#     changed_voxels = 0
-#     main_label = labeled_arr[1 - x_start_gap, 1 - y_start_gap, 1 - z_start_gap]
-#     other_labels = set([label_idx for label_idx in range(1, max_label + 1)])
-#     other_labels.remove(main_label)
-#     for i in range(llx):
-#         for j in range(lly):
-#             for k in range(llz):
-#                 if labeled_arr[i, j, k] in other_labels:
-#                     changed_voxels += 1
-#                     arr_copy[i, j, k] = 0
-#         return arr_copy, changed_voxels
-
-
-def mutate_and_validate_topology(arr_3d: np.ndarray,
-                                 mutation_probability: float, timeout: float) -> None | np.ndarray:
-    timeout_seconds = dt.timedelta(seconds=timeout)
-    arr_3d_mutated, voxels_0 = mutation(arr_3d.copy(), mutation_probability=mutation_probability)
+def mutate_and_validate_topology(arr_3d: np.ndarray, mutation_probability: float) -> None | np.ndarray:
+    # timeout_seconds = dt.timedelta(seconds=timeout)
+    arr_3d_mutated, total_voxels_0 = mutation(arr_3d.copy(), mutation_probability=mutation_probability)
     lx, ly, lz = arr_3d.shape
-    voxels_1, voxels_2, voxels_3 = 0, 0, 0
     while True:
         arr_3d_mutated_copy = arr_3d_mutated.copy()
-        now1 = dt.datetime.now()
+        total_voxels_1, total_voxels_2, total_voxels_3 = 0, 0, 0
         is_timeout = False
         while not is_timeout:
             _arr_3d_mutated_copy = arr_3d_mutated_copy.copy()  #
@@ -291,42 +169,32 @@ def mutate_and_validate_topology(arr_3d: np.ndarray,
                 return None
             arr_3d_mutated_copy, not_changed2, voxels_2 = make_3d_print_without_support(arr_3d_mutated_copy)
             arr_3d_mutated_copy, not_changed3, voxels_3 = make_voxels_surface_contact(arr_3d_mutated_copy, lx, ly, lz)
+            total_voxels_1 += voxels_1
+            total_voxels_2 += voxels_2
+            total_voxels_3 += voxels_3
             if not_changed1 and not_changed2 and not_changed3:  # while 문 처음과 끝에서 변한 구조가 없을 때 break
                 break
             if np.array_equal(arr_3d_mutated_copy, _arr_3d_mutated_copy):  #
                 is_timeout = True
-            now2 = dt.datetime.now()
-            time_diff = now2 - now1
-            if time_diff > timeout_seconds:
-                # Timeout due to too much long validation time
-                is_timeout = True
                 break
-            if abs(voxels_0 + voxels_1 + voxels_2 + voxels_3) > mutation_probability * lx * ly * lz:
-                # Timeout due to too much voxel changes in structure
-                is_timeout = True
+            # if abs(total_voxels_0 + total_voxels_1 + total_voxels_2 + total_voxels_3) > mutation_probability * lx * ly * lz:
+            #     is_timeout = True  # Timeout due to too much voxel changes in structure
+            #     break
+            # now2 = dt.datetime.now()
+            # time_diff = now2 - now1
+            # if time_diff > timeout_seconds:
+            #     is_timeout = True  # Timeout due to too much long validation time
+            #     break
         if is_timeout:
-            arr_3d_mutated, voxels_0 = mutation(arr_3d, mutation_probability=mutation_probability)
+            arr_3d_mutated, total_voxels_0 = mutation(arr_3d, mutation_probability=mutation_probability)
         else:
             break
         # Timeout!
-    print('> Total changes in structure: ', voxels_0 + voxels_1 + voxels_2 + voxels_3)
+    total_voxels_change = total_voxels_0 + total_voxels_1 + total_voxels_2 + total_voxels_3
+    print('> Total changes in structure during validation < ')
+    print(f"- Voxel number changes: [{total_voxels_change}] voxels", end=' | ')
+    print(f"Changed of volume fraction: [{100 * total_voxels_change/ (lx*ly*lz):.2f}] %")
     return arr_3d_mutated_copy
-
-
-def mutate_and_validate_topologies(arr_4d: np.ndarray, mutation_probability: float, timeout: float,
-                                   view_topo: bool = False) -> np.ndarray:
-    arr_4d_copy = arr_4d.copy()
-    for arr_idx, arr_3d in enumerate(arr_4d):
-        print(f'\n<<<<<<<<<< Offspring {arr_idx + 1} >>>>>>>>>>')
-        validated = mutate_and_validate_topology(arr_3d, mutation_probability=mutation_probability,
-                                                 timeout=timeout)
-        if validated is None:
-            continue
-        else:
-            arr_4d_copy[arr_idx] = validated
-        if view_topo:
-            visualize_one_cube(arr_4d_copy[arr_idx])
-    return arr_4d_copy
 
 
 @njit
@@ -349,6 +217,125 @@ def mutation(arr_3d: np.ndarray, mutation_probability: float) -> tuple[np.ndarra
                         arr_copy[idx_1, idx_2, idx_3] = 1
                         changed_voxels += 1
     return arr_copy, changed_voxels
+
+
+@njit
+def make_voxels_surface_contact(topologies: np.ndarray, lx: int, ly: int, lz: int) -> tuple[np.ndarray, bool, int]:
+    topo = topologies.copy()
+    flag = 1
+    direction = np.array([[1, 1],
+                          [1, -1],
+                          [-1, 1],
+                          [-1, -1]])
+    changed_voxels = 0
+
+    while flag:
+        flag = 0
+        for i in range(lx):
+            for j in range(ly):
+                for k in range(lz):
+                    if topo[k, j, i] == 1:
+                        for m in range(4):
+                            if k + direction[m, 0] in range(lz) and j + direction[m, 1] in range(ly):
+                                if topo[k + direction[m, 0], j + direction[m, 1], i] == 1:
+                                    if topo[k + direction[m, 0], j, i] == 0 and topo[k, j + direction[m, 1], i] == 0:
+                                        if random.getrandbits(1) == 1:
+                                            topo[k + direction[m, 0], j, i] = 1
+                                            changed_voxels += 1
+                                        else:
+                                            topo[k, j + direction[m, 1], i] = 1
+                                            changed_voxels += 1
+                                        flag = 1
+                                        break
+
+                            if k + direction[m, 0] in range(lz) and i + direction[m, 1] in range(lx):
+                                if topo[k + direction[m, 0], j, i + direction[m, 1]] == 1:
+                                    if topo[k + direction[m, 0], j, i] == 0 and topo[k, j, i + direction[m, 1]] == 0:
+                                        if random.getrandbits(1) == 1:
+                                            topo[k + direction[m, 0], j, i] = 1
+                                            changed_voxels += 1
+                                        else:
+                                            topo[k, j, i + direction[m, 1]] = 1
+                                            changed_voxels += 1
+                                        flag = 1
+                                        break
+
+                            if j + direction[m, 0] in range(ly) and i + direction[m, 1] in range(lx):
+                                if topo[k, j + direction[m, 0], i + direction[m, 1]] == 1:
+                                    if topo[k, j + direction[m, 0], i] == 0 and topo[k, j, i + direction[m, 1]] == 0:
+                                        if random.getrandbits(1) == 1:
+                                            topo[k, j + direction[m, 0], i] = 1
+                                            changed_voxels += 1
+                                        else:
+                                            topo[k, j, i + direction[m, 1]] = 1
+                                            changed_voxels += 1
+                                        flag = 1
+                                        break
+
+                            for z in [1, -1]:
+                                if k + direction[m, 0] in range(lz) and j + direction[m, 1] in range(
+                                        ly) and i + z in range(lx):
+                                    if topo[k + direction[m, 0], j + direction[m, 1], i + z] == 1:
+                                        if topo[k + direction[m, 0], j, i] == 0 and topo[
+                                            k, j + direction[m, 1], i] == 0 and topo[k, j, i + z] == 0:
+                                            if topo[k + direction[m, 0], j + direction[m, 1], i] == 0 and topo[
+                                                k + direction[m, 0], j, i + z] == 0 and topo[
+                                                k, j + direction[m, 1], i + z] == 0:
+                                                rand1 = random.randint(1, 3)
+                                                rand2 = random.randint(1, 2)
+
+                                                if rand1 == 1:
+                                                    topo[k + direction[m, 0], j, i] = 1
+                                                    changed_voxels += 1
+                                                    if rand2 == 1:
+                                                        topo[k + direction[m, 0], j + direction[m, 1], i] = 1
+                                                        changed_voxels += 1
+                                                    else:
+                                                        topo[k + direction[m, 0], j, i + z] = 1
+                                                        changed_voxels += 1
+
+                                                if rand1 == 2:
+                                                    topo[k, j + direction[m, 1], i] = 1
+                                                    changed_voxels += 1
+                                                    if rand2 == 1:
+                                                        topo[k + direction[m, 0], j + direction[m, 1], i] = 1
+                                                        changed_voxels += 1
+
+                                                    else:
+                                                        topo[k, j + direction[m, 1], i + z] = 1
+                                                        changed_voxels += 1
+
+                                                if rand1 == 3:
+                                                    topo[k, j, i + z] = 1
+                                                    changed_voxels += 1
+                                                    if rand2 == 1:
+                                                        topo[k + direction[m, 0], j, i + z] = 1
+                                                        changed_voxels += 1
+                                                    else:
+                                                        topo[k, j + direction[m, 1], i + z] = 1
+                                                        changed_voxels += 1
+                                                flag = 1
+    return topo, np.array_equal(topologies, topo), changed_voxels
+
+
+# @njit  # Currently not in use. Instead, make_voxels_surface_contact is used.
+# def connect_island(local_arr: np.ndarray, labeled_arr: np.ndarray, max_label: int,
+#                    x_start_gap: int, y_start_gap: int, z_start_gap: int) -> tuple[np.ndarray, int]:
+#     arr_copy = local_arr.copy()
+#     llx = local_arr.shape[0]
+#     lly = local_arr.shape[1]
+#     llz = local_arr.shape[2]
+#     changed_voxels = 0
+#     main_label = labeled_arr[1 - x_start_gap, 1 - y_start_gap, 1 - z_start_gap]
+#     other_labels = set([label_idx for label_idx in range(1, max_label + 1)])
+#     other_labels.remove(main_label)
+#     for i in range(llx):
+#         for j in range(lly):
+#             for k in range(llz):
+#                 if labeled_arr[i, j, k] in other_labels:
+#                     changed_voxels += 1
+#                     arr_copy[i, j, k] = 0
+#         return arr_copy, changed_voxels
 
 
 # @njit
@@ -409,24 +396,3 @@ def mutation(arr_3d: np.ndarray, mutation_probability: float) -> tuple[np.ndarra
 #                 p = rv.pdf((i, j, k))
 #                 arr[i, j, k] = np.random.binomial(lx * ly * lz, p)
 #     return arr
-
-
-if __name__ == '__main__':
-    # import timeit
-    #
-    # path = rf'F:\shshsh\temp\topo_parent_1.csv'
-    # cube_4d_array = np.genfromtxt(path, dtype=int, delimiter=',').reshape((100, 10, 10, 10))
-    # t = timeit.Timer(lambda: mutate_and_validate_topologies(cube_4d_array, mutation_probability=0.05,
-    #                                                         timeout=0.5, view_topo=False))
-    #
-    # test_iteration = 5
-    # print('Begin Testing...')
-    # print(f'Total runtime of {test_iteration} generations: {t.timeit(test_iteration)}s')
-
-    import os
-    from GeneticAlgorithm import generate_offspring
-    os.chdir('f:/shshsh/temp')
-    for n in range(51):
-        arrs = np.genfromtxt(f'topo_parent_{n + 1}.csv', delimiter=',', dtype=int)
-        generate_offspring(topo_parent=arrs, gen=n + 1, lx=10, ly=10, lz=10, end_pop=100, mutation_rate=0.05,
-                           timeout=100.0)
