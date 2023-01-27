@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MaxNLocator
 from .PostProcessing import get_datum_hv, get_hv_from_datum_hv, find_pareto_front_points, evaluate_all_fitness_values
-from .FileIO import load_pickled_dict_data
+from .FileIO import pickle_io, get_sorted_file_numbers_from_pattern
 from .ParameterDefinitions import Parameters, GuiParameters, translate_dictionary, radiobutton_name_dict, \
     fitness_definitions
 
@@ -37,6 +37,7 @@ class App:  # GUI class
         self.root.title(TITLE)
         self.root.config(background='#FFFFFF')
         self.root.resizable(False, False)
+        self.polling_rate = POLLING_RATE
 
         # Frames
         self.up_frame = tk.Frame(self.root, width=LEFT_WIDTH + RIGHT_WIDTH + 2 * PADX, height=100)
@@ -87,9 +88,9 @@ class App:  # GUI class
         self.ax[1].grid(True)
         self.ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
         if self.conn is not None:
-            self.update_canvas(polling_rate=POLLING_RATE)
+            self.update_canvas()
 
-    def update_canvas(self, polling_rate: float):
+    def update_canvas(self):
         if self.conn.poll():  # Checking if any received data available for every 1/polling_rate second
             try:
                 _x1, _y1, _x2y2 = self.conn.recv()
@@ -121,7 +122,7 @@ class App:  # GUI class
                 self.bar.draw()
             except Exception as error_message:
                 print('[GUI] An plotting error occurred:', error_message)
-        self.root.after(int(1000 / polling_rate), self.update_canvas)
+        self.root.after(int(1000 / self.polling_rate), self.update_canvas)
 
     def onclick_set_path_button(self):
         try:
@@ -302,15 +303,16 @@ class Visualizer:
             self.axes[0].grid(True)
             self.axes[1].grid(True)
 
-    def visualize(self, params, w, use_manual_rp, ref_x=0.0, ref_y=0.0):
-        topo_next_parent = load_pickled_dict_data(f'Topologies_{w + 1}')['parent']
-        result_next_parent = load_pickled_dict_data(f'FieldOutput_{w + 1}')
-        fitness_values_next_parent = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
-                                                                 params_dict=asdict(params), topologies=topo_next_parent,
-                                                                 results=result_next_parent)
-        fitness_pareto_next_parent = find_pareto_front_points(costs=fitness_values_next_parent, return_index=False)
-        self.plot(gen_num=w,
-                  pareto_1_sorted=fitness_pareto_next_parent[:, 0], pareto_2_sorted=fitness_pareto_next_parent[:, 1],
+    def visualize(self, params, gen, use_manual_rp, ref_x=0.0, ref_y=0.0):
+        next_parent_topologies = pickle_io(f'Topologies_{gen + 1}', mode='r')['parent']
+        next_parent_results = pickle_io(f'FieldOutput_{gen + 1}', mode='r')
+        next_parent_fitness_values = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
+                                                                 params_dict=asdict(params),
+                                                                 topologies=next_parent_topologies,
+                                                                 results=next_parent_results)
+        next_parent_pareto_indices = find_pareto_front_points(costs=next_parent_fitness_values, return_index=False)
+        self.plot(gen_num=gen,
+                  pareto_1_sorted=next_parent_pareto_indices[:, 0], pareto_2_sorted=next_parent_pareto_indices[:, 1],
                   use_manual_rp=use_manual_rp, ref_x=ref_x, ref_y=ref_y)
 
 
@@ -334,5 +336,7 @@ def translator(dictionary: dict, s: str, flip: bool = False) -> str:
     return {value: key for key, value in dictionary.items()}.get(s) if flip else dictionary.get(s)
 
 
-if __name__ == '__main__':
-    pass
+def load_previous_data(visualizer: Visualizer, params: Parameters):
+    file_numbers = get_sorted_file_numbers_from_pattern(r'FieldOutput_\d+')
+    for file_number in file_numbers:
+        visualizer.visualize(gen=file_number-1, params=params, use_manual_rp=False)

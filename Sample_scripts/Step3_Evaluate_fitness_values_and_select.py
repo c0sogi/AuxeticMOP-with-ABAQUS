@@ -48,3 +48,5 @@ selected_results = {entity_num: all_results[pareto_idx + 1]
                     for entity_num, pareto_idx in enumerate(pareto_indices, start=1)}
 print('Shape of selected topologies: ', selected_topologies.shape)
 print('Size of selected results: ', len(selected_results))
+pickle_io('Topologies_2', mode='w', to_dump={'parent': selected_topologies})
+pickle_io('FieldOutput_2', mode='w', to_dump=selected_results)

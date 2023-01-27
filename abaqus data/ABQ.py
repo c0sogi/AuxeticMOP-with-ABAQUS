@@ -20,13 +20,8 @@ try:
     from Queue import Queue
 except ImportError:
     from queue import Queue
-executeOnCaeStartup()
 
-material = {
-    'material_name': 'resin',
-    'density': 1.2e-09,
-    'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
-}
+executeOnCaeStartup()
 HOST = 'localhost'
 PORT = 12345
 
@@ -129,8 +124,7 @@ class MyModel:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if len(mdb.models.keys()) == 1:
             mdb.Model(name='empty_model', modelType=STANDARD_EXPLICIT)
-        del mdb.models[self.model.name]
-        del self
+        # del mdb.models[self.model.name]
 
     def create_voxel_part(self, voxel_name):
         _voxel_part = self.model.Part(name=voxel_name, dimensionality=THREE_D, type=DEFORMABLE_BODY)
@@ -260,6 +254,11 @@ class MyModel:
         if run:
             mdb.jobs[job_name].submit(consistencyChecking=OFF)
             mdb.jobs[job_name].waitForCompletion()
+
+
+def ascii_encode_dict(data):
+    ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
+    return dict(map(ascii_encode, pair) for pair in data.items())
 
 
 def open_job_log():
@@ -430,7 +429,8 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
         else:
             raise ValueError
         mm.root_assembly.regenerate()
-        mm.create_job(job_name='Job-{}'.format(model_name), num_cpus=params['n'], num_gpus=0, run=True)
+        mm.create_job(job_name='Job-{}'.format(model_name),
+                      num_cpus=params['n_cpus'], num_gpus=params['n_gpus'], run=True)
         export_outputs(model_name=model_name, step_name=analysis_step_name, rp_name='RP-y')
 
 
@@ -439,22 +439,27 @@ if __name__ == '__main__':
     frame = open_job_log()
     save_log('connected to {}:{}'.format(PORT, HOST), job_log_frame=frame)
     while True:
-        while True:
-            parameters = client.recv()
-            if parameters is not None:
-                break
+        parameters = client.recv()
+        parameters = ascii_encode_dict(parameters)
         print('Received: ', parameters)
         if parameters['exit_abaqus']:
             break
-        restart = parameters['restart']
+        material_property_definitions = {
+            'material_name': parameters['material_name'],
+            'density': parameters['density'],
+            'engineering_constants': parameters['engineering_constants']
+        }
+        start_topology_from = parameters['start_topology_from']
         topologies_file_name = parameters['topologies_file_name']
         topologies_key = parameters['topologies_key']
         topologies = load_pickled_dict_data(topologies_file_name)[topologies_key]
         gen_num = topologies_file_name.split('_')[-1]
         for entity_num, topology in enumerate(topologies, start=1):
+            if entity_num < start_topology_from:
+                continue
             run_analysis(model_name='{}-{}'.format(gen_num, entity_num), analysis_mode='compression',
                          topo_arr=topology, voxel_unit_length=parameters['unit_l'], full=False, params=parameters,
-                         material_properties=material, voxel_name='voxel', cube_name='cube',
+                         material_properties=material_property_definitions, voxel_name='voxel', cube_name='cube',
                          displacement={'u1': 0, 'u2': parameters['dis_y'], 'u3': 0, 'ur1': 0, 'ur2': 0, 'ur3': 0})
             save_log('Created Job{}-{}.odb'.format(gen_num, entity_num), job_log_frame=frame)
         client.send('[{}] Generation {} finished!'.format(datetime.now(), gen_num))

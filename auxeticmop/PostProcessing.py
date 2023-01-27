@@ -24,7 +24,8 @@ def evaluate_fitness_value_for_one_entity(vars_definitions: dict, fitness_value_
                                           params_dict: dict, result: dict, topology: np.ndarray) -> np.ndarray:
     vars_dict = dict()
     predefined_vars = {
-        'total_voxels': np.sum(topology)
+        'total_voxels': np.sum(topology),
+        'max_rf22': params_dict['unit_l'] * params_dict['lx'] * params_dict['unit_l'] * params_dict['lz'] * params_dict['material_modulus']
     }
     for var, definition in vars_definitions.items():
         if isinstance(definition, (list, tuple, set)):

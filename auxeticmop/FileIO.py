@@ -6,6 +6,16 @@ import numpy as np
 import re
 
 
+def remove_file(file_name: str) -> None:
+    """
+    Remove a file with designated filename.
+    :param file_name: The filename to remove.
+    :return: None
+    """
+    if os.path.isfile(file_name):
+        os.remove(file_name)
+
+
 def key_modifier(key: str, option: str | None) -> object:
     if option == 'int':
         return int(re.compile(r'\d+').search(key).group())
@@ -133,15 +143,15 @@ def pickles_io(file_names: list | tuple, mode: str, to_dumps=None, key_option=No
     return asyncio.run(pickles_aio(file_names=file_names, mode=mode, to_dumps=to_dumps, key_option=key_option))
 
 
-def open_history_output(gen, path=None):
-    if path is not None:
-        from os import chdir
-        chdir(path)
-    from pickle import load
-    file_names = ('U1_HistoryOutput', 'U2_HistoryOutput', 'U3_HistoryOutput',
-                  'RF1_HistoryOutput', 'RF2_HistoryOutput', 'RF3_HistoryOutput')
-    for file_name in file_names:
-        pickle_file_name = file_name + f'_{gen}'
-        with open(pickle_file_name, 'rb') as f:
-            loaded_file = load(f, encoding='bytes')
-            print(f'Gen{gen}-{pickle_file_name}: {loaded_file}')
+# def open_history_output(gen, path=None):
+#     if path is not None:
+#         from os import chdir
+#         chdir(path)
+#     from pickle import load
+#     file_names = ('U1_HistoryOutput', 'U2_HistoryOutput', 'U3_HistoryOutput',
+#                   'RF1_HistoryOutput', 'RF2_HistoryOutput', 'RF3_HistoryOutput')
+#     for file_name in file_names:
+#         pickle_file_name = file_name + f'_{gen}'
+#         with open(pickle_file_name, 'rb') as f:
+#             loaded_file = load(f, encoding='bytes')
+#             print(f'Gen{gen}-{pickle_file_name}: {loaded_file}')

@@ -8,26 +8,22 @@ class Parameters:
     abaqus_mode: str = 'script'  # noGUI: without abaqus gui, script: with abaqus gui
     mode: str = 'GA'  # GA mode
     evaluation_version: str = 'ver3'  # fitness value evaluation mode
-    restart_pop: int = 0  # 0 for no-restart, 1~ for initial restarting population
-    ini_pop: int = 1  # First population number, default: 1
-    end_pop: int = 100  # Last population number
-    ini_gen: int = 1  # First generation number, default: 1
-    end_gen: int = 50  # Last generation number
+    end_pop: int = 3  # Last population number
+    end_gen: int = 10  # Last generation number
     mutation_rate: float = 0.1  # mutation process option
     unit_l: float = 3  # Voxel length
-    lx: int = 5  # Number of voxels in x-direction
-    ly: int = 5  # Number of voxels in y-direction
-    lz: int = 5  # Number of voxels in z-direction
+    lx: int = 3  # Number of voxels in x-direction
+    ly: int = 3  # Number of voxels in y-direction
+    lz: int = 3  # Number of voxels in z-direction
     divide_number: int = 1  # up-scaling factor
-    mesh_size: float = 0.5  # abaqus meshing option
+    mesh_size: float = 1.0  # abaqus meshing option
     dis_y: float = -0.005  # abaqus boundary condition option
     material_modulus: float = 1100  # abaqus material property option
-    poisson_ratio: float = 0.4  # abaqus material property option
-    density: float = 1  # abaqus material property option
-    MaxRF22: float = 0.01  # fitness value evaluation option
+    # poisson_ratio: float = 0.4  # abaqus material property option
+    # density: float = 1  # abaqus material property option
     penalty_coefficient: float = 0.1  # fitness value evaluation option
-    sigma: float = 1  # filtering option
-    threshold: float = 0.5  # filtering option
+    # sigma: float = 1  # filtering option
+    # threshold: float = 0.5  # filtering option
     n_cpus: int = 1  # abaqus option
     n_gpus: int = 0  # abaqus option
 
@@ -36,12 +32,16 @@ class Parameters:
         self.ly *= self.divide_number
         self.lz *= self.divide_number  # number of voxels after increasing resolution
         self.unit_l /= self.divide_number
-        unit_lx_total = self.lx * self.unit_l
-        unit_ly_total = self.ly * self.unit_l
-        unit_lz_total = self.lz * self.unit_l
         self.mesh_size *= self.unit_l
-        self.dis_y *= unit_ly_total  # boundary condition (displacement)
-        self.MaxRF22 *= unit_lx_total * unit_lz_total * self.material_modulus
+        self.dis_y *= self.ly * self.unit_l  # boundary condition (displacement)
+
+
+@dataclass
+class JsonFormat:
+    start_topology_from: int | None
+    topologies_file_name: str
+    topologies_key: str
+    exit_abaqus: bool
 
 
 @dataclass
@@ -70,6 +70,12 @@ class FitnessDefinitions:
     fitness_value_definitions: tuple | list
 
 
+material_property_definitions = {
+    'material_name': 'resin',
+    'density': 1.2e-09,
+    'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
+}
+
 exported_field_outputs_format = {
     'displacement': {'xMax': np.ndarray, 'yMax': np.ndarray, 'zMax': np.ndarray},
     'rotation': np.ndarray,
@@ -83,7 +89,7 @@ fitness_definitions = {
             'dis11': ('displacement', 'xMax', 0),
             'dis22': ('displacement', 'yMax', 1),
             'rf22': ('reaction_force', 2),
-            'max_rf22': '@MaxRF22',
+            'max_rf22': '$max_rf22',
             'k': '@penalty_coefficient',  # The prefix @ means this is variable is from Parameters
             'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
             'lx': '@lx',
@@ -97,7 +103,7 @@ fitness_definitions = {
     'ver2': FitnessDefinitions(
         vars_definitions={
             'rf22': ('reaction_force', 2),
-            'max_rf22': '@MaxRF22',  # The prefix @ means this is variable is from Parameters
+            'max_rf22': '$max_rf22',  # The prefix @ means this is variable is from Parameters
             'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
             'lx': '@lx',
             'ly': '@ly',
@@ -142,7 +148,7 @@ translate_dictionary = {'abaqus_script': 'Filename of ABAQUS script',
                         'evaluation_version': 'GA evaluation version',
                         'restart_pop': '[P] Restart from population',
                         'ini_pop': '[P] First Population',
-                        'end_pop': '[P] Last Population',
+                        'end_pop': '[P] Populations per generation',
                         'ini_gen': '[G] First Generation',
                         'end_gen': '[G] Last Generation',
                         'mutation_rate': 'Mutation rate(0~1)',

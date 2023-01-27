@@ -1,8 +1,10 @@
 import socket
 import threading
 import json
+import os
 from datetime import datetime
-from time import sleep
+import multiprocessing as mp
+from multiprocessing import connection
 import pickle
 import struct
 from sys import version_info
@@ -166,21 +168,70 @@ class Client:
         print('<!> Connection dead')
 
 
-if __name__ == '__main__':
-    open_server = False
-    if open_server:  # Creating server
-        server = Server(host='', port=12345, option='json', run_nonblocking=True)
-        print('server created')
-        while len(server.connected_clients) == 0:
-            sleep(1)
-        while True:
-            data_to_send = {'a': 1, 'b': 2.0, 'c': 'hello'}
-            json_data = json.dumps(data_to_send)
-            server.send(client_socket=server.connected_clients[-1], data=data_to_send)
-            print('sending: ', json_data)
-            sleep(5)
+def make_and_start_process(target: any, duplex: bool = True,
+                           daemon: bool = True) -> tuple[mp.Process, connection.Connection, connection.Connection]:
+    """
+    Make GUI process and return a process and two Pipe connections between main process and GUI process.
+    :param target: The GUI class to run as another process.
+    :param duplex: If True, both receiving and sending data between main process and GUI process will be allowed.
+    Otherwise, conn_1 is only allowed for receiving data and conn_2 is only allowed for sending data.
+    :param daemon: If True, GUI process will be terminated when main process is terminated.
+    Otherwise, GUI process will be orphan process.
+    :return: A running process, Pipe connections of main process, GUI process, respectively.
+    """
+    conn_1, conn_2 = mp.Pipe(duplex=duplex)
+    process = mp.Process(target=target, args=(conn_2,), daemon=daemon)
+    process.start()
+    return process, conn_1, conn_2
 
-    else:  # Creating client
-        client = Client(host='localhost', port=12345, option='json', connect=True)
-        while True:
-            print('Received: ', client.recv())
+
+def start_abaqus_cae(script_name: str, option: str) -> mp.Process:
+    """
+    Open an abaqus CAE process
+    :param script_name: Name of python script file for abaqus. For example, ABQ.py.
+    :param option: 'noGUI' for abaqus non-gui mode, 'script' for abaqus gui mode.
+    :return: Abaqus process.
+    """
+    print(f"========== Opening ABAQUS on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
+    process = mp.Process(target=os.system, args=(f'abaqus cae {option}={script_name}',), daemon=True)
+    process.start()  # Start abaqus
+    return process
+
+
+def request_abaqus_jobs(json_data: dict, server: Server) -> None:
+    """
+    Hold main process until one generation of abaqus job is done.
+    :param json_data:
+    :param server: A server to ABAQUS
+    :return: Nothing
+    """
+    server.send(client_socket=server.connected_clients[-1], data=json_data)
+    print('Waiting for abaqus ...........')
+    message_from_client = server.recv()
+    print(message_from_client)
+    print(f"========== An abaqus job done on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
+
+
+# def ascii_encode_dict(data):
+#     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
+#     return dict(map(ascii_encode, pair) for pair in data.items())
+
+
+# if __name__ == '__main__':
+#     open_server = False
+#     if open_server:  # Creating server
+#         server = Server(host='', port=12345, option='json', run_nonblocking=True)
+#         print('server created')
+#         while len(server.connected_clients) == 0:
+#             sleep(1)
+#         while True:
+#             data_to_send = {'a': 1, 'b': 2.0, 'c': 'hello'}
+#             json_data = json.dumps(data_to_send)
+#             server.send(client_socket=server.connected_clients[-1], data=data_to_send)
+#             print('sending: ', json_data)
+#             sleep(5)
+#
+#     else:  # Creating client
+#         client = Client(host='localhost', port=12345, option='json', connect=True)
+#         while True:
+#             print('Received: ', client.recv())
