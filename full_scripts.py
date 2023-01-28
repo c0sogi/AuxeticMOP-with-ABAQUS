@@ -3,6 +3,23 @@ from auxeticmop.GraphicUserInterface import App, Visualizer, plot_previously_plo
 from auxeticmop.GeneticAlgorithm import NSGAModel
 from auxeticmop.Network import Server, make_and_start_process, start_abaqus_cae
 from auxeticmop.ParameterDefinitions import material_property_definitions
+import warnings
+warnings.warn(
+    "You must use conditional block [if __name__ == '__main__'] for running GA. Otherwise, [WinError 10048] occurs.")
+
+"""
+<!> Caution
+You must use if __name__ == '__main__' for running GA,
+If __name__=='__main__' is not used, multiple servers are running and multiple bindings occur on the same port,
+which causes OSError: [WinError 10048] server-binding error. The reason this phenomenon occurs is as follows.
+
+[1] Some functions like make_and_start_process() and 'start_abaqus_cae() creates new process.
+[2] If creating process using multiprocessing.Process(), that process will run the code at the top level of the script.
+[3] If you have code that you only want to run when the script is run directly, you can put it in the block of code
+indented under if __name__ == '__main__':, so that it will not be executed when the script is imported as a module and
+run in a new process. Without that condition, the same block of code will run multiple times in multiple processes
+which can lead to unexpected results.
+"""
 
 HOST = 'localhost'
 PORT = 12345

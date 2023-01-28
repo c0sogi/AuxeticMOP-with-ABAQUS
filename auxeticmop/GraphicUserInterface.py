@@ -4,6 +4,7 @@ from tkinter import messagebox
 import os
 import pickle
 from dataclasses import asdict
+from typing import Union
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -193,7 +194,7 @@ class App:  # GUI class
         print('[GUI] Closing GUI...')
         self.root.quit()
 
-    def show_parameters(self, loaded: None | dict) -> None:
+    def show_parameters(self, loaded: Union[None, dict]) -> None:
         self.down_frame.grid(row=1, column=0, padx=PADX, pady=PADY / 2)
         self.down_frame.grid_propagate(False)
         self.left_frame.grid(row=1, column=0, padx=PADX, pady=PADY / 2)
@@ -316,7 +317,7 @@ class Visualizer:
                   use_manual_rp=use_manual_rp, ref_x=ref_x, ref_y=ref_y)
 
 
-def atoi(s: str) -> str | int | float:
+def atoi(s: str) -> Union[str, int, float]:
     try:
         float(s)
         # s is integer or float type

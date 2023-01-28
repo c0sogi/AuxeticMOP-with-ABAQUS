@@ -6,9 +6,9 @@ Export these as 2nd generation; "Topologies_2" and "FieldOutput_2".
 
 
 def run():
-    from auxeticmop.PostProcessing import evaluate_all_fitness_values, selection
-    from auxeticmop.ParameterDefinitions import Parameters, fitness_definitions
-    from auxeticmop.FileIO import pickle_io
+    from ..PostProcessing import evaluate_all_fitness_values, selection
+    from ..ParameterDefinitions import Parameters, fitness_definitions
+    from ..FileIO import pickle_io
     import numpy as np
     from dataclasses import asdict
     import os
@@ -43,8 +43,9 @@ def run():
 
     # Gather topologies, results, and fitness values
     all_topologies = np.vstack((parent_topologies, offspring_topologies))
-    all_results = dict(parent_results | {entity_num + len(parent_results): offspring_results[entity_num]
-                                         for entity_num in sorted(offspring_results.keys())})
+    all_results = parent_results.copy()
+    all_results.update({entity_num + len(parent_results): offspring_results[entity_num]
+                        for entity_num in sorted(offspring_results.keys())})
     all_fitness_values = evaluate_all_fitness_values(fitness_definitions=fitness_definitions, params_dict=asdict(parameters),
                                                      results=all_results, topologies=all_topologies)
     print('Shape of all topologies: ', all_topologies.shape)

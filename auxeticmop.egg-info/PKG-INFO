@@ -1,3 +1,18 @@
+Metadata-Version: 2.1
+Name: auxeticmop
+Version: 1.0.0.0
+Summary: A package for finding meta-material structure using ABAQUS and MOP evolutionary algorithm approaches.
+Home-page: https://github.com/c0sogi/AuxeticMOP-with-ABAQUS
+Author: Seongbin Choi
+Author-email: dcas@naver.com
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Microsoft :: Windows
+Requires-Python: >=3.7,<3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # AuxeticMOP-with-ABAQUS
 ## Purpose
 - Finding metamaterial structure with negative poisson's ratio using ABAQUS and MOP evolutionary algorithm approaches.
@@ -16,28 +31,6 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 
 - Non-dominated Sorting Genetic Algorithm(NSGA) is used to validate and assess fitness values of generated topologies.
   + Related contents: `auxeticmop.GeneticAlgorithm`, `auxeticmop.MutateAndValidate`
-
-## Install
-
-See the [TensorFlow install guide](https://www.tensorflow.org/install) for the
-[pip package](https://www.tensorflow.org/install/pip)
-
-To install the current release:
-```
-$ pip install auxeticmop
-```
-
-#### *Try your first TensorFlow program*
-
-```shell
-$ python
-```
-
-```python
->>> from auxeticmop.sample_scripts import full_steps
->>> if __name__ == '__main__':
-  full_steps.run()
-```
 
 ## Overall Steps of GA
 > All Steps are included in `auxeticmop.GeneticAlgorithm.NSGAModel.run_a_generation()`.
@@ -65,11 +58,11 @@ $ python
 
 | Evaluation<br/>version | Fitness<br/> value 1                                 | Fitness<br/> value 2                  |
 |------------------------|------------------------------------------------------|---------------------------------------|
-| ver1                   | RF<sub>22</sub>/RF<sub>22,max</sub> + `k`*`vol_frac` | ν <sub>21</sub> + `k` * `vol_frac`    |
+| ver1                   | RF<sub>22</sub>/RF<sub>22,max</sub> + `k`*`vol_frac` |  <sub>21</sub> + `k` * `vol_frac`    |
 | ver2                   | `vol_frac`                                           | RF<sub>22</sub>/RF<sub>22,max</sub>   |
-| ver3                   | ν <sub>21</sub> + `k` * `vol_frac`                   | ν <sub>23</sub> +`k` * `vol_frac`     |
-| ver4                   | (σ<sub>mises</sub>)<sub>max</sub>                    | `vol_frac`                            |
-| ver5                   | (σ<sub>mises</sub>)<sub>max</sub>                    | max(ν <sub>21</sub>, ν <sub>23</sub>) |
+| ver3                   |  <sub>21</sub> + `k` * `vol_frac`                   |  <sub>23</sub> +`k` * `vol_frac`     |
+| ver4                   | (<sub>mises</sub>)<sub>max</sub>                    | `vol_frac`                            |
+| ver5                   | (<sub>mises</sub>)<sub>max</sub>                    | max( <sub>21</sub>,  <sub>23</sub>) |
 >- `vol_frac`: Volume fraction in cell (0~1)
 >- `k`: penalty coefficient
 

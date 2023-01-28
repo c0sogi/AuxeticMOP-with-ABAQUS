@@ -275,7 +275,7 @@ def open_job_log():
 
 def save_log(message, job_log_frame):
     _now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-    _message = '[{}]{}\n'.format(_now, message)
+    _message = '[{}] {}\n'.format(_now, message)
     print(_message)
     with open('log.txt', mode='a') as f_log:
         f_log.write(_message)
@@ -438,7 +438,7 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
 if __name__ == '__main__':
     client = Client(host=HOST, port=PORT, option='json', connect=True)
     frame = open_job_log()
-    save_log('connected to {}:{}'.format(PORT, HOST), job_log_frame=frame)
+    save_log('Connected to {}:{}'.format(PORT, HOST), job_log_frame=frame)
     while True:
         parameters = client.recv()
         parameters = ascii_encode_dict(parameters)

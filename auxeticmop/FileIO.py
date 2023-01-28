@@ -4,6 +4,7 @@ import asyncio
 import aiofiles
 import numpy as np
 import re
+from typing import Union
 
 
 def remove_file(file_name: str) -> None:
@@ -16,7 +17,7 @@ def remove_file(file_name: str) -> None:
         os.remove(file_name)
 
 
-def key_modifier(key: str, option: str | None) -> object:
+def key_modifier(key: str, option: Union[str, None]) -> object:
     if option == 'int':
         return int(re.compile(r'\d+').search(key).group())
     else:
@@ -93,7 +94,7 @@ def find_job_location_from_offspring(params_dict):
 #     return dict_data
 
 
-async def pickle_aio(file_name: str, mode: str, to_dump: object = None) -> any:
+async def pickle_aio(file_name: str, mode: str, to_dump: Union[dict, list, np.ndarray] = None) -> any:
     encoding = 'latin1'
     if mode == 'r':
         async with aiofiles.open(file_name, mode='rb') as f:
@@ -105,7 +106,7 @@ async def pickle_aio(file_name: str, mode: str, to_dump: object = None) -> any:
             serialized_pickle = await f.read()
         loaded = pickle.loads(serialized_pickle, encoding=encoding)
         if isinstance(loaded, dict):
-            loaded |= to_dump
+            loaded.update(to_dump)
         elif isinstance(loaded, list):
             loaded += to_dump
         elif isinstance(loaded, np.ndarray):
@@ -125,7 +126,7 @@ async def pickle_aio(file_name: str, mode: str, to_dump: object = None) -> any:
         raise ValueError
 
 
-async def pickles_aio(file_names: list | tuple, mode: str, to_dumps=None, key_option=None) -> dict:
+async def pickles_aio(file_names: Union[list, tuple], mode: str, to_dumps=None, key_option=None) -> dict:
     if mode == 'r':
         loaded = await asyncio.gather(*[asyncio.ensure_future(pickle_aio(file_name, mode=mode))
                                         for file_name in file_names])
@@ -139,7 +140,7 @@ def pickle_io(file_name: str, mode: str, to_dump: object = None) -> any:
     return asyncio.run(pickle_aio(file_name=file_name, mode=mode, to_dump=to_dump))
 
 
-def pickles_io(file_names: list | tuple, mode: str, to_dumps=None, key_option=None) -> dict:
+def pickles_io(file_names: Union[list, tuple], mode: str, to_dumps=None, key_option=None) -> dict:
     return asyncio.run(pickles_aio(file_names=file_names, mode=mode, to_dumps=to_dumps, key_option=key_option))
 
 

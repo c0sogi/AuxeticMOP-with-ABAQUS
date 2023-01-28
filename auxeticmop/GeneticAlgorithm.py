@@ -3,6 +3,7 @@ import numpy as np
 import itertools
 from functools import reduce
 from dataclasses import asdict
+from typing import Tuple
 from .ParameterDefinitions import Parameters, JsonFormat, fitness_definitions
 from .GraphicUserInterface import Visualizer
 from .Network import Server, request_abaqus
@@ -12,13 +13,14 @@ from .MutateAndValidate import mutate_and_validate_topology
 
 
 class NSGAModel:
-    def __init__(self, params: Parameters, material_properties: dict, visualizer: Visualizer = None, random_topology_density: float = 0.5):
+    def __init__(self, params: Parameters, material_properties: dict, visualizer: Visualizer = None,
+                 random_topology_density: float = 0.5):
         self.params = params
         self.visualizer = visualizer
         self.material_properties = material_properties
         self.random_topology_density = random_topology_density
 
-    def load_parent_data(self, gen: int, server: Server) -> tuple[np.ndarray, dict]:
+    def load_parent_data(self, gen: int, server: Server) -> Tuple[np.ndarray, dict]:
         try:
             parent_topologies = pickle_io(f'Topologies_{gen}', mode='r')['parent']
         except FileNotFoundError or KeyError:
@@ -35,11 +37,11 @@ class NSGAModel:
             parent_results = pickle_io(f'FieldOutput_offspring_{gen}', mode='r')
             remove_file(f'FieldOutput_offspring_{gen}')
             pickle_io(f'FieldOutput_{gen}', mode='w', to_dump=parent_results)
-            self.visualizer.visualize(params=self.params, gen=gen-1, use_manual_rp=False)
+            self.visualizer.visualize(params=self.params, gen=gen - 1, use_manual_rp=False)
         assert len(parent_topologies) == len(parent_results)
         return parent_topologies, parent_results
 
-    def determine_where_abaqus_start(self) -> tuple[int, int]:
+    def determine_where_abaqus_start(self) -> Tuple[int, int]:
         offspring_results_file_numbers = get_sorted_file_numbers_from_pattern(r'FieldOutput_offspring_\d+')
         if len(offspring_results_file_numbers) == 0:
             return 1, 1
@@ -73,9 +75,9 @@ class NSGAModel:
         request_abaqus(dict_data=json_data, server=server)
         offspring_results = pickle_io(f'FieldOutput_offspring_{running_gen}', mode='r')
         all_topologies = np.vstack((parent_topologies, offspring_topologies))
-        # This dict union using pipe operator is allowed only for Python version >= 3.9
-        all_results = dict(parent_results | {entity_num + len(parent_results): offspring_results[entity_num]
-                                             for entity_num in sorted(offspring_results.keys())})
+        all_results = parent_results.copy()
+        all_results.update({entity_num + len(parent_results): offspring_results[entity_num]
+                            for entity_num in sorted(offspring_results.keys())})
         all_fitness_values = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
                                                          params_dict=asdict(self.params),
                                                          results=all_results, topologies=all_topologies)
@@ -102,7 +104,7 @@ def find_where_same_array_locates(arr_to_find: np.ndarray, big_arr: np.ndarray) 
     return np.argwhere(np.all(big_arr == arr_to_find, axis=axis_range))
 
 
-def get_cutting_section_and_candidates(topologies: np.ndarray) -> tuple[int, np.ndarray]:
+def get_cutting_section_and_candidates(topologies: np.ndarray) -> Tuple[int, np.ndarray]:
     topologies_flattened = topologies.reshape((len(topologies), -1))
     possible_cutting_sections = np.random.permutation(topologies_flattened.shape[1])
     for possible_cutting_section in possible_cutting_sections:
@@ -157,9 +159,10 @@ def generate_offspring(gen: int, params: Parameters, topo_parents: np.ndarray, s
         for pair_idx in range(len(candidate_pairs)):
             chromosome_1_idx = candidate_pairs[pair_idx][0]
             chromosome_2_idx = candidate_pairs[pair_idx][1]
-            cross_overed_chromosome_1, cross_overed_chromosome_2 = crossover(chromosome_1=topo_parents[chromosome_1_idx],
-                                                                             chromosome_2=topo_parents[chromosome_2_idx],
-                                                                             cutting_section=cutting_section)
+            cross_overed_chromosome_1, cross_overed_chromosome_2 = crossover(
+                chromosome_1=topo_parents[chromosome_1_idx],
+                chromosome_2=topo_parents[chromosome_2_idx],
+                cutting_section=cutting_section)
             validated_chromosome_1 = mutate_and_validate_topology(cross_overed_chromosome_1, params.mutation_rate)
             validated_chromosome_2 = mutate_and_validate_topology(cross_overed_chromosome_2, params.mutation_rate)
             for validated_chromosome in (validated_chromosome_1, validated_chromosome_2):

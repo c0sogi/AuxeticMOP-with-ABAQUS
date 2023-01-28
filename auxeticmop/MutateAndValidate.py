@@ -1,6 +1,7 @@
 from scipy.ndimage import label
 from numba import njit, int32
 import numpy as np
+from typing import Union, Tuple
 
 
 def make_3d_print_without_support(arr_3d: np.ndarray, max_distance: int = 1) -> int:
@@ -29,7 +30,7 @@ def make_3d_print_without_support(arr_3d: np.ndarray, max_distance: int = 1) -> 
 
 @njit
 def dead_and_survived_islands(y_idx: int, y_direction: int, x_size: int, z_size: int, max_island_idx: int,
-                              labeled_arr: np.ndarray, arr_3d: np.ndarray) -> tuple[set, set]:
+                              labeled_arr: np.ndarray, arr_3d: np.ndarray) -> Tuple[set, set]:
     survived_islands = set()
     dead_islands = set()
     # Determining which ones are the dead islands
@@ -78,7 +79,7 @@ def voxel_elimination_by_islands(x_size: int, z_size: int, labeled_arr: np.ndarr
     return changed_voxels
 
 
-def one_connected_tree(arr_3d: np.ndarray) -> int | None:
+def one_connected_tree(arr_3d: np.ndarray) -> Union[int, None]:
     arr_shape = arr_3d.shape
     labeled_arr, max_label_idx = label(arr_3d)
     survived_labels = survived_tree_labels(labeled_arr, arr_shape[0], arr_shape[1], arr_shape[2])
@@ -140,7 +141,7 @@ def one_survived_tree(arr_3d: np.ndarray, labeled_arr: np.ndarray, survived_labe
     return changed_voxels
 
 
-def mutate_and_validate_topology(arr_3d: np.ndarray, mutation_probability: float) -> None | np.ndarray:
+def mutate_and_validate_topology(arr_3d: np.ndarray, mutation_probability: float) -> Union[None, np.ndarray]:
     arr_3d_mutated, voxels_mutation = mutation(arr_3d.copy(), mutation_probability=mutation_probability)
     lx, ly, lz = arr_3d.shape
     while True:
@@ -166,7 +167,7 @@ def mutate_and_validate_topology(arr_3d: np.ndarray, mutation_probability: float
 
 
 @njit
-def mutation(arr_3d: np.ndarray, mutation_probability: float) -> tuple[np.ndarray, int]:
+def mutation(arr_3d: np.ndarray, mutation_probability: float) -> Tuple[np.ndarray, int]:
     _arr_3d = arr_3d.copy()
     lx, ly, lz = arr_3d.shape
     changed_voxels = 0

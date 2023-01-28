@@ -13,6 +13,8 @@ Evaluate fitness from parent and offspring results of 1st generation.
 Select best topologies by pareto-front condition.
 Export these as 2nd generation; "Topologies_2" and "FieldOutput_2".
 """
-step1.run()
-step2.run()
-step3.run()
+
+if __name__ == '__main__':
+    step1.run()
+    step2.run()
+    step3.run()

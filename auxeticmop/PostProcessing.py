@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
+from typing import Union
 
 
 def get_datum_hv(pareto_1_sorted: np.ndarray, pareto_2_sorted: np.ndarray) -> float:
@@ -20,7 +21,7 @@ def get_hv_from_datum_hv(datum_hv: float, lower_bounds: list, ref_x: float, ref_
     return datum_hv + (ref_x - lower_bounds[0]) * (ref_y - lower_bounds[1])
 
 
-def evaluate_fitness_value_for_one_entity(vars_definitions: dict, fitness_value_definitions: tuple | list,
+def evaluate_fitness_value_for_one_entity(vars_definitions: dict, fitness_value_definitions: Union[tuple, list],
                                           params_dict: dict, result: dict, topology: np.ndarray) -> np.ndarray:
     vars_dict = dict()
     predefined_vars = {

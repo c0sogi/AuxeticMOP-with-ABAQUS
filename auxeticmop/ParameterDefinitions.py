@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import numpy as np
+from typing import Union
 
 
 @dataclass  # Use @dataclass(kw_only=True) for Python version >= 3.10
@@ -37,7 +38,7 @@ class Parameters:
 
 @dataclass
 class JsonFormat:
-    start_topology_from: int | None
+    start_topology_from: Union[int, None]
     topologies_file_name: str
     topologies_key: str
     exit_abaqus: bool
@@ -66,7 +67,7 @@ radiobutton_name_dict = {
 @dataclass
 class FitnessDefinitions:
     vars_definitions: dict
-    fitness_value_definitions: tuple | list
+    fitness_value_definitions: Union[tuple, list]
 
 
 material_property_definitions = {

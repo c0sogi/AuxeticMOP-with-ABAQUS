@@ -4,9 +4,9 @@ Randomly generate parent topologies
 
 
 def run():
-    from auxeticmop.GeneticAlgorithm import random_parent_generation
-    from auxeticmop.ParameterDefinitions import Parameters
-    from auxeticmop.PostProcessing import visualize_one_cube
+    from ..GeneticAlgorithm import random_parent_generation
+    from ..ParameterDefinitions import Parameters
+    from ..PostProcessing import visualize_one_cube
     import os
     script_dir = os.path.dirname(__file__)
     sample_data_dir = os.path.join(script_dir, 'sample_data')
@@ -38,4 +38,3 @@ def run():
 
 if __name__ == '__main__':
     run()
-

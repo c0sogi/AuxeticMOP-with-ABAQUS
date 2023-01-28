@@ -4,10 +4,10 @@ Generate offspring from parent topologies
 
 
 def run():
-    from auxeticmop.GeneticAlgorithm import generate_offspring
-    from auxeticmop import Parameters
-    from auxeticmop import visualize_one_cube
-    from auxeticmop.FileIO import pickle_io
+    from ..GeneticAlgorithm import generate_offspring
+    from ..ParameterDefinitions import Parameters
+    from ..PostProcessing import visualize_one_cube
+    from ..FileIO import pickle_io
     import os
     script_dir = os.path.dirname(__file__)
     sample_data_dir = os.path.join(script_dir, 'sample_data')

@@ -4,35 +4,42 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Organized main.py">
-      <change afterPath="$PROJECT_DIR$/auxeticmop/AbaqusScripts-copy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/AbaqusScripts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/full_steps.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/sample_data/FieldOutput_1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/sample_data/FieldOutput_offspring_1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/sample_data/Topologies_1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/sample_data/_PARAMETERS_" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sample_scripts.py" afterDir="false" />
+    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Organized package">
+      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/PKG-INFO" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/SOURCES.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/dependency_links.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/not-zip-safe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/requires.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/top_level.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0.0-py3-none-any.whl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0.0.tar.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/AuxeticMOP.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AuxeticMOP.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/FieldOutput_1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/FieldOutput_2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/FieldOutput_offspring_1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/Step1_Randomly_generates_parent_topologies.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step1_Randomly_generates_parent_topologies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/Step2_Generate_offspring_topologies.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step2_Generate_offspring_topologies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/Step3_Evaluate_fitness_values_and_select.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step3_Evaluate_fitness_values_and_select.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/Topologies_1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample_scripts/Topologies_2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/__forTesting__/test3.py" beforeDir="false" afterPath="$PROJECT_DIR$/__forTesting__/test3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abaqus data/ABQ.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/ansys_control.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/cad.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/output.step" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/test2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__forTesting__/test3.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/AbaqusScripts-copy.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/AbaqusScripts.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/AbaqusScripts.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/FileIO.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/FileIO.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/Network.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step1_Randomly_generates_parent_topologies.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step1_Randomly_generates_parent_topologies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step2_Generate_offspring_topologies.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step2_Generate_offspring_topologies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step3_Evaluate_fitness_values_and_select.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step3_Evaluate_fitness_values_and_select.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/full_steps.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/full_steps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/sample_data/_PARAMETERS_" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/full_scripts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample_scripts.py" beforeDir="false" afterPath="$PROJECT_DIR$/sample_scripts.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +56,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="beta" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -93,7 +100,7 @@
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode\22-12-31" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.setup">
     <configuration name="Network" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -107,48 +114,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/auxeticmop/Network.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Step2_Generate_offspring_topologies" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AuxeticMOP" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sample_scripts" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sample_scripts/Step2_Generate_offspring_topologies.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Step3_Evaluate_fitness_values_and_select (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AuxeticMOP" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sample_scripts" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sample_scripts/Step3_Evaluate_fitness_values_and_select.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -178,7 +143,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="full_scripts (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -190,7 +155,49 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/full_scripts.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="full_scripts" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AuxeticMOP" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\pythoncode\AuxeticMOP\full_scripts.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="setup" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AuxeticMOP" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/setup.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -283,11 +290,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main" />
+        <item itemvalue="Python.setup" />
+        <item itemvalue="Python.full_scripts (1)" />
         <item itemvalue="Python.test3" />
+        <item itemvalue="Python.full_scripts" />
         <item itemvalue="Python.Network" />
-        <item itemvalue="Python.Step3_Evaluate_fitness_values_and_select (1)" />
-        <item itemvalue="Python.Step2_Generate_offspring_topologies" />
       </list>
     </recent_temporary>
   </component>

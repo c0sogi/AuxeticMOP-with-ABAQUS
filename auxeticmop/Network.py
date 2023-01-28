@@ -9,6 +9,7 @@ from multiprocessing import connection
 from datetime import datetime
 from time import sleep
 from sys import version_info
+from typing import Tuple
 try:
     from Queue import Queue
 except ImportError:
@@ -29,7 +30,7 @@ class Server:
         self._header_format = '>I'
         self._header_bytes = 4
         if run_nonblocking:
-            self._server_th = threading.Thread(target=self.run)
+            self._server_th = threading.Thread(target=self.run, daemon=True)
             self._server_th.start()
 
     def run(self):
@@ -175,7 +176,7 @@ class Client:
 
 
 def make_and_start_process(target: any, duplex: bool = True,
-                           daemon: bool = True) -> tuple[mp.Process, connection.Connection, connection.Connection]:
+                           daemon: bool = True) -> Tuple[mp.Process, connection.Connection, connection.Connection]:
     """
     Make GUI process and return a process and two Pipe connections between main process and GUI process.
     :param target: The GUI class to run as another process.
