@@ -124,7 +124,7 @@ class MyModel:
     def __exit__(self, exc_type, exc_val, exc_tb):
         if len(mdb.models.keys()) == 1:
             mdb.Model(name='empty_model', modelType=STANDARD_EXPLICIT)
-        # del mdb.models[self.model.name]
+        del mdb.models[self.model.name]
 
     def create_voxel_part(self, voxel_name):
         _voxel_part = self.model.Part(name=voxel_name, dimensionality=THREE_D, type=DEFORMABLE_BODY)
@@ -256,6 +256,7 @@ class MyModel:
             mdb.jobs[job_name].waitForCompletion()
 
 
+# Function for Python 2
 def ascii_encode_dict(data):
     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
     return dict(map(ascii_encode, pair) for pair in data.items())
@@ -441,7 +442,6 @@ if __name__ == '__main__':
     while True:
         parameters = client.recv()
         parameters = ascii_encode_dict(parameters)
-        print('Received: ', parameters)
         if parameters['exit_abaqus']:
             break
         material_property_definitions = {

@@ -4,17 +4,16 @@ import numpy as np
 
 @dataclass  # Use @dataclass(kw_only=True) for Python version >= 3.10
 class Parameters:
-    abaqus_script: str = 'ABQ.py'  # abaqus python script filename e.g., ABQ.py
     abaqus_mode: str = 'script'  # noGUI: without abaqus gui, script: with abaqus gui
-    mode: str = 'GA'  # GA mode
-    evaluation_version: str = 'ver3'  # fitness value evaluation mode
-    end_pop: int = 3  # Last population number
-    end_gen: int = 10  # Last generation number
+    # mode: str = 'GA'  # GA mode
+    evaluation_version: str = 'ver5'  # fitness value evaluation mode
+    end_pop: int = 10  # Last population number
+    end_gen: int = 50  # Last generation number
     mutation_rate: float = 0.1  # mutation process option
     unit_l: float = 3  # Voxel length
-    lx: int = 3  # Number of voxels in x-direction
-    ly: int = 3  # Number of voxels in y-direction
-    lz: int = 3  # Number of voxels in z-direction
+    lx: int = 5  # Number of voxels in x-direction
+    ly: int = 5  # Number of voxels in y-direction
+    lz: int = 5  # Number of voxels in z-direction
     divide_number: int = 1  # up-scaling factor
     mesh_size: float = 1.0  # abaqus meshing option
     dis_y: float = -0.005  # abaqus boundary condition option
@@ -60,7 +59,7 @@ class GuiParameters:
 radiobutton_name_dict = {
     'abaqus_mode': ('noGUI', 'script'),
     'mode': ('GA', 'random'),
-    'evaluation_version': ('ver1', 'ver2', 'ver3')
+    'evaluation_version': ('ver3', 'ver4', 'ver5')
 }
 
 
@@ -139,6 +138,17 @@ fitness_definitions = {
         fitness_value_definitions=(
             'max_mises',
             'total_voxels / (lx * ly * lz)'
+        )),
+    'ver5': FitnessDefinitions(
+        vars_definitions={
+            'max_mises': ('mises_stress', 'max'),
+            'dis11': ('displacement', 'xMax', 0),
+            'dis22': ('displacement', 'yMax', 1),
+            'dis33': ('displacement', 'zMax', 2)
+        },
+        fitness_value_definitions=(
+            'max_mises',
+            'max(-dis11/dis22, -dis33/dis22)'
         ))
 }
 

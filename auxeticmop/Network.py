@@ -2,11 +2,12 @@ import socket
 import threading
 import json
 import os
-from datetime import datetime
-import multiprocessing as mp
-from multiprocessing import connection
 import pickle
 import struct
+import multiprocessing as mp
+from multiprocessing import connection
+from datetime import datetime
+from time import sleep
 from sys import version_info
 try:
     from Queue import Queue
@@ -49,15 +50,20 @@ class Server:
                 break
         self.server_socket.close()
 
-    def send(self, client_socket, data):
+    def send(self, client_socket: socket.socket, data: any) -> bool:
         if self.option == 'pickle':
             serialized_data = pickle.dumps(data, protocol=2)
         else:
             serialized_data = json.dumps(data).encode()
-        print('Sending packets: ', serialized_data)
-        client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
-        client_socket.sendall(serialized_data)
-        print('[{}] A data sent'.format(datetime.now()))
+        try:
+            print('Sending packets: ', serialized_data)
+            client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
+            client_socket.sendall(serialized_data)
+            print('[{}] A data sent'.format(datetime.now()))
+            return True
+        except ConnectionError as e:
+            print(e)
+            return False
 
     def recv(self):
         return self.q.get()
@@ -185,53 +191,59 @@ def make_and_start_process(target: any, duplex: bool = True,
     return process, conn_1, conn_2
 
 
-def start_abaqus_cae(script_name: str, option: str) -> mp.Process:
+def start_abaqus_cae(option: str) -> mp.Process:
     """
     Open an abaqus CAE process
-    :param script_name: Name of python script file for abaqus. For example, ABQ.py.
     :param option: 'noGUI' for abaqus non-gui mode, 'script' for abaqus gui mode.
     :return: Abaqus process.
     """
     print(f"========== Opening ABAQUS on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
-    process = mp.Process(target=os.system, args=(f'abaqus cae {option}={script_name}',), daemon=True)
+    script_path = os.path.join(os.path.dirname(__file__), 'AbaqusScripts.py')
+    process = mp.Process(target=os.system, args=(f'abaqus cae {option}={script_path}',), daemon=True)
     process.start()  # Start abaqus
     return process
 
 
-def request_abaqus_jobs(json_data: dict, server: Server) -> None:
+def request_abaqus(dict_data: dict, server: Server) -> None:
     """
-    Hold main process until one generation of abaqus job is done.
-    :param json_data:
+    Send Json data to ABAQUS
+    :param dict_data: Dictionary data to send to ABAQUS
     :param server: A server to ABAQUS
     :return: Nothing
     """
-    server.send(client_socket=server.connected_clients[-1], data=json_data)
-    print('Waiting for abaqus ...........')
+    while len(server.connected_clients) == 0:
+        print('Waiting for ABAQUS socket connection ...')
+        sleep(1.0)
+    is_data_sent = False
+    while not is_data_sent:
+        is_data_sent = server.send(client_socket=server.connected_clients[-1], data=dict_data)
+    print('Waiting for message from ABAQUS ...')
     message_from_client = server.recv()
     print(message_from_client)
     print(f"========== An abaqus job done on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
 
 
+# # This function is for Python2. Checkout ABQ.py
 # def ascii_encode_dict(data):
 #     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
 #     return dict(map(ascii_encode, pair) for pair in data.items())
 
 
-# if __name__ == '__main__':
-#     open_server = False
-#     if open_server:  # Creating server
-#         server = Server(host='', port=12345, option='json', run_nonblocking=True)
-#         print('server created')
-#         while len(server.connected_clients) == 0:
-#             sleep(1)
-#         while True:
-#             data_to_send = {'a': 1, 'b': 2.0, 'c': 'hello'}
-#             json_data = json.dumps(data_to_send)
-#             server.send(client_socket=server.connected_clients[-1], data=data_to_send)
-#             print('sending: ', json_data)
-#             sleep(5)
-#
-#     else:  # Creating client
-#         client = Client(host='localhost', port=12345, option='json', connect=True)
-#         while True:
-#             print('Received: ', client.recv())
+if __name__ == '__main__':
+    open_server = False
+    if open_server:  # Creating server
+        my_server = Server(host='', port=12345, option='json', run_nonblocking=True)
+        print('server created')
+        while len(my_server.connected_clients) == 0:
+            sleep(1)
+        while True:
+            data_to_send = {'a': 1, 'b': 2.0, 'c': 'hello', 'd': True, 'e': [0, 1, 2, 3]}
+            json_data = json.dumps(data_to_send)
+            my_server.send(client_socket=my_server.connected_clients[-1], data=data_to_send)
+            print('sending: ', json_data)
+            sleep(5)
+
+    else:  # Creating client
+        my_client = Client(host='localhost', port=12345, option='json', connect=True)
+        while True:
+            print('Received: ', my_client.recv())

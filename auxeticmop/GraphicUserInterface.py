@@ -336,7 +336,7 @@ def translator(dictionary: dict, s: str, flip: bool = False) -> str:
     return {value: key for key, value in dictionary.items()}.get(s) if flip else dictionary.get(s)
 
 
-def load_previous_data(visualizer: Visualizer, params: Parameters):
+def plot_previously_plotted_data(visualizer: Visualizer, params: Parameters):
     file_numbers = get_sorted_file_numbers_from_pattern(r'FieldOutput_\d+')
     for file_number in file_numbers:
         visualizer.visualize(gen=file_number-1, params=params, use_manual_rp=False)

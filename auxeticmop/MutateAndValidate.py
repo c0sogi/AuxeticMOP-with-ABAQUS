@@ -156,10 +156,9 @@ def mutate_and_validate_topology(arr_3d: np.ndarray, mutation_probability: float
             if np.array_equal(arr_3d_mutated, _arr_3d_mutated):
                 if voxels_oct == 0 and voxels_3pws == 0 and voxels_vsc == 0:
                     total_voxels_change = voxels_mutation + voxels_validation
-                    print('> Total changes in structure during validation < ')
-                    print("- Voxel number changes: [{}] voxels".format(total_voxels_change), end=' | ')
-                    print("Changed of volume fraction: [{:.2f}] percents".format(
-                        100 * total_voxels_change / (lx * ly * lz)))
+                    print('> Validation results')
+                    print("- Volume fraction [{}]%".format(100 * np.sum(arr_3d_mutated) / (lx * ly * lz)), end=' | ')
+                    print("Changed volume fraction: [{:.2f}]%".format(100 * total_voxels_change / (lx * ly * lz)))
                     return arr_3d_mutated
                 else:
                     arr_3d_mutated, voxels_mutation = mutation(arr_3d, mutation_probability=mutation_probability)

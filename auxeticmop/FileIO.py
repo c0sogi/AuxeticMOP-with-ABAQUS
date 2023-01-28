@@ -76,21 +76,21 @@ def find_job_location_from_offspring(params_dict):
                                               tp_prt=topo_pareto, tp_pf=topo_parent[0])
 
 
-def dump_pickled_dict_data(file_name: str, key: object, to_dump: object, mode: str) -> None:
-    if mode == 'a' and os.path.isfile(file_name):
-        with open(file_name, mode='rb') as f:
-            dict_data = pickle.load(f, encoding='latin1')
-        dict_data.update({key: to_dump})
-    else:
-        dict_data = {key: to_dump}
-    with open(file_name, mode='wb') as f:
-        pickle.dump(dict_data, f, protocol=2)
-
-
-def load_pickled_dict_data(file_name: str) -> dict:
-    with open(file_name, mode='rb') as f:
-        dict_data = pickle.load(f, encoding='latin1')
-    return dict_data
+# def dump_pickled_dict_data(file_name: str, key: object, to_dump: object, mode: str) -> None:
+#     if mode == 'a' and os.path.isfile(file_name):
+#         with open(file_name, mode='rb') as f:
+#             dict_data = pickle.load(f, encoding='latin1')
+#         dict_data.update({key: to_dump})
+#     else:
+#         dict_data = {key: to_dump}
+#     with open(file_name, mode='wb') as f:
+#         pickle.dump(dict_data, f, protocol=2)
+#
+#
+# def load_pickled_dict_data(file_name: str) -> dict:
+#     with open(file_name, mode='rb') as f:
+#         dict_data = pickle.load(f, encoding='latin1')
+#     return dict_data
 
 
 async def pickle_aio(file_name: str, mode: str, to_dump: object = None) -> any:

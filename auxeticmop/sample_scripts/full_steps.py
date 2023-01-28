@@ -1,13 +1,17 @@
-import os
-from auxeticmop.GraphicUserInterface import App, Visualizer, plot_previously_plotted_data
-from auxeticmop.GeneticAlgorithm import NSGAModel
-from auxeticmop.Network import Server, make_and_start_process, start_abaqus_cae
-from auxeticmop.ParameterDefinitions import material_property_definitions
+"""
+Run full GA steps
+"""
 
-HOST = 'localhost'
-PORT = 12345
 
-if __name__ == '__main__':
+def run():
+    import os
+    from ..GraphicUserInterface import App, Visualizer, plot_previously_plotted_data
+    from ..GeneticAlgorithm import NSGAModel
+    from ..Network import Server, make_and_start_process, start_abaqus_cae
+    from ..ParameterDefinitions import material_property_definitions
+
+    HOST = 'localhost'
+    PORT = 12345
     # Open socket server
     server = Server(host=HOST, port=PORT, option='json', run_nonblocking=True)
 
@@ -33,3 +37,7 @@ if __name__ == '__main__':
         print(e)
     finally:
         server.close()
+
+
+if __name__ == '__main__':
+    run()

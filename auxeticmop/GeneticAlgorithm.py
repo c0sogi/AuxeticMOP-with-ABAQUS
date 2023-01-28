@@ -3,12 +3,12 @@ import numpy as np
 import itertools
 from functools import reduce
 from dataclasses import asdict
-from auxeticmop.ParameterDefinitions import Parameters, JsonFormat, fitness_definitions
-from auxeticmop.GraphicUserInterface import Visualizer
-from auxeticmop.Network import Server, request_abaqus_jobs
-from auxeticmop.FileIO import pickle_io, pickles_io, remove_file, get_sorted_file_numbers_from_pattern
-from auxeticmop.PostProcessing import evaluate_all_fitness_values, selection
-from auxeticmop.MutateAndValidate import mutate_and_validate_topology
+from .ParameterDefinitions import Parameters, JsonFormat, fitness_definitions
+from .GraphicUserInterface import Visualizer
+from .Network import Server, request_abaqus
+from .FileIO import pickle_io, pickles_io, remove_file, get_sorted_file_numbers_from_pattern
+from .PostProcessing import evaluate_all_fitness_values, selection
+from .MutateAndValidate import mutate_and_validate_topology
 
 
 class NSGAModel:
@@ -31,7 +31,7 @@ class NSGAModel:
                                           topologies_file_name=f'Topologies_{gen}', exit_abaqus=False))
             json_data.update(asdict(self.params))
             json_data.update(self.material_properties)
-            request_abaqus_jobs(json_data=json_data, server=server)
+            request_abaqus(dict_data=json_data, server=server)
             parent_results = pickle_io(f'FieldOutput_offspring_{gen}', mode='r')
             remove_file(f'FieldOutput_offspring_{gen}')
             pickle_io(f'FieldOutput_{gen}', mode='w', to_dump=parent_results)
@@ -50,7 +50,7 @@ class NSGAModel:
                 needed_to_start_at_offspring = len(last_offspring_results) + 1
                 return last_offspring_results_file_number, needed_to_start_at_offspring
             else:
-                return last_offspring_results_file_number, 1
+                return last_offspring_results_file_number + 1, 1
 
     def generate_offspring_topologies(self, gen: int, server: Server) -> np.ndarray:
         parent_topologies, parent_results = self.load_parent_data(gen=gen, server=server)
@@ -70,7 +70,7 @@ class NSGAModel:
                                       topologies_file_name=f'Topologies_{running_gen}', exit_abaqus=False))
         json_data.update(asdict(self.params))
         json_data.update(self.material_properties)
-        request_abaqus_jobs(json_data=json_data, server=server)
+        request_abaqus(dict_data=json_data, server=server)
         offspring_results = pickle_io(f'FieldOutput_offspring_{running_gen}', mode='r')
         all_topologies = np.vstack((parent_topologies, offspring_topologies))
         # This dict union using pipe operator is allowed only for Python version >= 3.9
@@ -94,7 +94,7 @@ class NSGAModel:
         for gen in range(start_gen, self.params.end_gen):
             self.run_a_generation(running_gen=gen, start_offspring_from=start_offspring, server=server)
             start_offspring = 1
-        server.send(client_socket=server.connected_clients[-1], data={'exit_abaqus': True})
+        request_abaqus(dict_data={'exit_abaqus': True}, server=server)
 
 
 def find_where_same_array_locates(arr_to_find: np.ndarray, big_arr: np.ndarray) -> np.ndarray:
