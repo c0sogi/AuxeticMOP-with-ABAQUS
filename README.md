@@ -6,7 +6,7 @@
 
 
 ## Features
-- The script `main.py` or `auxeticmop.sample_scripts.full_steps.run()` generates 1/8 structure of unit cell using ABAQUS CAE software by genetic algorithm.
+- The script `full_scripts.py` or `auxeticmop.sample_scripts.full_steps.run()` generates 1/8 structure of unit cell using ABAQUS CAE software by genetic algorithm.
 This script is especially for finding mechanical meta-material structure consisting of 3D voxels.
 - GUI is provided for getting initial parameters for ABAQUS, and plotting results when a generation work is done.
   + Related contents: `auxeticmop.GraphicUserInterface`
@@ -19,15 +19,12 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 
 ## Install
 
-See the [TensorFlow install guide](https://www.tensorflow.org/install) for the
-[pip package](https://www.tensorflow.org/install/pip)
-
 To install the current release:
-```
-$ pip install auxeticmop
+```shell
+$ pip install auxeticmop==1.0.1
 ```
 
-#### *Try your first TensorFlow program*
+#### *Try out whole GA steps*
 
 ```shell
 $ python
@@ -75,6 +72,9 @@ $ python
 
 ---
 ## Required
-- [x] **[Language]** Python, with version `>=3.9` for some new PEP syntax. `3.10` is recommended.
+- [x] **[Language]** Python, with version `>=3.7 and <3.11`.
+- Version dependency
+  - `numba` for Python `3.11` is not supported yet.
+  - `dataclass` is not supported under Python `3.7`
 - [x] **[External libraries]** `numpy`, `numba`, `scipy`, `matplotlib`, `aiofiles`
 - [x] **[Other software]** `ABAQUS CAE`

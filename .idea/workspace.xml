@@ -4,42 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Organized package">
-      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/PKG-INFO" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/SOURCES.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/dependency_links.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/not-zip-safe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/requires.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/top_level.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0.0-py3-none-any.whl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0.0.tar.gz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/AuxeticMOP.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AuxeticMOP.iml" afterDir="false" />
+    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Release 1.0.0">
+      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0-py3-none-any.whl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0.tar.gz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__forTesting__/ansys_control.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/__forTesting__/cad.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/__forTesting__/output.step" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/__forTesting__/test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/__forTesting__/test2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/__forTesting__/test3.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/AbaqusScripts-copy.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/AbaqusScripts.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/AbaqusScripts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/FileIO.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/FileIO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GeneticAlgorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/MutateAndValidate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/Network.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/ParameterDefinitions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/PostProcessing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step1_Randomly_generates_parent_topologies.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step1_Randomly_generates_parent_topologies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step2_Generate_offspring_topologies.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step2_Generate_offspring_topologies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step3_Evaluate_fitness_values_and_select.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/Step3_Evaluate_fitness_values_and_select.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/full_steps.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/sample_scripts/full_steps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/sample_scripts/sample_data/_PARAMETERS_" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/full_scripts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sample_scripts.py" beforeDir="false" afterPath="$PROJECT_DIR$/sample_scripts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auxeticmop.egg-info/PKG-INFO" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop.egg-info/PKG-INFO" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -443,7 +414,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674831884704</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Release 1.0.0">
+      <created>1674893166057</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1674893166057</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -494,6 +472,7 @@
     <MESSAGE value="Organized some functions, added 50 generations of file samples" />
     <MESSAGE value="Added sample scripts" />
     <MESSAGE value="Organized main.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Organized main.py" />
+    <MESSAGE value="Release 1.0.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Release 1.0.0" />
   </component>
 </project>

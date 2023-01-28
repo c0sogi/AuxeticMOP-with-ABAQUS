@@ -4,7 +4,7 @@ long_descriptions = open('README.md', encoding='utf-8').read().encode("ascii", "
 print(long_descriptions)
 
 setup(name="auxeticmop",
-      version='1.0.0.0',
+      version='1.0.1',
       description="A package for finding meta-material structure using ABAQUS and MOP evolutionary algorithm approaches.",
       author='Seongbin Choi',
       author_email='dcas@naver.com',
