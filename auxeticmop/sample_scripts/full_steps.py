@@ -22,9 +22,6 @@ def run():
     from ..GeneticAlgorithm import NSGAModel
     from ..Network import Server, make_and_start_process, start_abaqus_cae
     from ..ParameterDefinitions import material_property_definitions, fitness_definitions
-    import warnings
-    warnings.warn(
-        "You must use conditional block [if __name__ == '__main__'] for running GA. Otherwise, [WinError 10048] occurs.")
 
     HOST = 'localhost'
     PORT = 12345

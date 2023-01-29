@@ -3,9 +3,7 @@ from auxeticmop.GraphicUserInterface import App, Visualizer, plot_previously_plo
 from auxeticmop.GeneticAlgorithm import NSGAModel
 from auxeticmop.Network import Server, make_and_start_process, start_abaqus_cae
 from auxeticmop.ParameterDefinitions import material_property_definitions, fitness_definitions
-import warnings
-warnings.warn(
-    "You must use conditional block [if __name__ == '__main__'] for running GA. Otherwise, [WinError 10048] occurs.")
+
 
 """
 <!> Caution

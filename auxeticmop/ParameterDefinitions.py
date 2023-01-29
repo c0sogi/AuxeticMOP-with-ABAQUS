@@ -6,7 +6,6 @@ from typing import Union
 @dataclass  # Use @dataclass(kw_only=True) for Python version >= 3.10
 class Parameters:
     abaqus_mode: str = 'script'  # noGUI: without abaqus gui, script: with abaqus gui
-    # mode: str = 'GA'  # GA mode
     evaluation_version: str = 'ver5'  # fitness value evaluation mode
     end_pop: int = 10  # Last population number
     end_gen: int = 50  # Last generation number
@@ -19,11 +18,7 @@ class Parameters:
     mesh_size: float = 1.0  # abaqus meshing option
     dis_y: float = -0.005  # abaqus boundary condition option
     material_modulus: float = 1100  # abaqus material property option
-    # poisson_ratio: float = 0.4  # abaqus material property option
-    # density: float = 1  # abaqus material property option
     penalty_coefficient: float = 0.1  # fitness value evaluation option
-    # sigma: float = 1  # filtering option
-    # threshold: float = 0.5  # filtering option
     n_cpus: int = 1  # abaqus option
     n_gpus: int = 0  # abaqus option
 
@@ -76,12 +71,14 @@ material_property_definitions = {
     'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
 }
 
+"""
 exported_field_outputs_format = {
     'displacement': {'xMax': np.ndarray, 'yMax': np.ndarray, 'zMax': np.ndarray},
     'rotation': np.ndarray,
     'reaction_force': np.ndarray,
     'mises_stress': {'max': float, 'min': float, 'average': float}
 }
+"""
 
 fitness_definitions = {
     'ver1': FitnessDefinitions(

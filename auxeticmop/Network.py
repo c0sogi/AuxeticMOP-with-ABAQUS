@@ -5,6 +5,7 @@ import os
 import pickle
 import struct
 import multiprocessing as mp
+import inspect
 from multiprocessing import connection
 from datetime import datetime
 from time import sleep
@@ -18,6 +19,11 @@ except ImportError:
 
 class Server:
     def __init__(self, host, port, option, run_nonblocking):
+        parent_frame = inspect.stack()[1][0]
+        parent_frame_name = inspect.getmodule(parent_frame).__name__
+        if parent_frame_name != '__main__':
+            raise SystemExit(f'[Error] Server is not created within conditional block if __name__=="__main__".'
+                             f' Use conditional block!')
         self.host = host
         self.port = port
         self.option = option

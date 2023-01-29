@@ -1,4 +1,4 @@
-# AuxeticMOP-with-ABAQUS
+# AuxeticMOP-with-ABAQUS `1.0.2b`
 ## Purpose
 - Finding metamaterial structure with negative poisson's ratio using ABAQUS and MOP evolutionary algorithm approaches.
 - In addition to structure with negative poisson's ratio, other types of material structure can be created by varying version fitness values definitions.
@@ -23,7 +23,7 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 ```shell
 $ pip install auxeticmop
 ```
-... or to install the current release via `anaconda` with Python version `3.9`:
+... or to install the current release via `anaconda` with Python version `>=3.7` and `<3.11`:
 ```shell
 $ conda install -c cosogi auxeticmop
 ```
@@ -35,8 +35,8 @@ $ python
 ```
 
 ```python
->> > from auxeticmop.sample_scripts import full_steps
->> > if __name__ == '__main__':
+>>> from auxeticmop.sample_scripts import full_steps
+>>> if __name__ == '__main__':
   ...   full_steps.run()
 ```
 #### *Modify your parameter definitions*

@@ -438,7 +438,7 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
 if __name__ == '__main__':
     client = Client(host=HOST, port=PORT, option='json', connect=True)
     frame = open_job_log()
-    save_log('Connected to {}:{}'.format(PORT, HOST), job_log_frame=frame)
+    save_log('Connected to {}:{}'.format(HOST, PORT), job_log_frame=frame)
     while True:
         parameters = client.recv()
         parameters = ascii_encode_dict(parameters)
