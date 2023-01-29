@@ -21,7 +21,7 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 
 To install the current release:
 ```shell
-$ pip install auxeticmop==1.0.1
+$ pip install auxeticmop
 ```
 
 #### *Try out whole GA steps*
@@ -33,8 +33,19 @@ $ python
 ```python
 >>> from auxeticmop.sample_scripts import full_steps
 >>> if __name__ == '__main__':
-  full_steps.run()
+...     full_steps.run()
 ```
+#### *Modify your parameter definitions*
+```python
+>>> from auxeticmop import ParameterDefinitions
+>>> dir(ParameterDefinitions)
+Output: ['FitnessDefinitions', 'GuiParameters', 'JsonFormat', 'Parameters', 'Union', '__builtins__',
+         '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__',
+         'dataclass', 'exported_field_outputs_format', 'fitness_definitions', 'material_property_definitions',
+         'np', 'radiobutton_name_dict', 'translate_dictionary']
+```
+- Go to `auxeticmop.ParameterDefinitions` and use editor to directly customize parameters.
+- If using VS code, press `F12`, if using Pycharm, press `Ctrl+B` to go to file.
 
 ## Overall Steps of GA
 > All Steps are included in `auxeticmop.GeneticAlgorithm.NSGAModel.run_a_generation()`.
