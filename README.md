@@ -19,9 +19,13 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 
 ## Install
 
-To install the current release:
+ To install the current release via `pip` with Python version `>=3.7` and `<3.11`:
 ```shell
 $ pip install auxeticmop
+```
+... or to install the current release via `conda` with Python version `>=3.7` and `<3.11`:
+```shell
+$ conda install -c cosogi auxeticmop
 ```
 
 #### *Try out whole GA steps*
