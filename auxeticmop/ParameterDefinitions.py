@@ -38,7 +38,7 @@ class Parameters:
 
 @dataclass
 class JsonFormat:
-    start_topology_from: Union[int, None]
+    start_topology_from: int
     topologies_file_name: str
     topologies_key: str
     exit_abaqus: bool
@@ -103,8 +103,8 @@ fitness_definitions = {
     'ver2': FitnessDefinitions(
         vars_definitions={
             'rf22': ('reaction_force', 2),
-            'max_rf22': '$max_rf22',  # The prefix @ means this is variable is from Parameters
-            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'max_rf22': '$max_rf22',
+            'total_voxels': '$total_voxels',
             'lx': '@lx',
             'ly': '@ly',
             'lz': '@lz'
@@ -118,8 +118,8 @@ fitness_definitions = {
             'dis11': ('displacement', 'xMax', 0),
             'dis22': ('displacement', 'yMax', 1),
             'dis33': ('displacement', 'zMax', 2),
-            'k': '@penalty_coefficient',  # The prefix @ means this is variable is from Parameters
-            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'k': '@penalty_coefficient',
+            'total_voxels': '$total_voxels',
             'lx': '@lx',
             'ly': '@ly',
             'lz': '@lz'
@@ -131,8 +131,8 @@ fitness_definitions = {
     'ver4': FitnessDefinitions(
         vars_definitions={
             'max_mises': ('mises_stress', 'max'),
-            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
-            'lx': '@lx',  # The prefix @ means this is variable is from Parameters
+            'total_voxels': '$total_voxels',
+            'lx': '@lx',
             'ly': '@ly',
             'lz': '@lz'
         },

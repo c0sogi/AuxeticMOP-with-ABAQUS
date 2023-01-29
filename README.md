@@ -19,9 +19,13 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 
 ## Install
 
-To install the current release:
+ To install the current release via `PyPI` with Python version `>=3.7` and `<3.11`:
 ```shell
 $ pip install auxeticmop
+```
+... or to install the current release via `anaconda` with Python version `3.9`:
+```shell
+$ conda install -c cosogi auxeticmop
 ```
 
 #### *Try out whole GA steps*
@@ -31,9 +35,9 @@ $ python
 ```
 
 ```python
->>> from auxeticmop.sample_scripts import full_steps
->>> if __name__ == '__main__':
-...     full_steps.run()
+>> > from auxeticmop.sample_scripts import full_steps
+>> > if __name__ == '__main__':
+  ...   full_steps.run()
 ```
 #### *Modify your parameter definitions*
 ```python
@@ -48,7 +52,7 @@ Output: ['FitnessDefinitions', 'GuiParameters', 'JsonFormat', 'Parameters', 'Uni
 - If using VS code, press `F12`, if using Pycharm, press `Ctrl+B` to go to file.
 
 ## Overall Steps of GA
-> All Steps are included in `auxeticmop.GeneticAlgorithm.NSGAModel.run_a_generation()`.
+> All Steps are included in `auxeticmop.GeneticAlgorithm.NSGAModel.evolve_a_generation()`.
 >1. Generate offspring topologies from parent topologies.
 >   - Related contents: `auxeticmop.GeneticAlgorithm.NSGAModel.generate_offspring_topologies()`
 >2. Analyze displacements, reaction forces, or other mechanical properties of offspring topologies using ABAQUS CAE.
@@ -57,7 +61,7 @@ Output: ['FitnessDefinitions', 'GuiParameters', 'JsonFormat', 'Parameters', 'Uni
 >   - Related contents: `auxeticmop.PostProcessing.evaluate_all_fitness_values()`
 >4. Select desired topologies which fits pareto-front(non-dominated) points and export these as next parent.
 >   - Related contents: `auxeticmop.PostProcessing.selection()`
->5. Redo steps 1~4 for next generations. Iterations of all generations are done in `auxeticmop.GeneticAlgorithm.NSGAModel.run()`.
+>5. Redo steps 1~4 for next generations. Iterations of all generations are done in `auxeticmop.GeneticAlgorithm.NSGAModel.evolve()`.
 
 ## Conditions to Meet in Validation Steps
 - 3D print-ability without supports, maximum overhang distance is also considered.

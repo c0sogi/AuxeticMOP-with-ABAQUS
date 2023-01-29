@@ -4,7 +4,7 @@ import itertools
 from functools import reduce
 from dataclasses import asdict
 from typing import Tuple
-from .ParameterDefinitions import Parameters, JsonFormat, fitness_definitions
+from .ParameterDefinitions import Parameters, JsonFormat
 from .GraphicUserInterface import Visualizer
 from .Network import Server, request_abaqus
 from .FileIO import pickle_io, pickles_io, remove_file, get_sorted_file_numbers_from_pattern
@@ -13,9 +13,10 @@ from .MutateAndValidate import mutate_and_validate_topology
 
 
 class NSGAModel:
-    def __init__(self, params: Parameters, material_properties: dict, visualizer: Visualizer = None,
-                 random_topology_density: float = 0.5):
+    def __init__(self, params: Parameters, material_properties: dict, fitness_definitions: dict,
+                 visualizer: Visualizer = None, random_topology_density: float = 0.5):
         self.params = params
+        self.fitness_definitions = fitness_definitions
         self.visualizer = visualizer
         self.material_properties = material_properties
         self.random_topology_density = random_topology_density
@@ -65,7 +66,7 @@ class NSGAModel:
         assert len(parent_topologies) == len(parent_results) == len(offspring_topologies)
         return offspring_topologies
 
-    def run_a_generation(self, running_gen: int, start_offspring_from: int, server: Server):
+    def evolve_a_generation(self, running_gen: int, start_offspring_from: int, server: Server):  # changed method name: from .run_a_generation() to .evolve_a_generation()
         parent_topologies, parent_results = self.load_parent_data(gen=running_gen, server=server)
         offspring_topologies = self.generate_offspring_topologies(gen=running_gen, server=server)
         json_data = asdict(JsonFormat(start_topology_from=start_offspring_from, topologies_key='offspring',
@@ -78,7 +79,7 @@ class NSGAModel:
         all_results = parent_results.copy()
         all_results.update({entity_num + len(parent_results): offspring_results[entity_num]
                             for entity_num in sorted(offspring_results.keys())})
-        all_fitness_values = evaluate_all_fitness_values(fitness_definitions=fitness_definitions,
+        all_fitness_values = evaluate_all_fitness_values(fitness_definitions=self.fitness_definitions,
                                                          params_dict=asdict(self.params),
                                                          results=all_results, topologies=all_topologies)
         pareto_indices = selection(all_fitness_values=all_fitness_values, selected_size=self.params.end_pop)
@@ -91,10 +92,10 @@ class NSGAModel:
         if self.visualizer is not None:
             self.visualizer.visualize(params=self.params, gen=running_gen, use_manual_rp=False)
 
-    def run(self, server):
+    def evolve(self, server):  # changed method name: from .run() to .evolve()
         start_gen, start_offspring = self.determine_where_abaqus_start()
         for gen in range(start_gen, self.params.end_gen):
-            self.run_a_generation(running_gen=gen, start_offspring_from=start_offspring, server=server)
+            self.evolve_a_generation(running_gen=gen, start_offspring_from=start_offspring, server=server)
             start_offspring = 1
         request_abaqus(dict_data={'exit_abaqus': True}, server=server)
 
