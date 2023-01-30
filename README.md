@@ -41,7 +41,7 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 are input in real time and output as a graph.
 
 ## Install
-Before installing this package, you must [ABAQUS CAE](https://edu.3ds.com/en/software/abaqus-learning-edition) must be installed.
+Before installing this package, [ABAQUS CAE](https://edu.3ds.com/en/software/abaqus-learning-edition) must be installed.
 
  To install the current release via `PyPI` with Python version `>=3.6` and `<3.11`:
 ```shell

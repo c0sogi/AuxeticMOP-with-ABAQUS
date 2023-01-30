@@ -5,10 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Release 1.0.2">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/GraphicUserInterface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop/Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop/Network.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conda/meta.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/conda/meta.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/PKG-INFO" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/SOURCES.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/dependency_links.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/not-zip-safe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/requires.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auxeticmop.egg-info/top_level.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.2-py3-none-any.whl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.2.tar.gz" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -451,7 +455,14 @@
       <option name="project" value="LOCAL" />
       <updated>1675071352960</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Release 1.0.2">
+      <created>1675074468423</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1675074468423</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
