@@ -1,13 +1,13 @@
 {% set name = "auxeticmop" %}
-{% set version = "1.0.1" %}
+{% set version = "1.0.2" %}
 
 package:
   name: "{{ name|lower }}"
   version: "{{ version }}"
 
 source:
-  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: b83f1ab6ab311131f7c31699de59f3bff484c49b9dc9186ced0d03a2a97e08b4
+  git_url: https://github.com/c0sogi/auxeticmop.git
+  git_rev: v1.0.2
 
 build:
   number: 0
@@ -22,6 +22,7 @@ requirements:
     - pip
     - python
     - scipy
+    - dataclasses
   run:
     - aiofiles
     - matplotlib
@@ -29,6 +30,7 @@ requirements:
     - numpy
     - python
     - scipy
+    - dataclasses
 
 test:
   imports:

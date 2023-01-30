@@ -26,6 +26,13 @@ HEIGHT = gui_parameters.height
 POLLING_RATE = gui_parameters.polling_rate
 TITLE = gui_parameters.title
 RADIOBUTTON_NAME_DICT = radiobutton_name_dict
+LOG_TEXT_WIDTH = gui_parameters.log_text_width
+LOG_TEXT_HEIGHT = gui_parameters.log_text_height
+DPI = gui_parameters.dpi
+SET_PATH_DISPLAY_WIDTH = gui_parameters.set_path_display_width
+MARKER_SIZE = gui_parameters.marker_size
+MARKER_EDGE_WIDTH = gui_parameters.marker_edge_width
+LABEL_WIDTH = gui_parameters.label_width
 
 
 class App:  # GUI class
@@ -49,12 +56,13 @@ class App:  # GUI class
         self.down_frame.config(background='#FFFFFF')
         self.left_frame = tk.Frame(self.down_frame, width=LEFT_WIDTH, height=HEIGHT, padx=PADX, pady=PADY)
         self.right_frame = tk.Frame(self.down_frame, width=RIGHT_WIDTH, height=HEIGHT, padx=PADX, pady=PADY)
+        self.log_frame = LogFrame(self.right_frame, padx=PADX)
 
         # Elements
         self.set_path_title = tk.Label(self.up_frame,
                                        text='Choose the folder containing the Abaqus script and pickle files.')
         self.set_path_title.config(background='#FFFFFF')
-        self.set_path_display = tk.Listbox(self.up_frame, width=50, height=1)
+        self.set_path_display = tk.Listbox(self.up_frame, width=SET_PATH_DISPLAY_WIDTH, height=1)
         self.set_path_btn = tk.Button(self.up_frame, text='Browse folder...', width=BUTTON_WIDTH,
                                       command=self.onclick_set_path_button)
         self.submit_btn = tk.Button(self.right_frame, width=BUTTON_WIDTH, text='Save presets',
@@ -66,7 +74,7 @@ class App:  # GUI class
         self.setPath = tk.StringVar()
         self.string_vars = [tk.StringVar() for _ in Parameters.__dict__]
         self.figure, self.ax = plt.subplots(nrows=1, ncols=2,
-                                            figsize=((LEFT_WIDTH - PADX) / 100, (HEIGHT - PADY) / 100), dpi=100)
+                                            figsize=((LEFT_WIDTH - PADX) / DPI, (HEIGHT - PADY) / DPI), dpi=DPI)
         self.bar = FigureCanvasTkAgg(self.figure, self.left_frame)
         self.bar.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
         self.parameters = Parameters()
@@ -94,33 +102,39 @@ class App:  # GUI class
     def update_canvas(self):
         if self.conn.poll():  # Checking if any received data available for every 1/polling_rate second
             try:
-                _x1, _y1, _x2y2 = self.conn.recv()
-                _x2, _y2 = zip(*_x2y2.items())
-                print('[GUI] Received: ', _x1, _y1, _x2, _y2)
+                received_data = self.conn.recv()
+                if 'log_message' in received_data.keys():
+                    self.log_frame.text.insert('end', received_data['log_message'])
+                    self.log_frame.text.see('end')
 
-                # Randomize plotting options to make data more noticeable
-                _color_1, _color_2 = np.random.rand(3, ), np.random.rand(3, )
-                _plot_options = {
-                    'marker': np.random.choice(
-                        ('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')),
-                    'color': _color_1,
-                    'markeredgecolor': _color_1,
-                    'markerfacecolor': _color_2,
-                    'markersize': 8,
-                    'markeredgewidth': 2}
-                # Delete all plotted hyper volumes
-                self.ax[1].clear()
-                self.ax[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
-                self.ax[1].grid(True)
-                self.ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
+                if 'plot_data' in received_data.keys():
+                    _x1, _y1, _x2y2 = received_data['plot_data']
+                    _x2, _y2 = zip(*_x2y2.items())
+                    print('[GUI] Received plotting data')
 
-                # Plot and scatter received data
-                self.ax[0].plot(_x1, _y1, **_plot_options)
-                for _generation, _hv, _line in zip(_x2, _y2, self.ax[0].lines):
-                    self.ax[1].scatter(_generation, _hv, marker=_line.get_marker(), c=[_line.get_markerfacecolor()],
-                                       edgecolors=_line.get_markeredgecolor(), s=_line.get_markersize() ** 2,
-                                       linewidth=_line.get_markeredgewidth())
-                self.bar.draw()
+                    # Randomize plotting options to make data more noticeable
+                    _color_1, _color_2 = np.random.rand(3, ), np.random.rand(3, )
+                    _plot_options = {
+                        'marker': np.random.choice(
+                            ('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')),
+                        'color': _color_1,
+                        'markeredgecolor': _color_1,
+                        'markerfacecolor': _color_2,
+                        'markersize': MARKER_SIZE,
+                        'markeredgewidth': MARKER_EDGE_WIDTH}
+                    # Delete all plotted hyper volumes
+                    self.ax[1].clear()
+                    self.ax[1].set(title='Hyper Volume by Generation', xlabel='Generation', ylabel='Hyper volume')
+                    self.ax[1].grid(True)
+                    self.ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
+
+                    # Plot and scatter received data
+                    self.ax[0].plot(_x1, _y1, **_plot_options)
+                    for _generation, _hv, _line in zip(_x2, _y2, self.ax[0].lines):
+                        self.ax[1].scatter(_generation, _hv, marker=_line.get_marker(), c=[_line.get_markerfacecolor()],
+                                           edgecolors=_line.get_markeredgecolor(), s=_line.get_markersize() ** 2,
+                                           linewidth=_line.get_markeredgewidth())
+                    self.bar.draw()
             except Exception as error_message:
                 print('[GUI] An plotting error occurred:', error_message)
         self.root.after(int(1000 / self.polling_rate), self.update_canvas)
@@ -210,9 +224,9 @@ class App:  # GUI class
             else:
                 _entry_frame = tk.Frame(self.right_frame, width=LEFT_WIDTH - 2 * PADX,
                                         height=HEIGHT / len(asdict(Parameters()).keys()) - PADY)
-                _label = tk.Label(_entry_frame, width=25, text=translator(dictionary=translate_dictionary,
+                _label = tk.Label(_entry_frame, width=LABEL_WIDTH, text=translator(dictionary=translate_dictionary,
                                                                           s=key, flip=False), anchor='w')
-                _entry = tk.Entry(_entry_frame, width=25, textvariable=self.string_vars[row_idx])
+                _entry = tk.Entry(_entry_frame, width=LABEL_WIDTH, textvariable=self.string_vars[row_idx])
                 _entry_frame.grid(row=row_idx, column=0)
                 _label.grid(row=0, column=0)
                 _entry.grid(row=0, column=1)
@@ -223,6 +237,9 @@ class App:  # GUI class
         self.submit_btn.grid(row=len(asdict(Parameters()).keys()) + 1)
         self.exit_btn.grid(row=len(asdict(Parameters()).keys()) + 2)
         self.set_default_btn.grid(row=len(asdict(Parameters()).keys()) + 3)
+        empty_label2 = tk.Label(self.right_frame)
+        empty_label2.grid(row=len(asdict(Parameters()).keys())+4)
+        self.log_frame.grid(row=len(asdict(Parameters()).keys()) + 5)
 
         if loaded:
             for params_idx, (key, value) in enumerate(loaded.items()):
@@ -281,7 +298,7 @@ class Visualizer:
 
         # Plot data onto GUI
         if self.conn_to_gui is not None:
-            self.conn_to_gui.send((pareto_1_sorted, pareto_2_sorted, _all_hv))
+            self.conn_to_gui.send({'plot_data': (pareto_1_sorted, pareto_2_sorted, _all_hv)})
         else:
             color_1 = np.random.rand(3, )
             color_2 = np.random.rand(3, )
@@ -315,6 +332,16 @@ class Visualizer:
         self.plot(gen_num=gen,
                   pareto_1_sorted=next_parent_pareto_indices[:, 0], pareto_2_sorted=next_parent_pareto_indices[:, 1],
                   use_manual_rp=use_manual_rp, ref_x=ref_x, ref_y=ref_y)
+
+
+class LogFrame(tk.Frame):
+    def __init__(self, *args, **kwargs):
+        tk.Frame.__init__(self, *args, **kwargs)
+        self.text = tk.Text(self, width=LOG_TEXT_WIDTH, height=LOG_TEXT_HEIGHT)
+        self.vsb = tk.Scrollbar(self, orient="vertical", command=self.text.yview)
+        self.text.configure(yscrollcommand=self.vsb.set)
+        self.vsb.pack(side="right", fill="y")
+        self.text.pack(side="left", fill="both", expand=True)
 
 
 def atoi(s: str) -> Union[str, int, float]:
