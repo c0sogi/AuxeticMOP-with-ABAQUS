@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Release 1.0.0">
-      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0-py3-none-any.whl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/auxeticmop-1.0.0.tar.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="60b05c53-f26c-48d7-ae07-de1d6b305148" name="Changes" comment="Release 1.0.2">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auxeticmop.egg-info/PKG-INFO" beforeDir="false" afterPath="$PROJECT_DIR$/auxeticmop.egg-info/PKG-INFO" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +22,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="beta" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -71,7 +66,7 @@
       <recent name="C:\Users\dcas\PythonCodes\Coop\pythoncode\22-12-31" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.setup">
+  <component name="RunManager" selected="Python.full_scripts (1)">
     <configuration name="Network" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AuxeticMOP" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -261,8 +256,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.setup" />
         <item itemvalue="Python.full_scripts (1)" />
+        <item itemvalue="Python.setup" />
         <item itemvalue="Python.test3" />
         <item itemvalue="Python.full_scripts" />
         <item itemvalue="Python.Network" />
@@ -421,7 +416,21 @@
       <option name="project" value="LOCAL" />
       <updated>1674893166057</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Release 1.0.0">
+      <created>1675066285004</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1675066285004</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Release 1.0.2">
+      <created>1675066487252</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1675066487252</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -473,6 +482,7 @@
     <MESSAGE value="Added sample scripts" />
     <MESSAGE value="Organized main.py" />
     <MESSAGE value="Release 1.0.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="Release 1.0.0" />
+    <MESSAGE value="Release 1.0.2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Release 1.0.2" />
   </component>
 </project>

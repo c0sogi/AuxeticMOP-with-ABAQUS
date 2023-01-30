@@ -1,12 +1,10 @@
 from dataclasses import dataclass
-import numpy as np
 from typing import Union
 
 
 @dataclass  # Use @dataclass(kw_only=True) for Python version >= 3.10
 class Parameters:
-    abaqus_mode: str = 'script'  # noGUI: without abaqus gui, script: with abaqus gui
-    # mode: str = 'GA'  # GA mode
+    # ** Required  ** #
     evaluation_version: str = 'ver5'  # fitness value evaluation mode
     end_pop: int = 10  # Last population number
     end_gen: int = 50  # Last generation number
@@ -15,30 +13,27 @@ class Parameters:
     lx: int = 5  # Number of voxels in x-direction
     ly: int = 5  # Number of voxels in y-direction
     lz: int = 5  # Number of voxels in z-direction
-    divide_number: int = 1  # up-scaling factor
     mesh_size: float = 1.0  # abaqus meshing option
     dis_y: float = -0.005  # abaqus boundary condition option
-    material_modulus: float = 1100  # abaqus material property option
-    # poisson_ratio: float = 0.4  # abaqus material property option
-    # density: float = 1  # abaqus material property option
-    penalty_coefficient: float = 0.1  # fitness value evaluation option
-    # sigma: float = 1  # filtering option
-    # threshold: float = 0.5  # filtering option
     n_cpus: int = 1  # abaqus option
     n_gpus: int = 0  # abaqus option
+    # ** Optional  ** #
+    penalty_coefficient: float = 0.1  # fitness value evaluation option
+    material_modulus: float = 1100  # abaqus material property option
+    # divide_number: int = 1  # up-scaling factor
 
     def post_initialize(self):  # call this method to set initial values to real value to be used
-        self.lx *= self.divide_number
-        self.ly *= self.divide_number
-        self.lz *= self.divide_number  # number of voxels after increasing resolution
-        self.unit_l /= self.divide_number
+        # self.lx *= self.divide_number
+        # self.ly *= self.divide_number
+        # self.lz *= self.divide_number  # number of voxels after increasing resolution
+        # self.unit_l /= self.divide_number
         self.mesh_size *= self.unit_l
         self.dis_y *= self.ly * self.unit_l  # boundary condition (displacement)
 
 
 @dataclass
 class JsonFormat:
-    start_topology_from: Union[int, None]
+    start_topology_from: int
     topologies_file_name: str
     topologies_key: str
     exit_abaqus: bool
@@ -49,11 +44,18 @@ class GuiParameters:
     parameter_file_name: str = '_PARAMETERS_'
     padx: int = 5  # Padding width
     pady: int = 5  # Padding height
-    left_width: int = 1400  # default width: 400
-    right_width: int = 400
+    left_width: int = 1200  # default width: 400
+    right_width: int = 500
     height: int = 750
     button_width: int = 15
     polling_rate: float = 10.0
+    log_text_width: int = 60
+    log_text_height: int = 20
+    dpi: int = 100
+    set_path_display_width: int = 50
+    marker_edge_width: int = 2
+    marker_size: int = 8
+    label_width: int = 25
     title: str = 'Abaqus-Python Unified Control Interface'
 
 
@@ -76,12 +78,14 @@ material_property_definitions = {
     'engineering_constants': (1500, 1200, 1500, 0.35, 0.35, 0.35, 450, 550, 450)
 }
 
+"""
 exported_field_outputs_format = {
     'displacement': {'xMax': np.ndarray, 'yMax': np.ndarray, 'zMax': np.ndarray},
     'rotation': np.ndarray,
     'reaction_force': np.ndarray,
     'mises_stress': {'max': float, 'min': float, 'average': float}
 }
+"""
 
 fitness_definitions = {
     'ver1': FitnessDefinitions(
@@ -103,8 +107,8 @@ fitness_definitions = {
     'ver2': FitnessDefinitions(
         vars_definitions={
             'rf22': ('reaction_force', 2),
-            'max_rf22': '$max_rf22',  # The prefix @ means this is variable is from Parameters
-            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'max_rf22': '$max_rf22',
+            'total_voxels': '$total_voxels',
             'lx': '@lx',
             'ly': '@ly',
             'lz': '@lz'
@@ -118,8 +122,8 @@ fitness_definitions = {
             'dis11': ('displacement', 'xMax', 0),
             'dis22': ('displacement', 'yMax', 1),
             'dis33': ('displacement', 'zMax', 2),
-            'k': '@penalty_coefficient',  # The prefix @ means this is variable is from Parameters
-            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
+            'k': '@penalty_coefficient',
+            'total_voxels': '$total_voxels',
             'lx': '@lx',
             'ly': '@ly',
             'lz': '@lz'
@@ -131,8 +135,8 @@ fitness_definitions = {
     'ver4': FitnessDefinitions(
         vars_definitions={
             'max_mises': ('mises_stress', 'max'),
-            'total_voxels': '$total_voxels',  # The prefix $ means this is predefined variable
-            'lx': '@lx',  # The prefix @ means this is variable is from Parameters
+            'total_voxels': '$total_voxels',
+            'lx': '@lx',
             'ly': '@ly',
             'lz': '@lz'
         },

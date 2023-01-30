@@ -5,6 +5,7 @@ import os
 import pickle
 import struct
 import multiprocessing as mp
+import inspect
 from multiprocessing import connection
 from datetime import datetime
 from time import sleep
@@ -18,6 +19,11 @@ except ImportError:
 
 class Server:
     def __init__(self, host, port, option, run_nonblocking):
+        parent_frame = inspect.stack()[1][0]
+        parent_frame_name = inspect.getmodule(parent_frame).__name__
+        if parent_frame_name != '__main__':
+            raise SystemExit(f'[Error] Server is not created within conditional block if __name__=="__main__".'
+                             f' Use conditional block!')
         self.host = host
         self.port = port
         self.option = option
@@ -60,7 +66,6 @@ class Server:
             print('Sending packets: ', serialized_data)
             client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
             client_socket.sendall(serialized_data)
-            print('[{}] A data sent'.format(datetime.now()))
             return True
         except ConnectionError as e:
             print(e)
@@ -132,9 +137,9 @@ class Client:
             serialized_data = json.dumps(data).encode()
         while True:
             try:
+                print('Sending packets: ', serialized_data)
                 self.client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
                 self.client_socket.sendall(serialized_data)
-                print('[{}] A data sent'.format(datetime.now()))
                 break
             except Exception as send_error:
                 print('Sending data failed, trying to reconnect to server: ', send_error)
@@ -192,7 +197,7 @@ def make_and_start_process(target: any, duplex: bool = True,
     return process, conn_1, conn_2
 
 
-def start_abaqus_cae(option: str) -> mp.Process:
+def start_abaqus_cae() -> mp.Process:
     """
     Open an abaqus CAE process
     :param option: 'noGUI' for abaqus non-gui mode, 'script' for abaqus gui mode.
@@ -200,14 +205,15 @@ def start_abaqus_cae(option: str) -> mp.Process:
     """
     print(f"========== Opening ABAQUS on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
     script_path = os.path.join(os.path.dirname(__file__), 'AbaqusScripts.py')
-    process = mp.Process(target=os.system, args=(f'abaqus cae {option}={script_path}',), daemon=True)
+    process = mp.Process(target=os.system, args=(f'abaqus cae script={script_path}',), daemon=True)
     process.start()  # Start abaqus
     return process
 
 
-def request_abaqus(dict_data: dict, server: Server) -> None:
+def request_abaqus(dict_data: dict, server: Server, conn_to_gui: connection.Connection) -> None:
     """
     Send Json data to ABAQUS
+    :param conn_to_gui: Pipe connection to GUI
     :param dict_data: Dictionary data to send to ABAQUS
     :param server: A server to ABAQUS
     :return: Nothing
@@ -219,15 +225,12 @@ def request_abaqus(dict_data: dict, server: Server) -> None:
     while not is_data_sent:
         is_data_sent = server.send(client_socket=server.connected_clients[-1], data=dict_data)
     print('Waiting for message from ABAQUS ...')
-    message_from_client = server.recv()
-    print(message_from_client)
-    print(f"========== An abaqus job done on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
-
-
-# # This function is for Python2. Checkout ABQ.py
-# def ascii_encode_dict(data):
-#     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
-#     return dict(map(ascii_encode, pair) for pair in data.items())
+    while True:
+        json_data_from_client = server.recv()
+        conn_to_gui.send({'log_message': json_data_from_client['log_message']})
+        if json_data_from_client['end_generation']:
+            break
+    print(f"========== An evolution on ABAQUS is done on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
 
 
 if __name__ == '__main__':

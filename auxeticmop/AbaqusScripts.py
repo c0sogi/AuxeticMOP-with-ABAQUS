@@ -57,9 +57,9 @@ class Client:
             serialized_data = json.dumps(data).encode()
         while True:
             try:
+                print('Sending packets: ', serialized_data)
                 self.client_socket.sendall(struct.pack(self._header_format, len(serialized_data)))
                 self.client_socket.sendall(serialized_data)
-                print('[{}] A data sent'.format(datetime.now()))
                 break
             except Exception as send_error:
                 print('Sending data failed, trying to reconnect to server: ', send_error)
@@ -98,16 +98,6 @@ class Client:
                 break
         self.is_alive = False
         print('<!> Connection dead')
-
-
-class JobLogFrame(tk.Frame):
-    def __init__(self, *args, **kwargs):
-        tk.Frame.__init__(self, *args, **kwargs)
-        self.text = tk.Text(self, height=50, width=100)
-        self.vsb = tk.Scrollbar(self, orient="vertical", command=self.text.yview)
-        self.text.configure(yscrollcommand=self.vsb.set)
-        self.vsb.pack(side="right", fill="y")
-        self.text.pack(side="left", fill="both", expand=True)
 
 
 class MyModel:
@@ -164,6 +154,7 @@ class MyModel:
 
     def assign_section_to_elements_of_part_by_bounding_box(self, part_name, material_name, section_name,
                                                            bound_definition):
+        print('bd:', bound_definition)
         bounded_elements = self.model.parts[part_name].elements.getByBoundingBox(**bound_definition)
         bounded_region = regionToolset.Region(elements=bounded_elements)
         self.model.HomogeneousSolidSection(material=material_name, name=section_name, thickness=None)
@@ -262,25 +253,14 @@ def ascii_encode_dict(data):
     return dict(map(ascii_encode, pair) for pair in data.items())
 
 
-def open_job_log():
-    _root = tk.Tk()
-    _root.title('Abaqus control log')
-    _frame = JobLogFrame(_root)
-    _frame.pack(fill="both", expand=True)
-    _new_thread = threading.Thread(target=_root.mainloop)
-    _new_thread.setDaemon(True)
-    _new_thread.start()
-    return _frame
-
-
-def save_log(message, job_log_frame):
-    _now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-    _message = '[{}] {}\n'.format(_now, message)
-    print(_message)
+def send_log(message, socket_connection, end_generation=False):
+    now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    message_to_send = '[{}] {}\n'.format(now, message)
+    json_data_to_send = {'log_message': message_to_send, 'end_generation': end_generation}
+    print(message_to_send)
     with open('log.txt', mode='a') as f_log:
-        f_log.write(_message)
-    job_log_frame.text.insert('end', _message)
-    job_log_frame.text.see('end')
+        f_log.write(message_to_send)
+    socket_connection.send(json_data_to_send)
 
 
 def dump_pickled_dict_data(file_name, key, to_dump, mode):
@@ -389,9 +369,9 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
                  analysis_mode, material_properties, full, displacement=None):
     topo_arr = quaver_to_full(topo_arr) if full else topo_arr.copy()
     cube_x_voxels, cube_y_voxels, cube_z_voxels = topo_arr.shape
-    cube_x_size = voxel_unit_length * cube_x_voxels
-    cube_y_size = voxel_unit_length * cube_y_voxels
-    cube_z_size = voxel_unit_length * cube_z_voxels
+    cube_x_size = float(voxel_unit_length * cube_x_voxels)
+    cube_y_size = float(voxel_unit_length * cube_y_voxels)
+    cube_z_size = float(voxel_unit_length * cube_z_voxels)
     whole_bound = {'xMin': 0., 'yMin': 0., 'zMin': 0., 'xMax': cube_x_size, 'yMax': cube_y_size, 'zMax': cube_z_size}
     bounds = {option: bound_setter(whole_bound=whole_bound, option=option) for option in whole_bound.keys()}
     rp_coordinates = {'RP-x': (1.05 * cube_x_size, cube_y_size / 2, cube_z_size / 2),
@@ -407,6 +387,7 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
         mm.assign_section_to_elements_of_part_by_bounding_box(part_name=cube_name, material_name=material_name,
                                                               section_name=material_name + '-section',
                                                               bound_definition=whole_bound)
+        mm.root_assembly.regenerate()
         for option, bound in bounds.items():
             mm.create_set_by_bounding_box(instance_name=cube_name + '-1', set_name=option, bound_definition=bound)
         for rp_name, rp_coordinate in rp_coordinates.items():
@@ -437,8 +418,7 @@ def run_analysis(params, model_name, topo_arr, voxel_name, voxel_unit_length, cu
 
 if __name__ == '__main__':
     client = Client(host=HOST, port=PORT, option='json', connect=True)
-    frame = open_job_log()
-    save_log('Connected to {}:{}'.format(PORT, HOST), job_log_frame=frame)
+    send_log('Connected to {}:{}'.format(HOST, PORT), socket_connection=client)
     while True:
         parameters = client.recv()
         parameters = ascii_encode_dict(parameters)
@@ -461,5 +441,6 @@ if __name__ == '__main__':
                          topo_arr=topology, voxel_unit_length=parameters['unit_l'], full=False, params=parameters,
                          material_properties=material_property_definitions, voxel_name='voxel', cube_name='cube',
                          displacement={'u1': 0, 'u2': parameters['dis_y'], 'u3': 0, 'ur1': 0, 'ur2': 0, 'ur3': 0})
-            save_log('Created Job{}-{}.odb'.format(gen_num, entity_num), job_log_frame=frame)
-        client.send('[{}] Generation {} finished!'.format(datetime.now(), gen_num))
+            send_log('Created Job{}-{}.odb'.format(gen_num, entity_num), socket_connection=client)
+        send_log('Generation {} finished!'.format(gen_num),
+                 socket_connection=client, end_generation=True)
