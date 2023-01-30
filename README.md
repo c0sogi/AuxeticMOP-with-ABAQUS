@@ -1,4 +1,5 @@
 # AuxeticMOP-with-ABAQUS `1.0.2b`
+
 ## Purpose
 - Finding metamaterial structure with negative poisson's ratio using ABAQUS and MOP evolutionary algorithm approaches.
 - In addition to structure with negative poisson's ratio, other types of material structure can be created by varying version fitness values definitions.
@@ -17,13 +18,36 @@ interpreter, and maybe the version is `2.7.15`. Other scripts are running on new
 - Non-dominated Sorting Genetic Algorithm(NSGA) is used to validate and assess fitness values of generated topologies.
   + Related contents: `auxeticmop.GeneticAlgorithm`, `auxeticmop.MutateAndValidate`
 
-## Install
+## Example
 
- To install the current release via `PyPI` with Python version `>=3.7` and `<3.11`:
+
+- ### Auxetic cell
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/121936784/215425185-a7d62330-8bec-4650-9079-637cc1dd8575.png"/>
+</p>
+
+>- 10 by 10 by 10 voxels per 1/8 cell.
+>- Negative negative poisson's ratio structure
+
+- ### GUI example
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/121936784/215425207-44187735-cea7-4486-a2b9-bf4683797a53.png"/>
+</p>
+
+>- Building a GUI using `tkinter` and `matplotlib`
+>- Receiving parameter values required for ABAQUS analysis and GA setting from the user
+>- The Pareto optimization solution and hyper volume value calculated from the Main Process
+are input in real time and output as a graph.
+
+## Install
+Before installing this package, you must [ABAQUS CAE](https://edu.3ds.com/en/software/abaqus-learning-edition) must be installed.
+
+ To install the current release via `PyPI` with Python version `>=3.6` and `<3.11`:
 ```shell
 $ pip install auxeticmop
 ```
-... or to install the current release via `anaconda` with Python version `>=3.7` and `<3.11`:
+... or to install the current release via `anaconda` with Python version `>=3.6` and `<3.11`:
 ```shell
 $ conda install -c cosogi auxeticmop
 ```
@@ -84,12 +108,13 @@ Output: ['FitnessDefinitions', 'GuiParameters', 'JsonFormat', 'Parameters', 'Uni
 | ver5                   | (σ<sub>mises</sub>)<sub>max</sub>                    | max(ν <sub>21</sub>, ν <sub>23</sub>) |
 >- `vol_frac`: Volume fraction in cell (0~1)
 >- `k`: penalty coefficient
+>- `k`: penalty coefficient
 
 ---
 ## Required
-- [x] **[Language]** Python, with version `>=3.7 and <3.11`.
+- [x] **[Language]** Python, with version `>=3.6 and <3.11`.
 - Version dependency
   - `numba` for Python `3.11` is not supported yet.
-  - `dataclass` is not supported under Python `3.7`
-- [x] **[External libraries]** `numpy`, `numba`, `scipy`, `matplotlib`, `aiofiles`
+  - `dataclass` is not supported under Python `3.6`
+- [x] **[External libraries]** `numpy`, `numba`, `scipy`, `matplotlib`, `aiofiles`, `dataclasses`
 - [x] **[Other software]** `ABAQUS CAE`
