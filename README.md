@@ -1,4 +1,4 @@
-# AuxeticMOP-with-ABAQUS `1.0.2b`
+# AuxeticMOP-with-ABAQUS `1.0.2`
 
 ## Purpose
 - Finding metamaterial structure with negative poisson's ratio using ABAQUS and MOP evolutionary algorithm approaches.

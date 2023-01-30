@@ -154,7 +154,6 @@ class MyModel:
 
     def assign_section_to_elements_of_part_by_bounding_box(self, part_name, material_name, section_name,
                                                            bound_definition):
-        print('bd:', bound_definition)
         bounded_elements = self.model.parts[part_name].elements.getByBoundingBox(**bound_definition)
         bounded_region = regionToolset.Region(elements=bounded_elements)
         self.model.HomogeneousSolidSection(material=material_name, name=section_name, thickness=None)
