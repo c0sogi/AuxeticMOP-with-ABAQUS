@@ -20,7 +20,7 @@ requirements:
     - numba
     - numpy
     - pip
-    - python
+    - python=3.10
     - scipy
     - dataclasses
   run:
@@ -28,7 +28,7 @@ requirements:
     - matplotlib
     - numba
     - numpy
-    - python
+    - python=3.10
     - scipy
     - dataclasses
 

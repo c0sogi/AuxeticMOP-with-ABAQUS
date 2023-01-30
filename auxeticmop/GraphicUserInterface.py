@@ -225,7 +225,7 @@ class App:  # GUI class
                 _entry_frame = tk.Frame(self.right_frame, width=LEFT_WIDTH - 2 * PADX,
                                         height=HEIGHT / len(asdict(Parameters()).keys()) - PADY)
                 _label = tk.Label(_entry_frame, width=LABEL_WIDTH, text=translator(dictionary=translate_dictionary,
-                                                                          s=key, flip=False), anchor='w')
+                                                                                   s=key, flip=False), anchor='w')
                 _entry = tk.Entry(_entry_frame, width=LABEL_WIDTH, textvariable=self.string_vars[row_idx])
                 _entry_frame.grid(row=row_idx, column=0)
                 _label.grid(row=0, column=0)
@@ -238,7 +238,7 @@ class App:  # GUI class
         self.exit_btn.grid(row=len(asdict(Parameters()).keys()) + 2)
         self.set_default_btn.grid(row=len(asdict(Parameters()).keys()) + 3)
         empty_label2 = tk.Label(self.right_frame)
-        empty_label2.grid(row=len(asdict(Parameters()).keys())+4)
+        empty_label2.grid(row=len(asdict(Parameters()).keys()) + 4)
         self.log_frame.grid(row=len(asdict(Parameters()).keys()) + 5)
 
         if loaded:
@@ -367,4 +367,4 @@ def translator(dictionary: dict, s: str, flip: bool = False) -> str:
 def plot_previously_plotted_data(visualizer: Visualizer, params: Parameters):
     file_numbers = get_sorted_file_numbers_from_pattern(r'FieldOutput_\d+')
     for file_number in file_numbers:
-        visualizer.visualize(gen=file_number-1, params=params, use_manual_rp=False)
+        visualizer.visualize(gen=file_number - 1, params=params, use_manual_rp=False)

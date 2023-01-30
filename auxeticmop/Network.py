@@ -5,7 +5,7 @@ import os
 import pickle
 import struct
 import multiprocessing as mp
-import inspect
+import warnings
 from multiprocessing import connection
 from datetime import datetime
 from time import sleep
@@ -19,18 +19,17 @@ except ImportError:
 
 class Server:
     def __init__(self, host, port, option, run_nonblocking):
-        parent_frame = inspect.stack()[1][0]
-        parent_frame_name = inspect.getmodule(parent_frame).__name__
-        if parent_frame_name != '__main__':
-            raise SystemExit(f'[Error] Server is not created within conditional block if __name__=="__main__".'
-                             f' Use conditional block!')
         self.host = host
         self.port = port
         self.option = option
         self.q = Queue()
         self.connected_clients = list()
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((self.host, self.port))
+        try:
+            self.server_socket.bind((self.host, self.port))
+        except Exception as e:
+            warnings.warn('Multiple server on same port cannot be bound. If not, Server might not be created within conditional block [if __name__=="__main__"]')
+            raise SystemExit(e)
         self.server_socket.listen(5)
         self._default_packet_size = 1024
         self._header_format = '>I'
@@ -200,7 +199,6 @@ def make_and_start_process(target: any, duplex: bool = True,
 def start_abaqus_cae() -> mp.Process:
     """
     Open an abaqus CAE process
-    :param option: 'noGUI' for abaqus non-gui mode, 'script' for abaqus gui mode.
     :return: Abaqus process.
     """
     print(f"========== Opening ABAQUS on {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}! ==========")
