@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-import numpy as np
 from typing import Union
 
 
 @dataclass  # Use @dataclass(kw_only=True) for Python version >= 3.10
 class Parameters:
-    abaqus_mode: str = 'script'  # noGUI: without abaqus gui, script: with abaqus gui
+    # ** Required  ** #
     evaluation_version: str = 'ver5'  # fitness value evaluation mode
     end_pop: int = 10  # Last population number
     end_gen: int = 50  # Last generation number
@@ -14,19 +13,20 @@ class Parameters:
     lx: int = 5  # Number of voxels in x-direction
     ly: int = 5  # Number of voxels in y-direction
     lz: int = 5  # Number of voxels in z-direction
-    divide_number: int = 1  # up-scaling factor
     mesh_size: float = 1.0  # abaqus meshing option
     dis_y: float = -0.005  # abaqus boundary condition option
-    material_modulus: float = 1100  # abaqus material property option
-    penalty_coefficient: float = 0.1  # fitness value evaluation option
     n_cpus: int = 1  # abaqus option
     n_gpus: int = 0  # abaqus option
+    # ** Optional  ** #
+    penalty_coefficient: float = 0.1  # fitness value evaluation option
+    material_modulus: float = 1100  # abaqus material property option
+    # divide_number: int = 1  # up-scaling factor
 
     def post_initialize(self):  # call this method to set initial values to real value to be used
-        self.lx *= self.divide_number
-        self.ly *= self.divide_number
-        self.lz *= self.divide_number  # number of voxels after increasing resolution
-        self.unit_l /= self.divide_number
+        # self.lx *= self.divide_number
+        # self.ly *= self.divide_number
+        # self.lz *= self.divide_number  # number of voxels after increasing resolution
+        # self.unit_l /= self.divide_number
         self.mesh_size *= self.unit_l
         self.dis_y *= self.ly * self.unit_l  # boundary condition (displacement)
 
@@ -44,11 +44,18 @@ class GuiParameters:
     parameter_file_name: str = '_PARAMETERS_'
     padx: int = 5  # Padding width
     pady: int = 5  # Padding height
-    left_width: int = 1400  # default width: 400
-    right_width: int = 400
+    left_width: int = 1200  # default width: 400
+    right_width: int = 500
     height: int = 750
     button_width: int = 15
     polling_rate: float = 10.0
+    log_text_width: int = 60
+    log_text_height: int = 20
+    dpi: int = 100
+    set_path_display_width: int = 50
+    marker_edge_width: int = 2
+    marker_size: int = 8
+    label_width: int = 25
     title: str = 'Abaqus-Python Unified Control Interface'
 
 

@@ -34,7 +34,7 @@ class NSGAModel:
                                           topologies_file_name=f'Topologies_{gen}', exit_abaqus=False))
             json_data.update(asdict(self.params))
             json_data.update(self.material_properties)
-            request_abaqus(dict_data=json_data, server=server)
+            request_abaqus(dict_data=json_data, server=server, conn_to_gui=self.visualizer.conn_to_gui)
             parent_results = pickle_io(f'FieldOutput_offspring_{gen}', mode='r')
             remove_file(f'FieldOutput_offspring_{gen}')
             pickle_io(f'FieldOutput_{gen}', mode='w', to_dump=parent_results)
@@ -73,7 +73,7 @@ class NSGAModel:
                                       topologies_file_name=f'Topologies_{running_gen}', exit_abaqus=False))
         json_data.update(asdict(self.params))
         json_data.update(self.material_properties)
-        request_abaqus(dict_data=json_data, server=server)
+        request_abaqus(dict_data=json_data, server=server, conn_to_gui=self.visualizer.conn_to_gui)
         offspring_results = pickle_io(f'FieldOutput_offspring_{running_gen}', mode='r')
         all_topologies = np.vstack((parent_topologies, offspring_topologies))
         all_results = parent_results.copy()
@@ -97,7 +97,7 @@ class NSGAModel:
         for gen in range(start_gen, self.params.end_gen):
             self.evolve_a_generation(running_gen=gen, start_offspring_from=start_offspring, server=server)
             start_offspring = 1
-        request_abaqus(dict_data={'exit_abaqus': True}, server=server)
+        request_abaqus(dict_data={'exit_abaqus': True}, server=server, conn_to_gui=self.visualizer.conn_to_gui)
 
 
 def find_where_same_array_locates(arr_to_find: np.ndarray, big_arr: np.ndarray) -> np.ndarray:

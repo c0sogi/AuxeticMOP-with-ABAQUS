@@ -137,11 +137,13 @@ async def pickles_aio(file_names: Union[list, tuple], mode: str, to_dumps=None, 
 
 
 def pickle_io(file_name: str, mode: str, to_dump: object = None) -> any:
-    return asyncio.run(pickle_aio(file_name=file_name, mode=mode, to_dump=to_dump))
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(pickle_aio(file_name=file_name, mode=mode, to_dump=to_dump))
 
 
 def pickles_io(file_names: Union[list, tuple], mode: str, to_dumps=None, key_option=None) -> dict:
-    return asyncio.run(pickles_aio(file_names=file_names, mode=mode, to_dumps=to_dumps, key_option=key_option))
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(pickles_aio(file_names=file_names, mode=mode, to_dumps=to_dumps, key_option=key_option))
 
 
 # def open_history_output(gen, path=None):

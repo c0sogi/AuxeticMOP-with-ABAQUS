@@ -36,7 +36,7 @@ def run():
     os.chdir(set_path)
 
     # Start ABAQUS
-    abaqus_process = start_abaqus_cae(option=parameters.abaqus_mode)
+    abaqus_process = start_abaqus_cae()
 
     # Load previous plotting data
     visualizer = Visualizer(conn_to_gui=parent_conn)
