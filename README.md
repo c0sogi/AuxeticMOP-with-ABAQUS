@@ -48,6 +48,7 @@ Before installing this package, you must [ABAQUS CAE](https://edu.3ds.com/en/sof
 $ pip install auxeticmop
 ```
 ... or to install the current release via `anaconda` with Python version `>=3.6` and `<3.11`:
+
 ```shell
 $ conda install -c cosogi auxeticmop
 ```
